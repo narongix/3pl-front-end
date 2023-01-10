@@ -71,7 +71,6 @@
         methods:{
             async initData(){
                 this.loadingData = true
-                console.log("prodcuts: "+this.products.length)
                 await this.$store.dispatch("products/onFetchProducts",{
                     offset: 0
                 })

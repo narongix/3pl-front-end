@@ -156,7 +156,7 @@ export default {
 					
 					<Column selectionMode="multiple"></Column>
 
-					<Column field="recipient" header="Reference" style="min-width:12rem" filterMatchMode="contains" :sortable="true">
+					<Column field="id" header="Id" style="min-width:12rem" filterMatchMode="contains" :sortable="true">
 						<template #body="{ data }">
 							<TransferItem :data="data"></TransferItem>
 						</template>
