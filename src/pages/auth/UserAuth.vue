@@ -79,8 +79,9 @@ export default {
             }))
 
             try {
-                await this.$store.dispatch('login', actionPayload);
+                await this.$store.dispatch('auth/login', actionPayload);
             } catch (e) {
+                console.log("REEEEEE")
                 console.log(e);
             }
         }

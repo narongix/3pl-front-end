@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from '../../../router.js';
-import ApiService from "../../../service/api_service.js";
+import ApiService from "../../../service/ApiService.js";
 
 var hosturl = process.env.VUE_APP_API_BASE_URL;
 
