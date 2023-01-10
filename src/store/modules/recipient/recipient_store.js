@@ -61,7 +61,6 @@ export default{
     actions:{
         async getRecipients({ commit, getters }, {offset}){
             const data = await ApiService.getRecipients(offset, getters["getLimit"])
-            console.log(data)
             commit("updateRecipientState", data)
         },
     }

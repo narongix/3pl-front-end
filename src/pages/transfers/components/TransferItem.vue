@@ -1,5 +1,5 @@
 <template>
-    <a @click="pushing" style="cursor: pointer;">{{ data.recipient }}</a>
+    <a @click="pushing" style="cursor: pointer;">{{ data.id }}</a>
 </template>
 <script>
     export default {

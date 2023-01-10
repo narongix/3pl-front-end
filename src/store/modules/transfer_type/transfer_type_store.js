@@ -21,7 +21,6 @@ export default{
                 }else{
                     state.transfer_type[index] = element
                 }
-                console.log(state.transfer_type)
             });
         }
     },

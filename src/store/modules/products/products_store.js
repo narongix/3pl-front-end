@@ -97,13 +97,15 @@ export default{
 
             console.log(params);
             //get local products instead of directly from odoo because of speed
-            await axios.get(hosturl+'/product/list',
+            await axios.get(hosturl+'/product/list?product_name=',
                 {
                     headers: {
                         'Authorization': localStorage.accessToken
                     }
                 }
             ).then(response => {
+
+                console.log("respones: "+JSON.stringify(response.data))
     
                 context.commit('setProducts', {
                     products: response.data

@@ -1,22 +1,14 @@
 <template>
 	<BaseFieldForm  
 	:baseData="baseData" 
-	@onClickSubmit="onFormSubmit" 
+	@onClickSubmit="onFormSubmit"
 	:data="oldData"
 	:FieldNotActive="fieldNotActive"
 	:disabledField="disabledField"
 	>
+		
 		<template #myTop>
-			<Dialog :visible="loadingData" :loading="loadingData" :modal=true :closable='false'>
-				<ProgressSpinner v-if="!error"/>
-				<p v-else>{{ textLoading }}</p>
-				<template #footer>
-					<div v-if="error">
-						<Button label="No" class="p-button-secondary p-button-text" @click="noRetry"></Button>
-						<Button label="Yes" class="p-button-text p-button-sucess" @click="retryLoading"></Button>
-					</div>
-				</template>
-			</Dialog>
+			<RetryField :toLoad="toLoad" :message="message"></RetryField>
 		</template>
 
 		<template #myButton="mySlot">
@@ -24,20 +16,20 @@
 			<Button v-if="!fieldNotActive" label="Save" class="p-button-success mr-2" type="submit" />
 			<Button v-if="!fieldNotActive" label="Discard" class="p-button-secondary mr-2" @click="revertBack(mySlot.myDiscardField)" />	
 		</template>
-</BaseFieldForm>
+	</BaseFieldForm>
 </template>
 
 <script>
 	import BaseFieldForm from './components/BaseFormField.vue';
-	import ProgressSpinner from 'primevue/progressspinner';
+	import RetryField from './components/RetryField.vue';
 
 	export default{
 		async created(){
-			await this.loadData()
+			this.toLoad = this.loadData
 		},
 		components:{
 			BaseFieldForm,
-			ProgressSpinner
+			RetryField
 		},
 		data(){
 			return {
@@ -55,12 +47,15 @@
 					buttonSubmit:"Create Move lines"
                 },
 				fieldNotActive: true,
-				error: false,
 				oldData: null,
-				loadingData: false,
-				textLoading: null,
-				transferDetail: null,	
-				productLoading: false,
+				transferDetail: null,
+
+				toLoad:null,
+				message:{
+					failed: "Error Loading Data. Try again?",
+					yesButton: "Yes",
+					noButton: "No"
+				}
 			}
 		},
 		computed:{
@@ -69,41 +64,25 @@
 			}
 		},
 		methods:{
-			async noRetry(){
-				this.loadingData=false
-			},
-
-			async retryLoading(){
-				await this.loadData()				
-			},
-
 			async loadData(){
-				try{
-					this.loadingData = true
-					
-					await this.$store.dispatch("products/onFetchProducts",{
-						offset: 0
-					}) 
-					await this.$store.dispatch("transferType/getTransferType")
-					await this.$store.dispatch("recipient/getRecipients",{
-						offset: 0
-					})
-					
-					this.transferDetail = await this.getTransferDetail()
+				await this.$store.dispatch("products/onFetchProducts",{
+					offset: 0
+				}) 
+				await this.$store.dispatch("transferType/getTransferType")
+				await this.$store.dispatch("recipient/getRecipients",{
+					offset: 0
+				})
+				
+				this.transferDetail = await this.getTransferDetail()
 
-					//TODO: Change to Enum instead of hard coding transfer type
-					if(this.transferDetail.transfer_type_id == 2){
-						this.transferDetail.contact_id = this.$store.getters["recipient/findRecipientId"](this.transferDetail.recipient)
-					}else{
-						this.transferDetail.contact_id = 0
-					}
-					
-					this.restoreData()
-					this.loadingData = false
-				}catch(e){
-					console.log(e)
-					this.textLoading="Error Loading Data. Try again?"
+				//TODO: Change to Enum instead of hard coding transfer type
+				if(this.transferDetail.transfer_type_id == 2){
+					this.transferDetail.contact_id = this.$store.getters["recipient/findRecipientId"](this.transferDetail.recipient)
+				}else{
+					this.transferDetail.contact_id = 0
 				}
+				
+				this.restoreData()
 			},
 			async getTransferDetail(){
 				const transferDetail = await this.$store.dispatch("transfers/getTransferDetail", {
@@ -113,7 +92,6 @@
 			},
 
 			async onFormSubmit(transfer, created, updated, deleted){
-				console.log("transfer: "+JSON.stringify(transfer))
                 await this.$store.dispatch("transfers/updateTransfer", {
 					recipient: this.$store.getters["recipient/getRecipientFullDetail"](transfer.contact_id),
 					id : transfer.id,
@@ -137,19 +115,7 @@
 
 			restoreData(){
 				this.oldData = {...this.transferDetail}
-			}
+			},
 		},
-
-		watch:{
-			textLoading(newValue){
-				if(newValue=="Error Loading Data. Try again?" || newValue == "Error Creating Data."){
-					this.error=true
-				}
-				else{
-					this.error=false
-				}
-			}
-		}
-
 	}
 </script>

@@ -11,7 +11,7 @@ export default{
         let res = await axios.post("/transfer",transfer,ApiConfig.header({
             "Content-Type": "application/json"
         }))
-        return res
+        return res.data
     },
 
     async getTransferDetails(id) {

@@ -61,6 +61,7 @@ export default{
 
         async createTransfers({commit}, { tempTransfer }){
             const newTransfer = await ApiService.createTransfer(tempTransfer)
+            console.log("newTransfser: "+JSON.stringify(newTransfer))
             commit("updateTransferState", [newTransfer])
         },
 

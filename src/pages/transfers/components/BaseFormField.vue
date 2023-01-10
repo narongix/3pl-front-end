@@ -48,7 +48,7 @@
                             :options="tempReceipientList" optionLabel="full_name" 
                             :class="{'p-invalid': validationField1.contact_id.value}" 
                             placeholder="Please select a recipient" 
-                            optionValue="contact_id" :selectOnFocus="true" :filter="true"
+                            optionValue="contact_id" :selectOnFocus="true" :filter="true" @blur="stopLoadingRecipient"
                             :virtualScrollerOptions="{lazy:true, onLazyLoad: onloadRecipient, showLoader:true, loading: recipientLoading, itemSize: 38}">
 
                                 <template #emptyfilter>
@@ -109,7 +109,7 @@
                 :class="{'p-invalid': validationField2.product_id.value}" 
                 placeholder="Please select a product" 
                 optionValue="product_id" optionLabel="product_name" :filter="true" 
-                :selectOnFocus="true" @filter="onFilter" 
+                :selectOnFocus="true" @filter="onFilter" @blur="stopLoadingProduct"
                 :virtualScrollerOptions="{lazy:true, onLazyLoad: onLoadProduct, showLoader:true, loading: productLoading, itemSize:38}">
 
                 <template #emptyfilter>
@@ -161,9 +161,6 @@ import { mapGetters } from 'vuex'
     import StringFunction from '../../../components/utils/StringFunction'
 
     export default{
-        created(){
-            console.log("treeee: "+JSON.stringify(this.getProducts))
-        },
         props:{
             baseData: Object,
             FieldNotActive: Boolean,
@@ -321,7 +318,6 @@ import { mapGetters } from 'vuex'
             }),
 
             getProductLength(){
-                console.log("this.getProducts.length: "+JSON.stringify(this.getProducts.length))
                 return this.getProducts.length
             },
 
@@ -501,7 +497,6 @@ import { mapGetters } from 'vuex'
 
             onFilter(event){
                 this.filterValue=event.value
-                console.log("filterValue: "+this.filterValue)
             },
 
             getTransferTypeName(slotProps){
@@ -509,40 +504,53 @@ import { mapGetters } from 'vuex'
             },
 
             async onloadRecipient(event){
-                if(event.last>this.trackPaginationRecipient){
-                    // TODO: this pagination only accounts for this page, if the recipient already loaded
-                    // there will be be bugs, implement a global offsetRecipient for recipient so it's sync everywhere
-                    this.recipientLoading = true
-                    this.offsetReceipient=this.offsetReceipient+ this.$store.getters["recipient/getLimit"]
+                try{
 
-                    await this.$store.dispatch("recipient/getRecipients",{
-                        offset: this.offsetReceipient
-                    })
+                    if(event.last>this.trackPaginationRecipient){
+                        // TODO: this pagination only accounts for this page, if the recipient already loaded
+                        // there will be be bugs, implement a global offsetRecipient for recipient so it's sync everywhere
+                        this.recipientLoading = true
+                        this.offsetReceipient=this.offsetReceipient+ this.$store.getters["recipient/getLimit"]
 
-                    this.trackPaginationRecipient=event.last
-                    this.recipientLoading = false
+                        await this.$store.dispatch("recipient/getRecipients",{
+                            offset: this.offsetReceipient
+                        })
+
+                        this.trackPaginationRecipient=event.last
+                        this.recipientLoading = false
+                    }
+                }catch(e){
+                    //TODO: Implement Try catch for OnLoadRecipient
+                    console.log(e)
                 }
             },
 
             async onLoadProduct(event){
-                console.log("event: "+JSON.stringify(event))
-                console.log("pages: "+this.trackPaginationProduct)
-                if(event.last>this.trackPaginationProduct){
-                    // TODO: this pagination only accounts for this page, if the product already loaded
-                    // there will be be bugs, implement a global offsetProduct for product so it's sync everywhere
-                    this.productLoading = true
-                    this.offsetProduct = this.offsetProduct + this.$store.getters["products/limit"]
-                    console.log("myOffset: " + this.offsetProduct)
-                    console.log("offsetProduct: "+this.offsetProduct)
-                    
-                    await this.$store.dispatch("products/onFetchProducts", {
-                        offset: this.offsetProduct,
-                    })
-                    
-                    console.log("getProducts: " + this.getProducts.length)
-                    this.trackPaginationProduct=event.last
-                    this.productLoading = false
+                try{
+                    if(event.last>this.trackPaginationProduct){
+                        // TODO: this pagination only accounts for this page, if the product already loaded
+                        // there will be be bugs, implement a global offsetProduct for product so it's sync everywhere
+                        this.productLoading = true
+                        this.offsetProduct = this.offsetProduct + this.$store.getters["products/limit"]
+                        
+                        await this.$store.dispatch("products/onFetchProducts", {
+                            offset: this.offsetProduct,
+                        })
+                        
+                        this.trackPaginationProduct=event.last
+                        this.productLoading = false
+                    }
                 }
+                catch(e){
+                    //TODO: Implement Try Catch for loading product
+                    console.log(e)
+                }
+            },
+            stopLoadingProduct(){
+                this.productLoading=false
+            },
+            stopLoadingRecipient(){
+                this.recipientLoading=false
             },
             findProduct(){
                 this.productLoading = true
@@ -576,7 +584,6 @@ import { mapGetters } from 'vuex'
             },
 
             editedIndex(newValue){
-                console.log("this.transferData.transferProducts[newValue]?.product_id: "+this.transferData.transferProducts[newValue]?.product_id)
                 if(newValue || newValue == 0){
                     this.product_id = this.transferData.transferProducts[newValue].product_id
                     this.demand = this.transferData.transferProducts[newValue].demand
@@ -602,6 +609,7 @@ import { mapGetters } from 'vuex'
             },
 
             filterMessage(newVal){
+                //TODO: Implement Search API
                 console.log("newVal: "+JSON.stringify(newVal))
             },
 
