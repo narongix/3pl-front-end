@@ -230,14 +230,18 @@ export default{
             context.commit('deleteProduct', payload);
         },
 
-        async onFetchProducts({ getters, commit }, {offset}){
-            const products = await ApiService.getProducts(offset, getters["limit"])
+        async onFetchProducts({ getters, commit }, {offset, productName}){
+            const myProductName = productName? productName : ""
+
+            const products = await ApiService.getProducts(offset, getters["limit"], myProductName)
             
             commit("updateProductState", products)
-        },
+            
+            return products
+        }
     },
     getters:{
-        products(state){
+        getProductState(state){
             return state.products;
         },
         hasProducts(state){
@@ -247,7 +251,7 @@ export default{
             return state.prodCategories;
         },
         limit(){
-            return 5
+            return 10
         }
     }
 }

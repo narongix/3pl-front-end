@@ -105,7 +105,7 @@
         },
         computed: {
             products() {
-                return this.$store.getters['products/products'];
+                return this.$store.getters['products/getProductState'];
             },
             isLoading() {
                 return this.loading1;
@@ -138,8 +138,8 @@
             },
             async deleteProduct() {
                 this.deleteProductDialog = false;
-                const actionPayload = {
-                    id: this.product.id,
+                const actionPayload = { 
+                    id: this.product.product_id,
                 };
                 await this.$store.dispatch('products/deleteProduct', actionPayload);
                 this.product = {};

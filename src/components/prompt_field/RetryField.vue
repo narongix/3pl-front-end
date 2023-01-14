@@ -1,11 +1,12 @@
 <template>
-    <Dialog :visible="loading" :loading="loading" :modal="true" :closable='false'>
+    <Dialog :visible="loading" :modal="true" :closable='false'>
         <ProgressSpinner v-if="!textLoading"/>
         <p v-else>{{ textLoading }}</p>
         <template #footer>
             <div v-if="textLoading">
                 <Button :label="message.noButton" class="p-button-secondary p-button-text" @click="noRetry"></Button>
                 <Button :label="message.yesButton" class="p-button-text p-button-sucess" @click="retryLoading" @mousedown="unFocus"></Button>
+                
             </div>
         </template>
     </Dialog>
@@ -20,7 +21,8 @@
         },
         props:{
             toLoad: Function,
-            message: Object
+            message: Object,
+            errorToast: Object
         },
         data(){
             return {
@@ -36,8 +38,13 @@
                     await this.toLoad()
                     this.loading=false
                 }catch(e){
-                    this.textLoading = this.message.error
-                    console.log(e)
+                    this.textLoading = this.message.failed
+                    this.$toast.add(this.toast ?? {
+                        severity: "error",
+                        summary: "Failed",
+                        detail: "Error",
+                        life: 3000
+                    })
                 }
             },
 
@@ -56,7 +63,7 @@
         },
         watch:{
             toLoad:{
-                async handler(newValue){
+                handler: async function (newValue){
                     // if it is not null or not undefined
                     if(newValue){
                         await this.loadData()

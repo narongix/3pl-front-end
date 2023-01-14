@@ -121,7 +121,7 @@ app.use(ToastService);
 app.use(router);
 
 //TODO: Next time use login instead of doing this
-localStorage.accessToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJkNzYyNjExZi0zMzI0LTQxYjktYjA5MC05YmZiMzg2YmY0M2YiLCJpYXQiOjE2NzEwNzgxMzJ9.eS6r33B_trAX6MjpLWfKEA0JMmuYzM-T8SVZpYaayQA"
+localStorage.accessToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJkNzYyNjExZi0zMzI0LTQxYjktYjA5MC05YmZiMzg2YmY0M2YiLCJpYXQiOjE2NzMzMTcyNTN9.sst2wJk368vhQayMxCAzMvfW1r5nAlWpPcgr9FXrNe4"
 
 app.directive('tooltip', Tooltip);
 app.directive('ripple', Ripple);

@@ -10,8 +10,7 @@
                     <p></p>
 
                     <div class="p-fluid formgrid grid">
-                        <!-- <Dropdown :options="rise" v-model="ree" :virtualScrollerOptions="{lazy:true, onLazyLoad: testtt, showLoader:true, loading: false}"></Dropdown> -->
-                        
+            
                         <div class="field col-12 md:col-3 sm:col-12">
                             <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
                             <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']" id="scheduleDate" v-model="transferData.scheduledDate" :showTime="true" hourFormat="12" showButtonbar="true"/>
@@ -19,43 +18,30 @@
                         </div>
 
                         <div class="field col-12 md:col-3 sm:col-12">
-                            
                             <label for="transfer_type_id" :class="{'p-error': validationField1.transfer_type_id.value}">Transfer Type</label>
                             <Dropdown :disabled="FieldNotActive || disabledField['transfer_type_id']" 
                             id="transfer_type_id" v-model="transferData.transfer_type_id" 
                             :options="transfer_type" :optionLabel="getTransferTypeName" 
                             :class="{'p-invalid': validationField1.transfer_type_id.value}" 
                             :placeholder="transferLoading? 'Loading' : 'Please select a transfer'" 
-                            :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="true" 
-                            :filterMessage="filterMessage">
-                            <!-- <template #value="slotProps" >
-                                <p v-if="slotProps.value">{{ getDisplayText(slotProps) }}</p>
-                                
-                                <p v-else>{{ slotProps.placeholder }}</p>
-                            </template>
-                            <template #option="slotProps">
-                                <p>{{ getDisplayText(slotProps) }}</p>
-                            </template> -->
+                            :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="true">
+                            
                         </Dropdown>
                             <small id="transfer_type_id-help" class="p-error" v-if="validationField1.transfer_type_id.value">Cannot be Empty</small>
                         </div>
 
                         <div v-if="showRecipientField" class="field col-12 md:col-3 sm:col-12">
                             <label for="recipient" :class="{'p-error': validationField1.contact_id.value}">Recipient</label>
-                            
-                            <Dropdown :disabled="FieldNotActive || disabledField['recipient']" 
-                            id="recipient" v-model="transferData.contact_id" 
-                            :options="tempReceipientList" optionLabel="full_name" 
-                            :class="{'p-invalid': validationField1.contact_id.value}" 
-                            placeholder="Please select a recipient" 
-                            optionValue="contact_id" :selectOnFocus="true" :filter="true" @blur="stopLoadingRecipient"
-                            :virtualScrollerOptions="{lazy:true, onLazyLoad: onloadRecipient, showLoader:true, loading: recipientLoading, itemSize: 38}">
-
-                                <template #emptyfilter>
-                                    <p :onload="findRecipient()">No Result Found!</p>
-                                </template>
-                            </Dropdown>
-                            <!-- <InputText :disabled="FieldNotActive || disabledField['recipient']" id="recipient=" type="text" v-model="transferData.recipient"></InputText> -->
+                            <DropDownPagination @onChanged="onReceipientChanged" :options="getRecipientsState" optionLabel="full_name" optionValue="contact_id"
+                            :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient" 
+                            :validation="validationField1.contact_id.value"
+                            :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
+                            :maxLength="getRecipientLength" 
+                            :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"  
+                            :SelectedValue="transferData.contact_id"
+                            >
+                                
+                            </DropDownPagination>
                             <small id="recipient-help" class="p-error" v-if="validationField1.contact_id.value">Cannot be Empty</small>
                         </div>
                     </div>
@@ -75,7 +61,7 @@
             <div class="col-12 md:col-12 sm:col-12">
                 <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
                 <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="promptEditField"
-                :paginator="true" class="p-datatable-gridlines" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll">
+                :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll">
                     <template #empty>
                         <p :class="{'p-error': validationField1.transferProducts.value}">Please create transfer detail</p>
                     </template>
@@ -99,30 +85,20 @@
         </div>
     </div>
 
-    <Dialog v-model:visible="promptCreateField" :style="{width: '450px'}" header="Create New Product" :modal=true>
+    <Dialog v-model:visible="promptCreateField" :style="{width: '450px'}" header="Select New Product" :modal=true>
         <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-12 sm:col-12">
-                <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product Id</label>
-                <Dropdown :disabled="FieldNotActive" 
-                id="product_id" v-model="product_id" 
-                :options="tempProductList"
-                :class="{'p-invalid': validationField2.product_id.value}" 
-                placeholder="Please select a product" 
-                optionValue="product_id" optionLabel="product_name" :filter="true" 
-                :selectOnFocus="true" @filter="onFilter" @blur="stopLoadingProduct"
-                :virtualScrollerOptions="{lazy:true, onLazyLoad: onLoadProduct, showLoader:true, loading: productLoading, itemSize:38}">
-
-                <template #emptyfilter>
-                    <p :onload="findProduct()">No Result Found!</p>
-                </template>
-
-                <template v-slot:loader="{ options }">
-                    <div class="flex align-items-center p-2" style="height: 38px" >
-                        <Skeleton :width="options.even ? '60%' : '50%'" />
-                    </div>
-                </template>
-
-                </Dropdown>
+                <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
+                <DropDownPagination @onChanged="onProductChanged" :options="getProducts" optionLabel="product_name" optionValue="product_id"
+                :disabled="FieldNotActive" id="product_id" placeholder="Please select a product" 
+                :validation="validationField2.product_id.value"
+                :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
+                :maxLength="getProductLength"
+                :errorToastLoading="errorToastLoadingProducts" :messageLoad="messageLoadProducts"
+                :SelectedValue="product_id"
+                >
+                    
+                </DropDownPagination>
                 <small id="product_id-help" class="p-error" v-if="validationField2.product_id.value!=null">{{ validationField2.product_id.value }}</small>
             </div>
             <div class="field col-12 md:col-12 sm:col-12">
@@ -131,6 +107,7 @@
                 <small id="demand-help" class="p-error" v-if="validationField2.demand.value!=null">{{ validationField2.demand.value }}</small>
             </div>
         </div>
+
         <template #footer>
             <Button label="Discard" class="p-button-secondary p-button-text" @click="changeStateDiaglog"></Button>
             <Button v-if="editedIndex!=null" :disabled="productLoading" label="Udate" class="p-button-text" @click="updateField"></Button>
@@ -138,16 +115,7 @@
         </template>
     </Dialog>
 
-    <Dialog v-model:visible="promptDeleted" :style="{width: '450px'}" header='Confirm' :modal=true>
-        <div class="flex align-items-center justify-content-center">
-            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"/>
-            <span>Are you sure you want to delete this transfer product?</span>
-        </div>
-        <template #footer>
-            <Button label="No" icon="pi pi-times" class="p-button-text" @click="changeDeletedStateDialog"/>
-            <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="onConfirmDeletedPrompt"></Button>
-        </template>
-    </Dialog>
+    <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="changeDeletedStateDialog" :message="messageDeletePrompt"/>
 </template>
 
 <style scoped>
@@ -157,8 +125,11 @@
 </style>
 
 <script>
-import { mapGetters } from 'vuex'
+    import { mapGetters } from 'vuex'
+
     import StringFunction from '../../../components/utils/StringFunction'
+    import DropDownPagination from './DropDownPagination.vue';
+    import PromptField from '../../../components/prompt_field/PromptField.vue';
 
     export default{
         props:{
@@ -166,13 +137,22 @@ import { mapGetters } from 'vuex'
             FieldNotActive: Boolean,
             data: Object,
             disabledField: Object,
-            // productLoading: Boolean,
         },
         
         emits:["onClickSubmit"],
+        components:{
+            DropDownPagination,
+            PromptField
+        },
 
         data(){
             return {
+                messageDeletePrompt:{
+                    decline: "No",
+                    accept: "Yes",
+                    prompt: null
+                },
+
                 promptCreateField: false,
                 promptDeleted:false,
 
@@ -191,8 +171,6 @@ import { mapGetters } from 'vuex'
                 demand: null,
 
                 showRecipientField:false,
-
-                filterMessage: null,
 
                 transferData:{
                     scheduledDate: null,
@@ -304,21 +282,53 @@ import { mapGetters } from 'vuex'
                 transferLoading: false,
                 recipientLoading:false,
 
-                filterValue: null,
-                rise:[1,2],
-                ree:null
+                filterValue: null, 
+                countdown: 2,
+                countdownTracker: null,
+
+
+                messageLoadRecipient:{
+                    failed: "Error loading Recipient, retry?",
+                    yesButton: "Yes",
+                    noButton: "No",
+                
+                },
+
+                errorToastLoadingRecipient:{
+                    severity:"error",
+                    summary: "Error!",
+                    detail: "Failed Loading Recipient!"
+                },
+
+                messageLoadProducts:{
+                    failed: "Error loading Products, retry?",
+                    yesButton: "Yes",
+                    noButton: "No",
+                },
+
+                errorToastLoadingProducts:{
+                    severity:"error",
+                    summary: "Error!",
+                    detail: "Failed Loading Products!"
+                }
             }
         },
         computed:{
             ...mapGetters({
-                getProducts: "products/products",
+                getProducts: "products/getProductState",
                 getRecipientsState: "recipient/getRecipientsState",
                 transfer_type: "transferType/getTansferType",
-                user: "auth/user"
+                user: "auth/user",
+                getProductLimit: "products/limit",
+                getRecipientLimit: "recipient/getLimit"
             }),
 
             getProductLength(){
                 return this.getProducts.length
+            },
+
+            getRecipientLength(){
+                return this.getRecipientsState.length
             },
 
             getDisplayTranser(){
@@ -335,7 +345,7 @@ import { mapGetters } from 'vuex'
                 this.transferData={
                     id: this.data?.id,
                     scheduledDate: this.data?.created_at,
-                    recipient: this.data?.recipient,
+                    recipient: this.data?.recipient ?? null,
                     transfer_type_id: this.data?.transfer_type_id,
                     transferProducts: this.data?.transfer_products? [...this.data.transfer_products] : [],
                     contact_id: this.data?.contact_id
@@ -349,15 +359,9 @@ import { mapGetters } from 'vuex'
                 const myIndex = this.getProducts.findIndex((e)=>e.product_id == this.product_id)
                 this.demand = parseInt(this.demand) || ""
 
-               // We do this because it's going to dilute or modify the original temp Product with demand key
-                if(this.editedIndex || this.editedIndex==0){
-                    this.tempMove = {...this.transferData.transferProducts[this.editedIndex]}
-                    this.tempMove.product_id = this.product_id
-                    this.tempMove.product_name = this.getProducts[myIndex].product_name
-                }
-                else{
-                    this.tempMove = this.getProducts[myIndex]
-                }
+                this.tempMove = {...(this.transferData.transferProducts?.[this.editedIndex] ?? this.getProducts[myIndex])}
+                this.tempMove.product_id = this.product_id ?? null
+                this.tempMove.product_name = this.getProducts?.[myIndex]?.product_name ?? null
                 this.tempMove["demand"] = this.demand
             },
 
@@ -429,6 +433,7 @@ import { mapGetters } from 'vuex'
                         product_id: this.product_id,
                         demand: this.demand
                     }
+
                     const UpdateTransfer = {
                         id: this.editedId,
                         updates: transfer
@@ -458,8 +463,9 @@ import { mapGetters } from 'vuex'
             promptEditField(data){
                if(!this.FieldNotActive) {
                     this.editedIndex = data.index
-                    this.product_id = this.transferData.transferProducts[this.editedIndex].product_id
-                    this.demand = this.transferData.transferProducts[this.editedIndex].demand
+                    this.product_id = this.data.product_id
+
+                    this.demand = this.data.demand
                     this.changeStateDiaglog()
                 }
             },
@@ -470,6 +476,8 @@ import { mapGetters } from 'vuex'
 
             onPopUpDeletedPrompt(data){
                 this.editedIndex = data.index
+
+                this.messageDeletePrompt.prompt = `Are you sure you want to delete ${ data.data.product_name ?? 'this' }?`
                 this.changeDeletedStateDialog()
             },
 
@@ -503,64 +511,49 @@ import { mapGetters } from 'vuex'
                 return StringFunction.capitalize(slotProps?.transfer_type_name)
             },
 
-            async onloadRecipient(event){
-                try{
+            async onLoadProductV2(offset){
+                const products = await this.$store.dispatch("products/onFetchProducts", {
+                    offset: offset,
+                })
 
-                    if(event.last>this.trackPaginationRecipient){
-                        // TODO: this pagination only accounts for this page, if the recipient already loaded
-                        // there will be be bugs, implement a global offsetRecipient for recipient so it's sync everywhere
-                        this.recipientLoading = true
-                        this.offsetReceipient=this.offsetReceipient+ this.$store.getters["recipient/getLimit"]
-
-                        await this.$store.dispatch("recipient/getRecipients",{
-                            offset: this.offsetReceipient
-                        })
-
-                        this.trackPaginationRecipient=event.last
-                        this.recipientLoading = false
-                    }
-                }catch(e){
-                    //TODO: Implement Try catch for OnLoadRecipient
-                    console.log(e)
-                }
+                return products.length
             },
 
-            async onLoadProduct(event){
-                try{
-                    if(event.last>this.trackPaginationProduct){
-                        // TODO: this pagination only accounts for this page, if the product already loaded
-                        // there will be be bugs, implement a global offsetProduct for product so it's sync everywhere
-                        this.productLoading = true
-                        this.offsetProduct = this.offsetProduct + this.$store.getters["products/limit"]
-                        
-                        await this.$store.dispatch("products/onFetchProducts", {
-                            offset: this.offsetProduct,
-                        })
-                        
-                        this.trackPaginationProduct=event.last
-                        this.productLoading = false
-                    }
-                }
-                catch(e){
-                    //TODO: Implement Try Catch for loading product
-                    console.log(e)
-                }
+            async onloadRecipientV2(offset){
+                const recipients = await this.$store.dispatch("recipient/getRecipients",{
+                    offset: offset
+                })
+                return recipients.length
             },
+
             stopLoadingProduct(){
                 this.productLoading=false
             },
+
             stopLoadingRecipient(){
                 this.recipientLoading=false
             },
-            findProduct(){
-                this.productLoading = true
-                //TODO: Intergrate search product
-                console.log("riseeee")
+
+            async findProduct(filterValue){ 
+                await this.$store.dispatch("products/onFetchProducts", {
+                    offset: 0,
+                    productName: filterValue
+                })
             },
-            findRecipient(){
-                this.recipientLoading = true
-                //TODO: Intergrate search receipient  
-                console.log("loading")
+
+            async findRecipient(filterValue){
+                await this.$store.dispatch("recipient/getRecipients", {
+                    offset: 0,
+                    searchString: filterValue
+                })
+            },
+
+            onProductChanged(id){
+                this.product_id=id
+            },
+
+            onReceipientChanged(contact_id){
+                this.transferData.contact_id = contact_id
             }
         },
         
@@ -607,27 +600,6 @@ import { mapGetters } from 'vuex'
                     this.showRecipientField = true
                 }
             },
-
-            filterMessage(newVal){
-                //TODO: Implement Search API
-                console.log("newVal: "+JSON.stringify(newVal))
-            },
-
-            getProducts:{
-                handler (newValue){
-                    this.tempProductList=[...newValue]
-                },
-                deep:true,
-                immediate:true
-            },
-
-            getRecipientsState:{
-                handler(newValue){
-                    this.tempReceipientList=[...newValue]
-                },
-                deep:true,
-                immediate:true
-            }
         }
     }
 </script>

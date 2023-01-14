@@ -7,16 +7,7 @@
     :data="{}"
     >
         <template #myTop>
-            <Dialog :visible="loadingData" :modal=true :closable='false'>
-				<ProgressSpinner v-if="loadingData"/>
-				<p v-else>{{ textLoading }}</p>
-				<template #footer>
-					<div v-if="error">
-						<Button label="No" class="p-button-secondary p-button-text" @click="loadingData=!loadingData"></Button>
-						<Button label="Yes" class="p-button-text p-button-sucess" @click="initData"></Button>
-					</div>
-				</template>
-			</Dialog>
+            <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
         </template>    
 
         <template #myButton="mySlot">
@@ -28,19 +19,19 @@
 <script>
     import BaseFieldForm from './components/BaseFormField.vue'
     import myTime from '../../components/utils/TimeConvert.js'
-    import ProgressSpinner from 'primevue/progressspinner'
     import { mapGetters } from 'vuex'
+    import RetryField from '../../components/prompt_field/RetryField.vue'
 
     export default{
         async created(){
-            await this.initData()
+            this.toLoad = this.initData
         },
         
         data(){
             return{
                 baseData:{
                     titleForm: "Add new Transfer",
-                    buttonSubmit: "Create Transfer Product"
+                    buttonSubmit: "Add Transfer detail"
                 },
                 disabledField:{
                     scheduleDate:false,
@@ -51,26 +42,35 @@
 					destination: false
                 },
                 FieldNotActive: false,
-                loadingData:false,
-                error:false,
-                textLoading: null,
+
+                toLoad:null,
+				message:{
+					failed: "Error Loading Data. Try again?",
+					yesButton: "Yes",
+					noButton: "No"
+				},
+                errorToast:{
+                    severity: "error",
+                    summary: "Failed",
+                    detail: "Error Creating Transfer",
+                    life: 3000
+                }
             }
         },
 
         components:{
             BaseFieldForm,
-            ProgressSpinner
+            RetryField
         },
 
         computed:{
             ...mapGetters({
-                products: "products/products"
+                products: "products/getProductState"
             })
         },
         
         methods:{
             async initData(){
-                this.loadingData = true
                 await this.$store.dispatch("products/onFetchProducts",{
                     offset: 0
                 })
@@ -78,11 +78,13 @@
                 await this.$store.dispatch("recipient/getRecipients", {
                     offset: 0,
                 })
-                this.loadingData = false
             },
 
             async onFormSubmit(transfer){
-                try{
+                // TODO: Implement bold text on Transfer List
+                // When created new data 
+                this.message.failed="Error Creating Data, Retry?"
+                this.toLoad = async ()=>{
                     transfer.scheduledDate=myTime.formatDateFromScheduleDate(transfer.scheduledDate)
                     
                     if(transfer.contact_id!=null){
@@ -90,7 +92,7 @@
                         delete transfer["contact_id"]
                     }
                     else{
-                        transfer.recipient="Recipient"    
+                        transfer.recipient=null    
                     }
 
                     transfer.transferProducts = transfer.transferProducts.map((e)=>{
@@ -99,31 +101,12 @@
                             "demand": e.demand,
                         }
                     })
-                    
-                    this.textLoading=null
-                    this.loadingData=true
-                    await this.$store.dispatch("transfers/createTransfers", {tempTransfer: transfer})                    
-                    this.loadingData=false
-                    this.$router.back()
-                }
 
-                catch(e){
-                    console.log(e)
-                    this.textLoading="Error Creating Data. Try again"
+                    const newTransfer = await this.$store.dispatch("transfers/createTransfers", {tempTransfer: transfer})  
+                    await this.$router.replace({name:"TransferDetail", params:{id: newTransfer.id}})
+                    this.$toast.add({severity:'success', summary: 'Success', detail:'Transfer Created Successfully', life: 3000});
                 }
-                
-            }
+            },
         },
-
-        watch:{
-			textLoading(newValue){
-				if(newValue=="Error Loading Data. Try again?" || newValue == "Error Creating Data."){
-					this.error=true
-				}
-				else{
-					this.error=false
-				}
-			}
-		}
     }
 </script>

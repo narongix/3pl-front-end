@@ -6,7 +6,7 @@ export default {
     props: ['data'],
     computed: {
        productLink() {
-            return this.$route.path + '/' + this.data.id;
+            return this.$route.path + '/' + this.data.product_id;
         }
     }
 }

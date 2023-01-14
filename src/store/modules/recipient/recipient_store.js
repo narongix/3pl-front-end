@@ -17,13 +17,11 @@ export default{
             try{
                 const index = state.recipients.findIndex((e)=> e.contact_id == id)
                 const recipient = state.recipients[index]
-                const fullDetail = `${recipient.full_name } - ${recipient.phone_number}` 
+                const fullDetail = `${recipient.full_name ?? "" } - ${recipient.phone_number ?? ""}` 
                 return fullDetail
             }
-            catch(e){
-                console.log(e)
-                const recipient = state.recipients[0]
-                const fullDetail = `${recipient.full_name } - ${recipient.phone_number}` 
+            catch(e){git
+                const fullDetail = null 
                 return fullDetail
             }
         },
@@ -33,7 +31,6 @@ export default{
                 const detail = `${e.full_name} - ${e.phone_number}`
                 return detail == contact
             })
-            console.log(index)
             if(index>=0){
                 return state.recipients[index].contact_id   
             }
@@ -59,9 +56,13 @@ export default{
     },
 
     actions:{
-        async getRecipients({ commit, getters }, {offset}){
-            const data = await ApiService.getRecipients(offset, getters["getLimit"])
+        async getRecipients({ commit, getters }, {offset, searchString}){
+            const filterValue = searchString? searchString : "" 
+
+            const data = await ApiService.getRecipients(offset, getters["getLimit"], filterValue)
             commit("updateRecipientState", data)
+            return data
         },
+
     }
 }
