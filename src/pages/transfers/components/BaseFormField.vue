@@ -455,6 +455,8 @@
             validateAndSubmit(e){
                 const index = this.onValidateField1()
                 if(index<0){
+                    // TODO: Implement Proper Time conversion to API
+                    // this.transferData.scheduledDate = this.transferData.scheduledDate.toUTCString()
                     this.$emit('onClickSubmit', this.transferData, this.addedTransferProducts, this.updatedTransferProducts,  this.deletedTransferProducts)
                 }
                 e.preventDefault();

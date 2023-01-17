@@ -86,15 +86,16 @@
                 this.message.failed="Error Creating Data, Retry?"
                 this.toLoad = async ()=>{
                     transfer.scheduledDate=myTime.formatDateFromScheduleDate(transfer.scheduledDate)
-                    
                     if(transfer.contact_id!=null){
-                        transfer.recipient = this.$store.getters["recipient/getRecipientFullDetail"](transfer.contact_id)
-                        delete transfer["contact_id"]
+                        transfer.recipient = this.$store.getters["recipient/getRecipientFullDetail"](transfer.contact_id)       
                     }
                     else{
-                        transfer.recipient=null    
+                        // TODO: Make sure to confirm what this field is if the transfer type is delivery
+                        transfer.recipient=""    
                     }
 
+                    delete transfer["contact_id"]
+                    
                     transfer.transferProducts = transfer.transferProducts.map((e)=>{
                         return {
                             "product_id":e.product_id,
