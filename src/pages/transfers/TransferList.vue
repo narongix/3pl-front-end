@@ -28,10 +28,6 @@
 					</Column>
 
 					<Column field="created_at" header="Schedule Date" style="min-width:12rem">
-
-						<template #editor="slotProps">
-							<InputText v-model="slotProps.data[slotProps.field]" />
-						</template>
 					</Column>
 					
 					<Column field="transfer_status_id" header="Status"></Column>
@@ -97,9 +93,7 @@
 				row: 10,
 
 				filters:{	
-					"id":{value: null, matchMode: FilterMatchMode.CONTAINS},
-					"source_location":{value: null, matchMode: FilterMatchMode.STARTS_WITH},
-					"destination_location": {value:null, matchMode: FilterMatchMode.CONTAINS}
+					"id":{value: null, matchMode: FilterMatchMode.CONTAINS}
 				},
 
 				toLoadRetry: null,
