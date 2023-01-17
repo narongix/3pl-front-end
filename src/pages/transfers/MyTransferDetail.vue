@@ -21,7 +21,7 @@
 
 <script>
 	import BaseFieldForm from './components/BaseFormField.vue';
-	import RetryField from './components/RetryField.vue';
+	import RetryField from '../../components/prompt_field/RetryField.vue';
 
 	export default{
 		async created(){
@@ -44,7 +44,7 @@
                     titleForm: "Add new Transfer",
                     titleField1: "Transfer Name",
                     titleField2: "Operation Type",
-					buttonSubmit:"Create Move lines"
+					buttonSubmit:"Add Transfer Detail"
                 },
 				fieldNotActive: true,
 				oldData: null,
@@ -55,6 +55,11 @@
 					failed: "Error Loading Data. Try again?",
 					yesButton: "Yes",
 					noButton: "No"
+				},
+				errorToast:{
+					severity: "error",
+					summary: "Error!",
+					detail: "Failed Editing Transfer"
 				}
 			}
 		},
@@ -92,16 +97,17 @@
 			},
 
 			async onFormSubmit(transfer, created, updated, deleted){
+				// TODO: Implement Bold Text on Transfer List
+				// When edited Transfer
                 await this.$store.dispatch("transfers/updateTransfer", {
-					recipient: this.$store.getters["recipient/getRecipientFullDetail"](transfer.contact_id),
+					recipient: transfer.transfer_type_id == 2? this.$store.getters["recipient/getRecipientFullDetail"](transfer.contact_id) : null,
 					id : transfer.id,
 					created, 
 					updated, 
 					deleted})
 				
 				this.changeEditState()
-				
-                this.$router.back()
+				this.$toast.add({severity:"success",summary:"Success", detail:"Transfer Edited Successfully", life:3000})
             },
 
 			changeEditState(){

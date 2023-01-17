@@ -131,6 +131,7 @@ export default {
         return {
             editDisabled: true,
             productHistory: null,
+            products: null,
             product: {
                 id: {
                     val: null,
@@ -220,15 +221,15 @@ export default {
         },
         async loadData() {
 
-            this.products = await this.$store.getters['products/products'].filter(product => {
-                return product.id == this.$route.params.id;
+            this.products = await this.$store.getters['products/getProductState'].filter(product => {
+                return product.product_id == this.$route.params.id;
             })[0];
 
             this.product = Object.assign({
 
                 id: {
-                    val: this.products.id,
-                    newVal: this.products.id,
+                    val: this.products.product_id,
+                    newVal: this.products.product_id,
                     isValid: true,
                 },
                 name: {

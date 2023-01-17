@@ -50,6 +50,7 @@ export default{
             state.offset = state.offset + currentOffset
             const data = await ApiService.getTransfers(state.offset, limit)
             commit("updateTransferState", data)
+            return data
         },
         
         async getTransferDetail({ commit }, { transferId }){
@@ -61,8 +62,9 @@ export default{
 
         async createTransfers({commit}, { tempTransfer }){
             const newTransfer = await ApiService.createTransfer(tempTransfer)
-            console.log("newTransfser: "+JSON.stringify(newTransfer))
             commit("updateTransferState", [newTransfer])
+
+            return newTransfer
         },
 
         async updateTransfer({ commit }, { recipient, id, created, updated, deleted }){
