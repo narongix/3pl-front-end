@@ -158,7 +158,7 @@
 			onPressDeletedProduct(data){
 				//Do this else it will not recognize it's a new value on watch
 				this.selectedForDelete = {...data}
-				this.message.prompt = `Are you sure you want to delete ${ this.selectedForDelete.recipient } transfer?`
+				this.message.prompt = `Are you sure you want to delete ${ this.selectedForDelete.recipient ?? this.selectedForDelete.id ?? "this" } transfer?`
 			},
 
 			DiscardDeletedPrompt(){
