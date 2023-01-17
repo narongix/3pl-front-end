@@ -20,7 +20,7 @@ export default{
                 const fullDetail = `${recipient.full_name ?? "" } - ${recipient.phone_number ?? ""}` 
                 return fullDetail
             }
-            catch(e){git
+            catch(e){
                 const fullDetail = null 
                 return fullDetail
             }
