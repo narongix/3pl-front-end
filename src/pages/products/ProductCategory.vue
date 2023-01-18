@@ -3,17 +3,14 @@
         <div class="col-12">
             <div class="card">
                 <h5>Product Categories</h5>
-                <!-- <Button @click="ree">riseeee</Button>
-                <p>{{ findProductCategogory }}</p> -->
                 <Button v-if="!isLoading" label="Create" class="p-button-success mr-2" @click="goToNewProduct" />
                 <p></p>
-                <DataTable :value="prodCategories" :paginator="true" class="p-datatable-gridlines" :rows="10" dataKey="id"
+                <DataTable :value="prodCategories" :paginator="true" class="p-datatable-sm" :rows="10" dataKey="id"
                     :rowHover="true" filterDisplay="menu" :loading="loading1" responsiveLayout="scroll" :rowsPerPageOptions="[10,20,30]">
 
                 
                     <template #loading v-if="isLoading">
                     </template>
-
 
                     <!-- <Column field="Barcode" header="Barcode" style="min-width:15rem">
                         <template #body="{ data }">
@@ -21,21 +18,14 @@
                         </template>
                     </Column> -->
 
-                    <Column field="categoryName" header="Category Name" style="min-width:12rem">
+                    <Column field="category_name" header="Category Name" style="min-width:12rem" :sortable="true">
                         <template #body="{ data }">
-                            <!-- {{ data.category_name }} -->
-                            <categories-item :data="data"></categories-item>
+                            <categories-item :data="data" :class="{shake: activateOrNot(data.id)}"></categories-item>
                         </template>
                     </Column>
-
-                    <!-- <Column field="id" header="Category id" style="min-width:12rem">
-                        
-                    </Column> -->
         
                     <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
                         <template #body="slotProps">
-                            <!-- <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                                @click="editProduct(slotProps.data)" /> -->
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
                                 @click="confirmDeleteProduct(slotProps.data)" />
                         </template>
@@ -54,22 +44,38 @@
                 </Dialog>
             </div>
         </div>
-
     </div>
+    <template>
+        <RetryField :toLoad="toLoadCategory" :message="message" :errorToast="errorToastDeletingProCategory"></RetryField>
+    </template>
 </template>
 
 <script>
 import CategoriesItem from './components/products/CategoriesItem.vue';
 import router from '../../router';
+import RetryField from "../../components/prompt_field/RetryField.vue"
 export default {
     components: {
-      CategoriesItem
+      CategoriesItem,
+      RetryField
     },
     data() {
         return {
             loading1: true,
             deleteProductDialog: false,
-            temp: null
+            temp: null,
+            disabled: false,
+            toLoadCategory: null,
+            message: {
+                failed: "Error Loading Data. Try again?",
+                yesButton: "Yes",
+                noButton: "No",
+            },
+            errorToastDeletingProCategory: {
+                severity:"error",
+                summary: "Error!",
+                detail: "Failed Deleting Product Category!"
+            }
         }
     },
     computed: {
@@ -78,23 +84,18 @@ export default {
         },
         isLoading() {
             return this.loading1;
-        },
-
-        // findProductCategogory() {
-        //     console.log("searching: " + JSON.stringify(this.$store.getters["products/findProductCategogory"](2)))
-        //     return this.$store.getters["products/findProductCategogory"](2)
-        // }
+        }
     },
     created() {
         this.loadProductCategories();
+        this.warnDisabled();
+        this.toLoadCategory = this.initData
     },
     methods: {
 
-        // ree(){
-        //     this.$store.commit("products/rise")
-        //    console.log("searching: " + JSON.stringify(this.$store.getters["products/findProductCategogory"](2)))
-        //    console.log(this.$store.commit["products/rose"])
-        // },
+        activateOrNot(id){
+            return id == this.$route.query.id ?? false
+        },
 
         async loadProductCategories(refresh = false) {
 
@@ -105,32 +106,43 @@ export default {
             } catch (error) {
                 this.error = error.message || 'Something went wrong!';
             }
-
             this.loading1 = false;
         },
-        goToNewProduct() {
-            router.push('/product-categories/new/');
+        async goToNewProduct() {
+            await router.push('/product-categories/new/');
         },
         confirmDeleteProduct(category) {
             this.temp = category;
-            // console.log(this.temp)   
-            // console.log("this.prodCategories.id "+this.temp.id)
 
             this.deleteProductDialog = true;
         },
+        warnDisabled() {
+            this.disabled = true;
+            setTimeout(() => {
+                this.disabled = false;
+            }, 1500)
+        },
 
-    async deleteProductCategory() {
-            this.deleteProductDialog = false;
-            const actionPayload = {
-                id: this.temp.id,
-            };
-            await this.$store.dispatch('products/deleteProductCategory', {
-                payload: actionPayload
-            } );
-			this.temp = null;
-			this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Category Deleted', life: 3000});
+        async deleteProductCategory() {
+            this.toLoadCategory = async ()=>{
+                const actionPayload = {
+                    id: this.temp.id,
+                };
+                await this.$store.dispatch('products/deleteProductCategory', {
+                    payload: actionPayload
+                } );
+                this.temp = null;
+                this.deleteProductDialog=false
+                this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Category Deleted', life: 3000});
+            }
+        },
+        async initData() {
+            await this.$store.dispatch("products/onFetchProducts",{
+                offset: 0
+            })
+            await this.$store.dispatch("products/getProdCategories")
         }
-    }
+    },
 
 }
 </script>
@@ -146,4 +158,3 @@ export default {
     font-weight: bold;
 }
 </style>
-

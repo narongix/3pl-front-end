@@ -9,6 +9,7 @@
         <div class="layout-main-container">
             <div class="layout-main">
                 <router-view />
+                <Toast />
             </div>
             <!-- <AppFooter /> -->
         </div>
@@ -35,12 +36,12 @@ export default {
             overlayMenuActive: false,
             mobileMenuActive: false,
             menu : [
-                {
-                    label: 'Home',
-                    items: [{
-                        label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'
-                    }]
-                },
+                // {
+                //     label: 'Home',
+                //     items: [{
+                //         label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'
+                //     }]
+                // },
                 {
                     label: 'Operations',
                     items: [

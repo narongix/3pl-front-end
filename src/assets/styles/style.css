@@ -1,0 +1,33 @@
+
+.shake {
+    animation: shake 3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    transform: translate3d(0, 0, 0);
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        color: black;
+        font-weight: bold;
+    }
+
+    20%,
+    80% {
+        color: black;
+        font-weight: bold;
+    }
+
+    30%,
+    50%,
+    70% {
+        color: black;
+        font-weight: bold;
+    }
+
+    40%,
+    60% {
+        color: black;
+        font-weight: bold;
+    }
+}

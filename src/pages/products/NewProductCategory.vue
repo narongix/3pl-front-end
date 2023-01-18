@@ -3,68 +3,93 @@
         <div class="grid">
             <div class="col-9">
                 <div class="card">
-                    <h5>Add New ProductCategory</h5>
-                    <Button label="SAVE" type="submit" class="p-button-success mr-2"/>
+                        <h5>Add New ProductCategory</h5>
+                        <Button label="SAVE" type="submit" class="p-button-success mr-2"/>
                     <hr>
                     <p></p>
                     <div class="p-fluid formgrid grid">
                         <div class="field col-12 md:col-12">
                             <label for="category-name">Category Name</label>
                             <InputText id="category-name" type="text" v-model.trim="categoryName.val"
-                                :class="{ 'p-invalid': !categoryName.isValid }" @blur="clearValidity('categoryName')" />
+                                :class="{ 'p-invalid': submitted && !categoryName.val }" />
+                                <small class="p-error" v-if="submitted && !categoryName.val">Category is required.</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <template>
+            <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
+        </template>
     </form>
 </template>
 
 <script>
-import router from '../../router.js'
+import RetryField from '../../components/prompt_field/RetryField.vue'
 export default {
+    components: {
+        RetryField
+    },
     data() {
         return {
             categoryName: {
-                val: null,
-                isValid: true,
+                val: null,  
+            },
+            formIsValid: true,
+            submitted: false,
+            toLoad: null,
+            // click to create show stt
+            message: {
+                failed: "Error Loading Data. Try again?",
+                yesButton: "Yes",
+                noButton: "No"
+            },
+            errorToast:{
+                severity: "error",
+                summary: "Failed",
+                detail: "Error Creating Product Category",
+                life: 3000
             }
         }
     },
-    computed: {
-        showValidity() {
-            return this.productName.isValid
-        }
-    },
-    methods: {
+    methods: { 
         async submitForm() {
+            // when created failed internet 
+            // this.message.failed="Error Creating Data, Retry?"
+            this.submitted = true;
             this.validateForm();
-
             if (!this.formIsValid){
-                return;
+                return ;
             }
-            const actionPayload = {
-                category_name: this.categoryName.val,
-            };
-            try {
-                await this.$store.dispatch('products/addProductCategory', actionPayload);
-                router.replace('/product-categories');
-            } 
-             catch (e) {
-                console.log(e);
-             }
+
+            this.toLoad = async ()=>{
+                const actionPayload = {
+                    category_name: this.categoryName.val,
+                };
+                const newProductCat = await this.$store.dispatch('products/addProductCategory', actionPayload);
+                await this.$router.push({ name: 'productCategoriesList', query: {id: newProductCat.id, name: actionPayload.category_name}});
+                this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Category Created', life: 3000});
+            }
         },
         validateForm(){
-            this.formIsValid = true;
-            if(this.categoryName.val === ' || this.categoryName.val === null'){
+            if(this.categoryName.val === '' || this.categoryName.val === null){
                 console.log("Category Name not valid")
                 this.formIsValid = false;
-                this.categoryName.isValid = false;
+            }else{
+                this.formIsValid = true;
             }
         },
-        clearValidity(input) {
-            this[input].isValid = true;
-        }, 
+
+        // Loading 
+        async initData(){
+            await this.$store.dispatch("products/onFetchProducts",{
+                offset: 0
+            })
+            await this.$store.dispatch("products/getProdCategories")
+        }
+    }, 
+    created(){
+        this.toLoad = this.initData
     }
 }
 </script>

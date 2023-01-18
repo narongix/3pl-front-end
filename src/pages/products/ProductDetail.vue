@@ -107,26 +107,14 @@
  
                         </template> -->
                     </Column>
-
-
-
-
-
                 </DataTable>
             </div>
-
-
         </div>
-
     </div>
-
-
 </template>
 <script>
 // import { exportDefaultSpecifier } from '@babel/types';
-
 export default {
-
     data() {
         return {
             editDisabled: true,
@@ -284,12 +272,10 @@ export default {
                 },
             })
 
-            // console.log(`Load Data ${JSON.stringify(this.products)}`)
-
         },
         saveData() {
 
-            console.log(this.product.id.newVal);
+            // console.log(this.product.id.newVal);
             let actionPayload = {
                 id: this.product.id.newVal,
             }
@@ -300,8 +286,6 @@ export default {
                     actionPayload[field] = this.product[field].newVal;
                 }
             }
-
-            // console.log(`actionPayload  after ${JSON.stringify(actionPayload)}`)
             this.$store.dispatch('products/updateProduct', actionPayload);
 
         }

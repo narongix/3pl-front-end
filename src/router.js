@@ -95,6 +95,7 @@ const routes = [
             },
             {
                 path: '/product-categories',
+                name: "productCategoriesList",
                 component: ProductCategory,
     
             },
@@ -210,7 +211,7 @@ const routes = [
     {
         path: '/login',
         name: 'login',
-        component: () => import('./pages/Login.vue')
+        component: () => import('./pages/auth/UserAuth.vue')
     },
     {
         path: '/landing',
