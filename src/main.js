@@ -102,9 +102,8 @@ import CodeHighlight from './AppCodeHighlight';
 import BlockViewer from './BlockViewer';
 import vSelect from "vue-select";
 
-
-
-
+import { FilterService, FilterMatchMode } from "primevue/api"
+// import TimeConvert from "../src/components/utils/TimeConvert"
 
 router.beforeEach(function(to, from, next) {
     window.scrollTo(0, 0);
@@ -115,13 +114,81 @@ const app = createApp(AppWrapper);
 
 app.config.globalProperties.$appState = reactive({ theme: 'lara-light-indigo', darkTheme: false });
 
-app.use(PrimeVue, { ripple: true, inputStyle: 'outlined' });
+app.use(PrimeVue, { ripple: true, inputStyle: 'outlined',
+ filterMatchModeOptions:{
+    customDate:[
+        "dateGreaterThan",
+        "dateLessThan",
+        "range",
+        "datesIn"
+    ],
+    text: [
+        FilterMatchMode.STARTS_WITH,
+        FilterMatchMode.CONTAINS,
+        FilterMatchMode.NOT_CONTAINS,
+        FilterMatchMode.ENDS_WITH,
+        FilterMatchMode.EQUALS,
+        FilterMatchMode.NOT_EQUALS
+    ],
+    numeric: [
+        FilterMatchMode.EQUALS,
+        FilterMatchMode.NOT_EQUALS,
+        FilterMatchMode.LESS_THAN,
+        FilterMatchMode.LESS_THAN_OR_EQUAL_TO,
+        FilterMatchMode.GREATER_THAN,
+        FilterMatchMode.GREATER_THAN_OR_EQUAL_TO
+    ],
+    date: [
+        FilterMatchMode.DATE_IS,
+        FilterMatchMode.DATE_IS_NOT,
+        FilterMatchMode.DATE_BEFORE,
+        FilterMatchMode.DATE_AFTER
+    ]
+ }
+});
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(router);
 
 //TODO: Next time use login instead of doing this
-localStorage.accessToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJkNzYyNjExZi0zMzI0LTQxYjktYjA5MC05YmZiMzg2YmY0M2YiLCJpYXQiOjE2NzMzMTcyNTN9.sst2wJk368vhQayMxCAzMvfW1r5nAlWpPcgr9FXrNe4"
+localStorage.accessToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJkNzYyNjExZi0zMzI0LTQxYjktYjA5MC05YmZiMzg2YmY0M2YiLCJpYXQiOjE2NzQxMjMwMzR9.f9yrdrsF7tVmb_oThugEhGxzN3nBlmeayWKoL6sot6Y"
+FilterService.register("dateGreaterThan", (rowValue, filterValue)=>{
+    if (filterValue) {
+        return Date.parse(rowValue) >= Date.parse(filterValue);
+    }
+    return true
+})
+
+FilterService.register("dateLessThan", (rowValue, filterValue)=>{
+    if(filterValue){
+        // this already account for the utc to local time time zone, so no need to worry.
+        return Date.parse(rowValue)<= Date.parse(filterValue)
+    }
+    return true
+})
+
+FilterService.register("dateRanges", (rowValue, filterValue)=>{
+    if(filterValue && (filterValue?.length ?? false)>0){
+        const rowMs = Date.parse(rowValue)
+        const filterMs = filterValue.map((e)=>Date.parse(e))
+        
+        return rowMs >=filterMs[0] && rowMs <= filterMs[1] 
+    }
+    return true
+})
+
+FilterService.register("datesIn", (rowValue, filterValue)=>{
+    if(filterValue){
+        const rowMs = Date.parse(rowValue)
+        let filterValue2 = new Date(filterValue.toString())
+        filterValue.setHours(0,0,0)
+        filterValue2.setHours(23,59,59)
+        const filterMs = Date.parse(filterValue)
+        const filterMs2 = Date.parse(filterValue2)
+        return rowMs >= filterMs && rowMs <= filterMs2
+    }
+    return true
+})
 
 app.directive('tooltip', Tooltip);
 app.directive('ripple', Ripple);

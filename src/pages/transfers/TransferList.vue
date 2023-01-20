@@ -17,9 +17,10 @@
 					
 					<Column selectionMode="multiple"></Column>
 
-					<Column field="id" header="Id" style="min-width:12rem" filterMatchMode="contains" :sortable="true">
+					<Column field="id" header="Id" style="min-width:12rem" :sortable="true">
 						<template #body="{ data }">
 							<TransferItem :data="data"></TransferItem>
+							
 						</template>
 
 						<template #filter="{ filterModel }">
@@ -27,10 +28,27 @@
 						</template>
 					</Column>
 
-					<Column field="created_at" header="Schedule Date" style="min-width:12rem">
+					<Column field="created_at" header="Schedule Date" :showFilterMatchModes="false" style="min-width:12rem">
+						<template #body="{ data }">
+							<!-- <DateItem :data="data"></DateItem> -->
+							{{ formatDate(data.created_at) }}
+						</template>
+
+						<template #filter>
+							<!-- <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by date"></InputText> -->
+							
+							<Dropdown v-model="calenderFilterMode" :options="customDate" optionLabel="label" optionValue="value"></Dropdown>
+							
+							<Calendar class="mt-3" v-model="calendarValue" :selectionMode="selectionMode" :inline="true" :showTime="showTime"/>
+						</template>
 					</Column>
 					
-					<Column field="transfer_status_id" header="Status"></Column>
+					<Column field="transfer_status_id" :showFilterMatchModes="false" header="Status">
+						<template #filter="{ filterModel, filterCallback }">
+							<InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by status"></InputText>
+						</template>
+						
+					</Column>
 					
 					<Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
 						<template #body="{ data }">
@@ -74,6 +92,7 @@
 	export default {
 		created(){
 			this.toLoadHidden=this.initData
+			this.calenderFilterMode = "datesIn"
 		},
 		components:{
 			TransferItem,
@@ -93,11 +112,18 @@
 				row: 10,
 
 				filters:{	
-					"id":{value: null, matchMode: FilterMatchMode.CONTAINS}
+					id: {value: null, matchMode: FilterMatchMode.CONTAINS},
+					created_at: {value:null, matchMode: "datesIn"},
+					transfer_status_id: {value:null, matchMode: FilterMatchMode.CONTAINS}
 				},
 
 				toLoadRetry: null,
 				toLoadHidden: null,
+
+				calenderFilterMode: null,
+				calendarValue: null,
+				selectionMode:null,
+				showTime: true,
 
 				message:{
 					failed: "Error Deleting Transfer, Try again",
@@ -124,7 +150,7 @@
 					severity: "error",
 					summary: "Error!",
 					detail: "Failed Loading Transfer!"
-				}
+				},
 			}
 		},
 		computed: {
@@ -146,11 +172,35 @@
 				return this.loading1 && !this.$store.state.transfers.transfers
 			},
 
-			translate (date){
-				return myTime.fromUTCToLocal(Date(date.created_at))
+			customDate(){
+				return [
+					{label: "Date is in between", value: "dateRanges"},
+					{label: "Date in", value: "datesIn"},
+					{label: "Date greater than", value: "dateGreaterThan"},
+					{label: "Date less than", value: "dateLessThan"}
+				]
+			},
+
+			convertForCalendar(){
+				return {
+					dateRanges: "range",
+				}
+			},
+
+			showTimeOrNot(){
+				return {
+					datesIn: false,
+					dateRanges: true,
+					dateGreaterThan: true,
+					dateLessThan: true
+				}
 			}
 		},
 		methods:{
+			formatDate(value){
+				return myTime.formatDateFromScheduleDate(value)
+			},
+
 			goToCreateTransfer(){
 				this.$router.push({name: "TransferCreate"})
 			},
@@ -224,8 +274,26 @@
 			},
 
 			mySelected(){
-				if(this.mySelected<=0){
-					this.promptDeleted=false
+				if(this.mySelected <= 0){
+					this.promptDeleted = false
+				}
+			},
+
+			calenderFilterMode:{
+				immediate:true,
+				handler: function(newValue){
+					this.filters.created_at.matchMode = newValue
+					this.selectionMode = this.convertForCalendar?.[newValue]
+					this.showTime = this.showTimeOrNot?.[newValue] ?? true
+					this.calendarValue=null
+				}
+			},
+
+			calendarValue:{
+				immediate:true,
+				handler: function(newValue){
+					
+					this.filters.created_at.value = newValue
 				}
 			},
 		}
