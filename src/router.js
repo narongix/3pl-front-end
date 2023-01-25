@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHashHistory, START_LOCATION } from 'vue-router';
 import App from './App.vue';
 import ProductList from './pages/products/ProductList.vue';
 import ProductDetail from './pages/products/ProductDetail.vue';
@@ -6,7 +6,7 @@ import NewProduct from './pages/products/NewProduct.vue';
 import ProductCategory from './pages/products/ProductCategory.vue' ;
 import NewProductCategory from './pages/products/NewProductCategory.vue';
 import ProductCategoryDetail from './pages/products/ProductCategoryDetail.vue';
-
+import store from "@/store";
 
 
 const routes = [
@@ -239,5 +239,16 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes,
 });
+
+router.beforeEach((to,from)=>{
+    const token = store.getters["auth/getToken"]
+    if(!token && to.name !== "login"){
+        return {name:"login"}
+    }
+    // If page is refresh and theres no token and it's not at login page
+    if(from == START_LOCATION && !token && to.name!='login'){
+        return {name: "login"}
+    }
+})
 
 export default router;

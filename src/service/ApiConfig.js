@@ -1,11 +1,14 @@
-export default{
-    header(myHeaders){
+import store from "../store/index";
+
+export default {
+    header(myHeaders) {
+        const token = "Bearer " +  store.getters["auth/getToken"]
         return {
             baseURL: process.env.VUE_APP_API_BASE_URL,
-            headers:{
+            headers: {
                 ...myHeaders,
-                "Authorization": "Bearer "+ localStorage.getItem("accessToken")
-            } 
+                "Authorization": token
+            }
         }
     }
 }

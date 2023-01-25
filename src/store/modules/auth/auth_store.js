@@ -1,47 +1,68 @@
-import router from '../../../router.js';
 import ApiService from '../../../service/ApiService.js';
+import LocalStorageKeys from "../../../domains/LocalStorageKeys.js";
 
-export default{
-    state(){
-        return{
-            user:null,
-            isLoggedIn:false
+export default {
+    namespaced: true,
+    state() {
+        return {
+            user: null,
+            isLoggedIn: false,
+            oneTimeAccessToken: null,
         }
     },
-    getters:{
+    getters: {
         user(state) {
+            if (!state.user) {
+                state.user = Object.assign(state.user, localStorage.getItem(LocalStorageKeys.userKey))
+            }
             return state.user;
-          },  
-          isLoggedIn(state) {
+        },
+
+        isLoggedIn(state) {
             return state.isLoggedIn;
-          }
+        },
+
+        getFullName(state) {
+            return (state.user?.first_name ?? "") + " " + (state.user?.last_name ?? "")
+        },
+
+        getEmail(state) {
+            return state.user?.email ?? ""
+        },
+
+        getToken(state){
+            const token = state.oneTimeAccessToken ?? localStorage.getItem(LocalStorageKeys.accessTokenkey)
+            return token
+        }
     },
-    mutations:{
+    mutations: {
         setUser(state, payload) {
             state.user = payload.user;
-            console.log("state.user: "+JSON.stringify(state.user))
             state.isLoggedIn = payload.isLoggedIn;
-          }
-    },
-    actions:{
-        async login(context, payload) {
-            try{
-                const data = {
-                    email: payload.email,
-                    password: payload.password
-                }
-                const loginData = await ApiService.login(data)
-                localStorage.setItem('accessToken', loginData.access_token);
-                context.commit('setUser', {
-                    user: loginData.user,
-                    isLoggedIn: true
-                });
-                router.push('/transfers');
-            }
-            catch(e){
-                const error = new Error(e || 'Failed to authenticate. Check your login data.');
-                throw error;
-            }
         }
+    },
+    actions: {
+        async logout(context) {
+            await ApiService.logout()
+
+            context.state.user = null
+            context.state.oneTimeAccessToken = null
+            context.state.isLoggedIn = false
+
+            localStorage.removeItem(LocalStorageKeys.userKey)
+            localStorage.removeItem(LocalStorageKeys.accessTokenkey)
+        },
+
+        async login(context, payload) {
+            const loginData = await ApiService.login(payload)
+            context.state.oneTimeAccessToken = loginData.access_token
+
+            context.commit('setUser', {
+                user: loginData.user,
+                isLoggedIn: true
+            });
+
+            return loginData
+        },
     }
 }

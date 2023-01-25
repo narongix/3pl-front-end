@@ -21,7 +21,11 @@
         },
         props:{
             toLoad: Function,
-            message: Object,
+            message: {
+              failed: String,
+              yesButton: String,
+              noButton: String
+            },
             errorToast: Object
         },
         data(){

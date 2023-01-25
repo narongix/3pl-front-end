@@ -290,8 +290,7 @@
                 messageLoadRecipient:{
                     failed: "Error loading Recipient, retry?",
                     yesButton: "Yes",
-                    noButton: "No",
-                
+                    noButton: "No"
                 },
 
                 errorToastLoadingRecipient:{

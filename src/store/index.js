@@ -14,6 +14,13 @@ const store = createStore({
         auth: authModule,
         recipient: recipientModule,
         transferType: transferTypeModule
+    },
+    actions:{
+        clearAllStates({ commit }){
+            commit("transfers/onClearState")
+            commit("products/onClearState")
+            commit("recipient/onClearState")
+        }
     }
 });
 export default store;
