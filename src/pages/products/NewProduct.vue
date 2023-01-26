@@ -125,7 +125,6 @@ export default {
         validateForm() {
             this.formIsValid = true;
             if (this.productName.val === '' || this.productName.val === null) {
-                console.log("Product Name not valid")
                 this.formIsValid = false;
                 this.productName.isValid = false;
             }

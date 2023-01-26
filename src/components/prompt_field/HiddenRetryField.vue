@@ -46,7 +46,6 @@
                         this.textLoading=this.message.failed
                         this.popUpPrompt = true
                     }, 300)
-                    console.log(e)
                 }
             },
             unFocus(event){

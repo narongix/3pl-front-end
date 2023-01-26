@@ -184,7 +184,6 @@ export default {
     methods: {
         changeEditMode() {
             this.editDisabled = !this.editDisabled;
-            // console.log(this.editDisabled);
             if (this.editDisabled) {
                 this.saveData();
             }
@@ -197,10 +196,6 @@ export default {
             if(typeof this.product.sku !== "undefined" && (this.product.sku.val!==this.product.sku.newVal)){
                 this.product.sku.newVal = this.product.sku.val;
             }
-            // console.log(typeof this.product.upc ==="undefined" );
-            // if(typeof this.product.upc.newVal === "undefined"){
-            //     console.log("UNDEFINED")
-            // }
             if(typeof this.product.upc !== "undefined" && (this.product.upc.val!==this.product.upc.newVal)){
                 this.product.upc.newVal = this.product.upc.val;
             }
@@ -274,12 +269,9 @@ export default {
 
         },
         saveData() {
-
-            // console.log(this.product.id.newVal);
             let actionPayload = {
                 id: this.product.id.newVal,
             }
-            // let temp = {};
 
             for (const field of Object.keys(this.product)) {
                 if (this.product[field].val !== this.product[field].newVal) {
@@ -292,8 +284,6 @@ export default {
     },
     created() {
         this.loadData();
-
-        // this.updatedProduct.name.val = product.name;
     },
     computed: {
         barcode() {
@@ -315,10 +305,6 @@ export default {
         updatedName() {
             return this.product.name.val === this.product.name.newVal ? false : true;
         }
-
-        ///track which fields have been updated
-        /// and construct update payload according
-        /// to those updates
 
     }
 }

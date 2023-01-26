@@ -10,16 +10,16 @@ export default {
     },
     getters: {
 
-        getProductState(state){
+        getProductState(state) {
             return state.products;
         },
-        hasProducts(state){
-            return state.products && state.products.length>0;
+        hasProducts(state) {
+            return state.products && state.products.length > 0;
         },
-        prodCategories(state){
+        prodCategories(state) {
             return state.prodCategories;
         },
-        limit(){
+        limit() {
             return 10
         }
     },
@@ -31,20 +31,16 @@ export default {
         setProdCategories(state, payload) {
             state.prodCategories = payload.prodCategories;
         },
+        updateProductState(state, products) {
 
-        updateProduct(state, payload) {
-            const data = {
-                id: payload.id,
-                name: payload.name ?? "",
-                sku: payload.sku ?? "",
-                upc: payload.upc ?? ""
-            }
-
-            const index = state.products.findIndex(product => product.product_id == data.id);
-
-            if (state.products[index]) {
-                state.products[index] = Object.assign(state.products[index], data);
-            }
+            products.forEach(element => {
+                const index = state.products.findIndex((e) => e.product_id == element.product_id)
+                if (index >= 0) {
+                    state.products[index] = element
+                } else {
+                    state.products.unshift(element)
+                }
+            });
         },
 
         deleteProductState(state, payload) {
@@ -52,48 +48,10 @@ export default {
             state.products.splice(index, 1)
         },
 
-      deleteProduct(state, payload) {
-        state.products = state.products.filter(val => val.id !== payload.id);
-      },
-
-
-      updateProductCategory(state, payload) {
-        let category_name = payload.name;
-        const data = {
-          id: payload.id,
-        }
-        if (category_name) { data.category_name = category_name; }
-
-        const index = state.prodCategories.findIndex(category => category.id == data.id);
-
-        if (state.prodCategories[index]) {
-          state.prodCategories[index] = Object.assign(state.prodCategories[index], data);
-        }
-      },
-
-
-      deleteProductCategory(state, payload) {
-        const index = state.prodCategories.findIndex( e => e.id == payload.id)
-        state.prodCategories.splice(index, 1)
-
-      },
-
-        updateProductState(state, products){
-            products.forEach(element => {
-            const index = state.products.findIndex((e)=>e.product_id == element.product_id)
-                if(index>=0){
-                    state.products[index]=element
-                }else{
-                    state.products.push(element)
-                }
-            });
+        onClearState(state) {
+            state.products.length = 0
+            state.prodCategories.length = 0
         },
-        
-        onClearState(state){
-            state.products.length=0
-            state.prodCategories.length=0
-        }
-    },
 
         updateProductCategoryState(state, payload) {
             payload.forEach((element) => {
@@ -110,19 +68,8 @@ export default {
             const index = state.prodCategories.findIndex(e => e.id == payload.id)
             state.prodCategories.splice(index, 1)
         },
-
-        updateProductState(state, products) {
-
-            products.forEach(element => {
-                const index = state.products.findIndex((e) => e.product_id == element.product_id)
-                if (index >= 0) {
-                    state.products[index] = element
-                } else {
-                    state.products.unshift(element)
-                }
-            });
-        },
-    actions: {  
+    },
+    actions: {
         async addProduct(context, payload) {
             try {
                 const data = {
@@ -137,42 +84,23 @@ export default {
                 throw error;
             }
         },
-
-        async getProducts(context, params) {
-            //TODO: Refactor this to API layer
-            const config = {
-                headers: { Authorization: `Bearer ${localStorage.accessToken}` }
-            };
-
-            await axios
-                .post(hosturl+'/product/add', data, config)
-                .then(response => {
-                    console.log(response);
-                    router.replace('/products')
-                })
-                .catch(e => {
-                    const error = new Error(e || 'Cannot add products!');
-                    throw error;
-                })
-    
-        },
         async updateProduct(context, payload) {
             const data = {
                 'product_name': payload.name,
                 'sku': payload.sku,
             }
-            try{
+            try {
                 const products = await ApiService.updateOnProduct(data, payload.id)
-                context.commit('updateProduct', products);  
+                context.commit('updateProductState', [products]);
                 return products
-            }   
-            catch(e) {
+            }
+            catch (e) {
                 const error = new Error(e || 'Cannot update products!');
                 throw error;
-            }         
+            }
         },
         async deleteProduct(context, payload) {
-            try{
+            try {
                 const data = {
                     productIds: []
                 }
@@ -187,28 +115,22 @@ export default {
             }
         },
 
-        async onFetchProducts({ getters, commit }, {offset, productName}){
-            const myProductName = productName? productName : ""
+        async onFetchProducts({ getters, commit }, { offset, productName }) {
+            const myProductName = productName ? productName : ""
 
             const products = await ApiService.getProducts(offset, getters["limit"], myProductName)
 
             commit("updateProductState", products)
-            
+
             return products
         },
-    },
-    getters:{
-        getProductState(state){
-            return state.products;
-        },
-            
-        // List for Product Categories
-        async getProdCategories(context, params) {
-            try{
+
+        async getProdCategories(context) {
+            try {
                 const categories = await ApiService.getProdCategories()
                 context.commit('updateProductCategoryState', categories);
             }
-            catch(e) {
+            catch (e) {
                 const error = new Error(e || 'Cannot retrieve categories!');
                 throw error;
             }
