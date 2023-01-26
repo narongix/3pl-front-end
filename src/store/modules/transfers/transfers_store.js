@@ -43,6 +43,11 @@ export default{
                     state.transfers.splice(index, 1)
                 }
             })
+        },
+
+        onClearState(state){
+            state.transfers.length=0
+            state.offset=0
         }
     },
     actions:{

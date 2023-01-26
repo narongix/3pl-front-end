@@ -52,6 +52,10 @@ export default{
                     state.recipients[index] = element
                 }
             });
+        },
+
+        onClearState(state){
+            state.recipients.length=0
         }
     },
 
@@ -63,6 +67,5 @@ export default{
             commit("updateRecipientState", data)
             return data
         },
-
     }
 }

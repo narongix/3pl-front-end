@@ -16,7 +16,11 @@
     export default{
         props:{
             loading: Boolean,
-            message: Object
+            message: {
+              decline: String,
+              accept: String,
+              prompt: null
+            }
         },
         emits:["onDecline", "onAccept"],
         data(){
