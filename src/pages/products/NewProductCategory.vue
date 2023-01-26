@@ -73,7 +73,6 @@ export default {
         },
         validateForm(){
             if(this.categoryName.val === '' || this.categoryName.val === null){
-                console.log("Category Name not valid")
                 this.formIsValid = false;
             }else{
                 this.formIsValid = true;

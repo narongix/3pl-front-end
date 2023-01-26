@@ -72,7 +72,6 @@
             catch (e) {
 				this.outOfFetch=1
 				this.loading=false
-				console.log(e);
 			}
         },
         stopLoading() {

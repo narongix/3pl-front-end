@@ -7,5 +7,5 @@ export default {
     ...TransferServices,
     ...RecipientServices,
     ...AuthServices,
-    ...ProductServices
+    ...ProductServices,
 }
