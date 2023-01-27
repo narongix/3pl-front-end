@@ -1,8 +1,10 @@
 <template>
     <Dialog :visible="popUp" :modal="true" :closable="false"> 
         <div class="flex align-items-center justify-content-center">
-            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"/>
-            <span>{{ message.prompt }}</span>
+            <slot>
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"/>
+                <span>{{ message?.prompt ?? "Are you sure you want to do this operation?" }}</span>
+            </slot>
         </div>
 
         <template #footer>

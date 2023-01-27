@@ -10,21 +10,21 @@
                     :rowsPerPageOptions="[10, 20, 30]" v-model:filters="filters">
                     <template #loading v-if="isLoading">
                     </template>
-
-                    <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="true" :showFilterMatchModes="false">
+                    <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="true"
+                        :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <product-item :data="data"
                                 :class="{ shake: activateOrNot(data.product_name) }"></product-item>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
-                                @input="filterCallback()"/>
+                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
+                                optionValue="value" @input="filterCallback()" />
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by barcode"/>
+                                class="p-column-filter mt-3" placeholder="Search by barcode" />
                         </template>
                     </Column>
-
-                    <Column field="sku" header="VendorCode" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
+                    <Column field="sku" header="VendorCode" style="min-width:12rem" :sortable="true"
+                        :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.sku }}</p>
                         </template>
@@ -35,20 +35,20 @@
                                 class="p-column-filter mt-3" placeholder="Search by vendorCode"/>
                         </template> -->
                     </Column>
-
-                    <Column field="product_name" header="Product Name" style="min-width:15rem" :sortable="true" :showFilterMatchModes="false">
+                    <Column field="product_name" header="Product Name" style="min-width:15rem" :sortable="true"
+                        :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.product_name }}</p>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
-                                @input="filterCallback()"/>
+                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
+                                optionValue="value" @input="filterCallback()" />
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by name"/>
+                                class="p-column-filter mt-3" placeholder="Search by name" />
                         </template>
                     </Column>
-
-                    <Column field="upc" header="UPC" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
+                    <Column field="upc" header="UPC" style="min-width:12rem" :sortable="true"
+                        :showFilterMatchModes="false">
                         <template #body="{ data }">
                             {{ data.upc }}
                         </template>
@@ -59,8 +59,8 @@
                                 class="p-column-filter mt-3" placeholder="Search by upc"/>
                         </template> -->
                     </Column>
-
-                    <Column field="category_name" header="Product Category" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
+                    <Column field="category_name" header="Product Category" style="min-width:12rem" :sortable="true"
+                        :showFilterMatchModes="false">
                         <!-- <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
@@ -68,8 +68,8 @@
                                 class="p-column-filter mt-3" placeholder="Search by product category"/>
                         </template> -->
                     </Column>
-
-                    <Column field="onHands" header="On Hands" style="width:10%" :sortable="true" :showFilterMatchModes="false">
+                    <Column field="onHands" header="On Hands" style="width:10%" :sortable="true"
+                        :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.onHands }}</p>
                         </template>
@@ -80,19 +80,18 @@
                                 class="p-column-filter mt-3" placeholder="Search by on hands"/>
                         </template> -->
                     </Column>
-
-                    <Column field="sync_status" header="Sync Status" style="width:10%" :sortable="true" :showFilterMatchModes="false">
+                    <Column field="sync_status" header="Sync Status" style="width:10%" :sortable="true"
+                        :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.sync_status }}</p>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
-                                @input="filterCallback()"/>
+                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
+                                optionValue="value" @input="filterCallback()" />
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by status"/>
+                                class="p-column-filter mt-3" placeholder="Search by status" />
                         </template>
                     </Column>
-
                     <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
                         <template #body="slotProps">
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
@@ -104,7 +103,7 @@
                     :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete <b>{{ product.name }}</b>?</span>
+                        <span v-if="product">Are you sure you want to delete <b>{{ product.product_name }}</b>?</span>
                     </div>
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text"
@@ -119,7 +118,6 @@
         <RetryField :toLoad="toLoadProduct" :message="message" :errorToast="errorToastDeletingProduct"></RetryField>
     </template>
 </template>
-
 <script>
 import ProductItem from '../../components/ui/products/ProductItem.vue';
 import router from '../../router';
@@ -134,24 +132,25 @@ export default {
     },
     data() {
         return {
+            product: null,
             loading1: true,
             productDialog: false,
             deleteProductDialog: false,
             disabled: false,
             myData: [],
             filters: {
-                product_name:{ value: null, matchMode: FilterMatchMode.STARTS_WITH },
-                sync_status:{ value: null, matchMode: FilterMatchMode.STARTS_WITH },
-                barcode:{ value: null, matchMode: FilterMatchMode.STARTS_WITH },
+                product_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+                sync_status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+                barcode: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 // sku:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
                 // upc:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
                 // category_name:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
                 // onHands:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
             },
             customFilter: [
-                {label: "Starts with", value: FilterMatchMode.STARTS_WITH},
-                {label: "Contains", value: FilterMatchMode.CONTAINS},
-                {label: "Equals", value: FilterMatchMode.EQUALS},
+                { label: "Starts with", value: FilterMatchMode.STARTS_WITH },
+                { label: "Contains", value: FilterMatchMode.CONTAINS },
+                { label: "Equals", value: FilterMatchMode.EQUALS },
             ],
             toLoadProduct: null,
             message: {
@@ -160,7 +159,7 @@ export default {
                 noButton: "No",
             },
             errorToastDeletingProduct: {
-                severity:"error",
+                severity: "error",
                 summary: "Error!",
                 detail: "Failed Deleting Product!"
             }
@@ -182,7 +181,6 @@ export default {
     },
     methods: {
         activateOrNot(product_name) {
-
             return product_name == this.$route.query.name ?? false
         },
         warnDisabled() {
@@ -195,7 +193,6 @@ export default {
             await this.$store.dispatch("products/onFetchProducts", {
                 offset: 0,
             })
-
             this.loading1 = false;
         },
         goToNewProduct() {
@@ -206,7 +203,7 @@ export default {
             this.deleteProductDialog = true;
         },
         async deleteProduct() {
-            this.toLoadProduct = async ()=>{
+            this.toLoadProduct = async () => {
                 this.deleteProductDialog = false;
                 const actionPayload = {
                     id: this.product.product_id,
@@ -216,8 +213,8 @@ export default {
                 this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
             }
         },
-        async initData(){
-            await this.$store.dispatch("products/onFetchProducts",{
+        async initData() {
+            await this.$store.dispatch("products/onFetchProducts", {
                 offset: 0
             })
         }
@@ -238,5 +235,5 @@ export default {
 </style>
 
 <style scoped>
-    @import '../../assets/styles/style.css';
+@import '../../assets/styles/style.css';
 </style>
