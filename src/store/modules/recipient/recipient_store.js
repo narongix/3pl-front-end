@@ -10,7 +10,13 @@ export default{
 
     getters:{
         getRecipientsState(state){
-            return state.recipients
+            const myTempList = []
+            for(let i=0; i<state.recipients.length; i++){
+                myTempList.push({...state.recipients[i]})
+                // If phone number empty don't show anything
+                myTempList[i].full_name = `${state.recipients?.[i]?.full_name ?? "Recipient" }${state.recipients?.[i]?.phone_number? (' - '+state.recipients?.[i]?.phone_number) : ''}`
+            }
+            return myTempList
         },
 
         getRecipientFullDetail: (state)=>(id)=>{

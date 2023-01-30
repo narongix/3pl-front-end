@@ -42,6 +42,7 @@
                     await this.toLoad()
                     this.loading=false
                 }catch(e){
+                    console.log(e)
                     this.textLoading = this.message.failed
                     this.$toast.add(this.toast ?? {
                         severity: "error",

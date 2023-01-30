@@ -103,7 +103,6 @@ import BlockViewer from './BlockViewer';
 import vSelect from "vue-select";
 
 import { FilterService, FilterMatchMode } from "primevue/api"
-// import TimeConvert from "../src/components/utils/TimeConvert"
 
 router.beforeEach(function(to, from, next) {
     window.scrollTo(0, 0);
@@ -176,7 +175,7 @@ FilterService.register("dateRanges", (rowValue, filterValue)=>{
 })
 
 FilterService.register("datesIn", (rowValue, filterValue)=>{
-    if(filterValue){
+    if(filterValue && rowValue){
         const rowMs = Date.parse(rowValue)
         let filterValue2 = new Date(filterValue.toString())
         filterValue.setHours(0,0,0)
@@ -187,6 +186,18 @@ FilterService.register("datesIn", (rowValue, filterValue)=>{
     }
     return true
 })
+
+FilterService.register("MultipleMatchMode", (rowValue, filterValues)=>{
+    if(!(filterValues?.length ?? false)>0){
+        return true
+    }
+    for(let i=0; i<filterValues.length; i++){
+        if(Number(filterValues[i])===rowValue){
+            return true
+        }
+    }
+    return false
+})   
 
 app.directive('tooltip', Tooltip);
 app.directive('ripple', Ripple);

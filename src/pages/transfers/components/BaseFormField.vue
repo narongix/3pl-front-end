@@ -1,4 +1,5 @@
 <template>
+
     <slot name="myTop"></slot>
     <div class="card">
         <form @submit="validateAndSubmit">
@@ -13,32 +14,33 @@
             
                         <div class="field col-12 md:col-3 sm:col-12">
                             <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
-                            <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']" id="scheduleDate" v-model="transferData.scheduledDate" :showTime="true" hourFormat="12" showButtonbar="true"/>
+                            <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
+                                      id="scheduleDate" v-model="transferData.scheduledDate"
+                                      :showTime="true" hourFormat="12" showButtonbar="true" dateFormat="M dd yy"/>
                             <small id="scheduleDate-help" class="p-error" v-if="validationField1.scheduledDate.value">Cannot be Empty</small>
                         </div>
 
                         <div class="field col-12 md:col-3 sm:col-12">
                             <label for="transfer_type_id" :class="{'p-error': validationField1.transfer_type_id.value}">Transfer Type</label>
                             <Dropdown :disabled="FieldNotActive || disabledField['transfer_type_id']" 
-                            id="transfer_type_id" v-model="transferData.transfer_type_id" 
-                            :options="transfer_type" :optionLabel="getTransferTypeName" 
-                            :class="{'p-invalid': validationField1.transfer_type_id.value}" 
-                            :placeholder="transferLoading? 'Loading' : 'Please select a transfer'" 
-                            :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="true">
-                            
-                        </Dropdown>
+                              id="transfer_type_id" v-model="transferData.transfer_type_id"
+                              :options="transfer_type" :optionLabel="getTransferTypeName"
+                              :class="{'p-invalid': validationField1.transfer_type_id.value}"
+                              :placeholder="transferLoading? 'Loading' : 'Please select a transfer'"
+                              :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="true">
+                            </Dropdown>
                             <small id="transfer_type_id-help" class="p-error" v-if="validationField1.transfer_type_id.value">Cannot be Empty</small>
                         </div>
 
                         <div v-if="showRecipientField" class="field col-12 md:col-3 sm:col-12">
                             <label for="recipient" :class="{'p-error': validationField1.contact_id.value}">Recipient</label>
                             <DropDownPagination @onChanged="onReceipientChanged" :options="getRecipientsState" optionLabel="full_name" optionValue="contact_id"
-                            :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient" 
-                            :validation="validationField1.contact_id.value"
-                            :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
-                            :maxLength="getRecipientLength" 
-                            :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"  
-                            :SelectedValue="transferData.contact_id"
+                              :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
+                              :validation="validationField1.contact_id.value"
+                              :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
+                              :maxLength="getRecipientLength"
+                              :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
+                              :SelectedValue="transferData.contact_id"
                             >
                                 
                             </DropDownPagination>
@@ -61,18 +63,29 @@
             <div class="col-12 md:col-12 sm:col-12">
                 <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
                 <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="promptEditField"
-                :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll">
+                :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll"
+                v-model:filters="filters"  filterDisplay="menu"
+                >
                     <template #empty>
                         <p :class="{'p-error': validationField1.transferProducts.value}">Please create transfer detail</p>
                     </template>
-                    <Column field="product_name" header="Name" style="min-width:12rem">
+
+                    <Column field="product_name" header="Name" :sortable="true" style="min-width:12rem">
                         <template #body="{ data }">
                             <p :class="{highlight: !FieldNotActive}">{{ data.product_name }}</p>
                         </template>
+
+                      <template #filter="{filterModel, filterCallback}">
+                        <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name"></InputText>
+                      </template>
                     </Column>
-                    <Column field="demand" header="Demands" style="min-width:12rem">
+                    <Column field="demand" header="Demands" :sortable="true" style="min-width:12rem">
                         <template #body="{ data }">
                             <p :class="{highlight: !FieldNotActive}">{{ data.demand }}</p>
+                        </template>
+
+                        <template #filter="{ filterModel, filterCallback }">
+                          <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by demands"></InputText>
                         </template>
                     </Column>
                     <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
@@ -131,6 +144,9 @@
     import DropDownPagination from './DropDownPagination.vue';
     import PromptField from '../../../components/prompt_field/PromptField.vue';
 
+    import TimeConvert from "@/components/utils/TimeConvert";
+    import {FilterMatchMode, FilterOperator} from "primevue/api";
+
     export default{
         props:{
             baseData: Object,
@@ -147,6 +163,10 @@
 
         data(){
             return {
+              filters:{
+                product_name: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.CONTAINS}]},
+                demand: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
+              },
                 messageDeletePrompt:{
                     decline: "No",
                     accept: "Yes",
@@ -343,7 +363,7 @@
             initializeData(){
                 this.transferData={
                     id: this.data?.id,
-                    scheduledDate: this.data?.created_at,
+                    scheduledDate: TimeConvert.formatDateFromScheduleDate(this.data?.created_at),
                     recipient: this.data?.recipient ?? null,
                     transfer_type_id: this.data?.transfer_type_id,
                     transferProducts: this.data?.transfer_products? [...this.data.transfer_products] : [],
