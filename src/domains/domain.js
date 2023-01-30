@@ -7,5 +7,10 @@ const transferStatus = {
     7: "Cancel"
 }
 
-export default transferStatus
+const transferType ={
+    1: "Receipt",
+    2: "Delivery"
+}
+
+export { transferStatus, transferType }
 

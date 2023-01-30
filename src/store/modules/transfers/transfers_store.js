@@ -19,8 +19,8 @@ export default{
         },
         
         findTransferDetail: (state) => (id) => {
-            const rise = state.transfers.find(element=>element.id==id)
-            return rise
+            const transfer = state.transfers.find(element=>element.id==id)
+            return transfer
         }   
     },
     mutations:{
@@ -51,9 +51,15 @@ export default{
         }
     },
     actions:{
-        async getTransfers({ commit, state }, { currentOffset, limit }){
+        async getTransfers({ commit, state }, { currentOffset, limit, params }){
             state.offset = state.offset + currentOffset
-            const data = await ApiService.getTransfers(state.offset, limit)
+
+            const data = await ApiService.getTransfers({
+                offset: state.offset,
+                limit: limit, 
+                ...params
+            })
+                
             commit("updateTransferState", data)
             return data
         },

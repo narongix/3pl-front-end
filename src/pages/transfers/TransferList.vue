@@ -1,301 +1,387 @@
-
 <template>
-	<div class="grid">
-		<div class="col-12">
-			<div class="card">
-				<h5>Transfers</h5>
-                <Button v-if="!isLoading" label="Create" class="p-button-success mr-2" @click="goToCreateTransfer" />
-				<p></p>
-				<DataTable :value="myTransfers" :paginator="true" class="p-datatable-sm" dataKey="id"
-					:rowHover="true" filterDisplay="menu" :loading="isLoading" responsiveLayout="scroll" 
-					v-model:selection="mySelected" v-model:filters="filters" @page="onPage($event)" v-model:rows="row" 
-					:rowsPerPageOptions="[10,20,30]">
+  <CountDown v-slot="MyCountDown" @activateAPI="activateAPI()">
+    <div class="grid">
+      <div class="col-12">
+        <div class="card">
+          <h5>Transfers</h5>
+          <Button v-if="!isLoading" label="Create" class="p-button-success mr-2" @click="goToCreateTransfer"/>
+          <p></p>
+          
+            <DataTable :value="myTransfers" :paginator="true" class="p-datatable-sm" dataKey="id"
+                    :rowHover="true" filterDisplay="menu" :loading="isLoading" responsiveLayout="scroll"
+                    v-model:selection="mySelected" v-model:filters="filters" @page="onPage($event)" v-model:rows="row"
+                    :rowsPerPageOptions="[10,20,30]">
+              <template #empty>
+                <p :onload="findData(MyCountDown.startCountdown)">No Transfer found.</p>
+              </template>
 
-					<template #empty>
-						No Transfer found.
-					</template>
-					
-					<Column selectionMode="multiple"></Column>
+              <Column selectionMode="multiple"></Column>
 
-					<Column field="id" header="Id" style="min-width:12rem" :sortable="true">
-						<template #body="{ data }">
-							<TransferItem :data="data"></TransferItem>
-							
-						</template>
+              <Column field="id" header="Id" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
+                <template #body="{ data }">
+                  <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
+                </template>
 
-						<template #filter="{ filterModel }">
-							<InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by Reference"></InputText>
-						</template>
-					</Column>
+                <template #filter="{ filterModel, filterCallback }">
+                  <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
+                            placeholder="Search by Reference"></InputText>
+                </template>
+              </Column>
 
-					<Column field="created_at" header="Schedule Date" :showFilterMatchModes="false" style="min-width:12rem">
-						<template #body="{ data }">
-							<!-- <DateItem :data="data"></DateItem> -->
-							{{ formatDate(data.created_at) }}
-						</template>
+              <Column :sortable="true" style="min-width:12rem" field="reference" header="Reference"></Column>
 
-						<template #filter>
-							<!-- <InputText type="text" v-model="filterModel.value" class="p-column-filter" placeholder="Search by date"></InputText> -->
-							
-							<Dropdown v-model="calenderFilterMode" :options="customDate" optionLabel="label" optionValue="value"></Dropdown>
-							
-							<Calendar class="mt-3" v-model="calendarValue" :selectionMode="selectionMode" :inline="true" :showTime="showTime"/>
-						</template>
-					</Column>
-					
-					<Column field="transfer_status_id" :showFilterMatchModes="false" header="Status">
-						<template #filter="{ filterModel, filterCallback }">
-							<InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by status"></InputText>
-						</template>
-						
-					</Column>
-					
-					<Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
-						<template #body="{ data }">
-							<Button icon="pi pi-trash" class="p-button-rounded p-button-warning m-0" @click="onPressDeletedProduct(data)" />
-						</template>
-					</Column>
-				</DataTable>
-				
-				<RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingTransfer"></RetryField>
-				<PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="onDecline" :message="message"/>
-				<HiddenRetryField :toLoad="toLoadHidden" :message="messageLoading" :errorToast="errorToastLoadingTransfer"></HiddenRetryField>
-			</div>
-		</div>
-	</div>
+              <Column :sortable="true" style="min-width:12rem" field="transfer_type_id" header="Transfer Type">
+                <template #body="{ data }">
+                  <TransferTypeField :data="data"></TransferTypeField>
+                </template>
+                
+              </Column>
+
+              <Column :sortable="true" style="min-width:12rem" field="schedule_time" header="Schedule Time"
+                      :showFilterMatchModes="false">
+                <template #filter>
+                  <CalendarTime @getValueMode="storeScheduleTimeMode" @getValue="storeScheduleTimeValue"></CalendarTime>
+                </template>
+              </Column>
+
+              <Column :sortable="true" style="min-width:12rem" field="complete_time" header="Complete Time"
+                      :showFilterMatchModes="false">
+                <template #body="{ data }">
+                  {{ formatDate(data.complete_time) }}
+                </template>
+
+                <template #filter>
+                    <CalendarTime @getValueMode="storeCompleteTimeMode"
+                                @getValue="storeCompleteTimeValue"></CalendarTime>
+                </template>
+              </Column>
+
+              <Column field="recipient" header="Recipient" style="min-width:12rem">
+                <template #filter="{ filterModel, filterCallback }">
+                  <InputText v-model="filterModel.value" @input="filterCallback()"
+                            placeholder="Search by Recipient"></InputText>
+                </template>
+              </Column>
+
+              <Column field="transfer_status_id" :sortable="true" style="min-width:10rem" :showFilterMatchModes="false"
+                      header="Status">
+                <template #body="{ data }">
+                  <TransferStatusField :data='data'></TransferStatusField>
+                </template>
+
+                <template #filter = "{filterModel, filterCallback}">
+                  <MultiSelect :options="convertToList" v-model="filterModel.value" @change="onInputStatusId($event.value, filterCallback)" optionLabel="name" optionValue="id"
+                              class="p-column-filter" placeholder="Search by status"></MultiSelect>
+                </template>
+              </Column>
+
+              <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:12rem">
+                <template #body="{ data }">
+                  {{ formatDate(data.created_at) }}
+                </template>
+
+                <template #filter>
+                  <CalendarTime @getValueMode="storeCreatedAtMode" @getValue="storeCreatedAtValue" @onLoad="loadCalendarParam"></CalendarTime>
+                </template>
+              </Column>
+
+              <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
+                <template #body="{ data }">
+                  <Button icon="pi pi-trash" class="p-button-rounded p-button-warning m-0"
+                          @click="onPressDeletedProduct(data)"/>
+                </template>
+              </Column>
+            </DataTable>
+          
+          
+
+          <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingTransfer"></RetryField>
+          <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="onDecline"
+                      :message="message"/>
+          <HiddenRetryField :toLoad="toLoadHidden" :message="messageLoading"
+                            :errorToast="errorToastLoadingTransfer"></HiddenRetryField>
+        </div>
+      </div>
+      <TransferStatusField></TransferStatusField>
+    </div>
+  </CountDown>
 </template>
 
 
 <style scoped lang="scss">
-	@import '@/assets/demo/badges.scss';
+@import '@/assets/demo/badges.scss';
 
-	::v-deep(.p-datatable-frozen-tbody) {
-		font-weight: bold;
-	}
+::v-deep(.p-datatable-frozen-tbody) {
+  font-weight: bold;
+}
 
-	::v-deep(.p-datatable-scrollable .p-frozen-column) {
-		font-weight: bold;
-	}
+::v-deep(.p-datatable-scrollable .p-frozen-column) {
+  font-weight: bold;
+}
 </style>
 
-
-
 <script>
-	import { FilterMatchMode } from "primevue/api"
-	import { mapGetters } from "vuex"
-	import TransferItem from "../transfers/components/TransferItem.vue"
-	import myTime from "../../components/utils/TimeConvert.js"
-	import RetryField from "../../components/prompt_field/RetryField.vue"
-	import PromptField from "../../components/prompt_field/PromptField.vue"
-	import HiddenRetryField from "../../components/prompt_field/HiddenRetryField.vue"
+  import {FilterMatchMode, FilterOperator} from "primevue/api"
+  import {mapGetters} from "vuex"
+  import TransferItem from "../transfers/components/TransferItem.vue"
+  import myTime from "../../components/utils/TimeConvert.js"
+  import RetryField from "../../components/prompt_field/RetryField.vue"
+  import PromptField from "../../components/prompt_field/PromptField.vue"
+  import HiddenRetryField from "../../components/prompt_field/HiddenRetryField.vue"
+  import TransferStatusField from "./components/TransferStatusField.vue"
 
-	export default {
-		created(){
-			this.toLoadHidden=this.initData
-			this.calenderFilterMode = "datesIn"
-		},
-		components:{
-			TransferItem,
-			RetryField,
-			PromptField,
-			HiddenRetryField
-		},
-		data() {
-			return {
-				loading1: false,
-				mySelected: [],
-				promptDeleted: false,
-				selectedForDelete: null,
+  import {transferStatus} from "../../domains/domain"
+  import CalendarTime from "@/pages/transfers/components/CalendarTime.vue";
+  import CountDown from "../../components/CountDown.vue"
+  import TransferTypeField from "./components/TransferTypeField.vue"
 
-				outOfFetch: 1,
-				
-				row: 10,
+  export default {
+    updated(){
+      console.log("updating")
+    },
+    created() {
+      this.toLoadHidden = this.initData
+    },
+    components: {
+      CalendarTime,
+      TransferItem,
+      RetryField,
+      PromptField,
+      HiddenRetryField,
+      TransferStatusField,
+      CountDown,
+      TransferTypeField
+    },
+    data() {
+      return {
+        loading1: false,
+        mySelected: [],
+        promptDeleted: false,
+        selectedForDelete: null,
 
-				filters:{	
-					id: {value: null, matchMode: FilterMatchMode.CONTAINS},
-					created_at: {value:null, matchMode: "datesIn"},
-					transfer_status_id: {value:null, matchMode: FilterMatchMode.CONTAINS}
-				},
+        outOfFetch: 1,
 
-				toLoadRetry: null,
-				toLoadHidden: null,
+        row: 10,
 
-				calenderFilterMode: null,
-				calendarValue: null,
-				selectionMode:null,
-				showTime: true,
+        filters: {
+          id: {value: null, matchMode: FilterMatchMode.CONTAINS},
+          transfer_status_id: {value: null, matchMode: "MultipleMatchMode"},
+          schedule_time: {value: null, matchMode: "datesIn"},
+          complete_time: {value: null, matchMode: "datesIn"},
+          created_at: {value: null, matchMode: "datesIn"},
+          recipient: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.CONTAINS}]}
+        },
 
-				message:{
-					failed: "Error Deleting Transfer, Try again",
-					yesButton: "Yes",
-					noButton: "No",
-					decline: "No",
-					accept: "Yes",
-					prompt: null
-				},
+        toLoadRetry: null,
+        toLoadHidden: null,
 
-				messageLoading:{
-					failed: "Error loading Transfer, Try again",
-					yesButton: "Yes",
-					noButton: "No",
-				},
+        filterValueToSearch: null,
+        filterParamsToSearch: null,
+        emptyMessage: null,
 
-				errorToastDeletingTransfer:{
-					severity:"error",
-					summary: "Error!",
-					detail: "Failed Deleting Transfer!"
-				},
+        selectedStatus:null,
 
-				errorToastLoadingTransfer:{
-					severity: "error",
-					summary: "Error!",
-					detail: "Failed Loading Transfer!"
-				},
-			}
-		},
-		computed: {
-			...mapGetters({
-				myTransfers: "transfers/getTransfers",
-				hasTransfers: "transfers/hasTransfers",
-				LoginStatus: "isLoggedIn",
-			}),
+        message: {
+          failed: "Error Deleting Transfer, Try again",
+          yesButton: "Yes",
+          noButton: "No",
+          decline: "No",
+          accept: "Yes",
+          prompt: null
+        },
 
-			multipleSelectMode(){
-				return this.mySelected.length>0
-			},
+        messageLoading: {
+          failed: "Error loading Transfer, Try again",
+          yesButton: "Yes",
+          noButton: "No",
+        },
 
-			accessToken() {
-				return localStorage.accessToken;
-			},
+        errorToastDeletingTransfer: {
+          severity: "error",
+          summary: "Error!",
+          detail: "Failed Deleting Transfer!"
+        },
 
-			isLoading(){
-				return this.loading1 && !this.$store.state.transfers.transfers
-			},
+        errorToastLoadingTransfer: {
+          severity: "error",
+          summary: "Error!",
+          detail: "Failed Loading Transfer!"
+        },
+      }
+    },
+    computed: {
+      ...mapGetters({
+        myTransfers: "transfers/getTransfers",
+        hasTransfers: "transfers/hasTransfers",
+        LoginStatus: "isLoggedIn",
+      }),
 
-			customDate(){
-				return [
-					{label: "Date is in between", value: "dateRanges"},
-					{label: "Date in", value: "datesIn"},
-					{label: "Date greater than", value: "dateGreaterThan"},
-					{label: "Date less than", value: "dateLessThan"}
-				]
-			},
+      convertToList() {
+        //Transform from an object to list
+        const myList = []
+        for (const i in transferStatus) {
+          myList.push({id: i, name: (transferStatus?.[i] ?? "Error")})
+        }
+        return myList
+      },
 
-			convertForCalendar(){
-				return {
-					dateRanges: "range",
-				}
-			},
+      multipleSelectMode() {
+        return this.mySelected.length > 0
+      },
 
-			showTimeOrNot(){
-				return {
-					datesIn: false,
-					dateRanges: true,
-					dateGreaterThan: true,
-					dateLessThan: true
-				}
-			}
-		},
-		methods:{
-			formatDate(value){
-				return myTime.formatDateFromScheduleDate(value)
-			},
+      accessToken() {
+        return localStorage.accessToken;
+      },
 
-			goToCreateTransfer(){
-				this.$router.push({name: "TransferCreate"})
-			},
-			
-			onPressDeletedProduct(data){
-				//Do this else it will not recognize it's a new value on watch
-				this.selectedForDelete = {...data}
-				this.message.prompt = `Are you sure you want to delete ${ this.selectedForDelete.recipient ?? this.selectedForDelete.id ?? "this" } transfer?`
-			},
+      isLoading() {
+        return this.loading1 && !this.$store.state.transfers.transfers
+      },
+    },
+    methods: {
+      onInputStatusId(id, filterCallback){
+        //TODO: Interfrate id params
+        this.filterParamsToSearch = {
+          id: id
+        }
+        filterCallback()
+      },
 
-			DiscardDeletedPrompt(){
-				this.mySelected = []
-				this.selectedForDelete = null
-			},
+      async loadCalendarParam(){
+        //TODO: Intergrate calendar params
+        this.filterParamsToSearch = {date: this.filterValueToSearch }
+      },
 
-			async onConfirmDeletedPrompt(){
-				this.message.failed = `Failed to delete ${this.selectedForDelete.recipient} transfer, try again?`
-				this.promptDeleted=false
+      async loadIdParam(){
+        //TODO: Intergrate id params
+        this.filterParamsToSearch = {
+          id: this.filterValueToSearch
+        }
+      },
 
-				this.toLoadRetry = async ()=>{	
-					await this.$store.dispatch("transfers/deleteSingleTransfer", {
-					transfer: this.selectedForDelete
-					})
-					this.$toast.add({severity:'success', summary: "Success!", detail: "Transfer Deleted Successfully", life:3000})
-					this.DiscardDeletedPrompt()
-				}			
-			},
-			
-			onPage(event){
-				if(event.page+1 == Math.floor(this.myTransfers.length/10) && this.outOfFetch>0){
-					this.loadData()
-				}
-			},
+      async activateAPI(){
+        if(this.filterValueToSearch){
+        // TODO: Intergrate Search API
+        // await this.$store.dispatch("transfers/getTransfers", {
 
-			async initData(){
-				this.message.failed ="Loading failed, retry?"
-				
-				await this.$store.dispatch("transfers/getTransfers", {
-					currentOffset: 0,
-					limit: this.row*2
-				})
-			},
+        // })
+        }
+      },
 
-			async loadData(){
-				this.toLoadHidden = async ()=>{
-					// The Ui will first need 2 pages in order for pagination to work, 
-					// Because it's triggered by pressing the button which does it in the background 
-					// so we have to get data*2 then the current ui in order for the press next button to work
-					const tranfers = await this.$store.dispatch("transfers/getTransfers", {
-						currentOffset: this.row*2,
-						limit: this.row*2
-					})
-					this.outOfFetch = tranfers.length
-				}
-			},
+      findData(startCountDown){
+        // For some reason if we emits the value from StartCountdown(), it will cause an endless recurrsion
+        // that refreshes the datatable endlessly, this is fine for dropdownpagination
+        // TODO: Refactor countdownStartTimer
+        startCountDown()
+      },
+      
+      formatDate(value) {
+        return myTime.formatDateFromScheduleDate(value)
+      },
 
-			noRetry(){
-				this.loading1=false
-			},
+      goToCreateTransfer() {
+        this.$router.push({name: "TransferCreate"})
+      },
 
-			onDecline(newValue){
-				this.promptDeleted=newValue
-			}
-		},
+      onPressDeletedProduct(data) {
+        //Do this else it will not recognize it's a new value on watch
+        this.selectedForDelete = {...data}
+        this.message.prompt = `Are you sure you want to delete ${this.selectedForDelete.recipient ?? this.selectedForDelete.id ?? "this"} transfer?`
+      },
 
-		watch:{
-			selectedForDelete(newValue){
-				// First Exclamation mark means return false if there's data
-				// Second means return true if there's data
-				this.promptDeleted=!!newValue
-			},
+      DiscardDeletedPrompt() {
+        this.mySelected = []
+        this.selectedForDelete = null
+      },
 
-			mySelected(){
-				if(this.mySelected <= 0){
-					this.promptDeleted = false
-				}
-			},
+      async onConfirmDeletedPrompt() {
+        this.message.failed = `Failed to delete ${this.selectedForDelete.recipient} transfer, try again?`
+        this.promptDeleted = false
 
-			calenderFilterMode:{
-				immediate:true,
-				handler: function(newValue){
-					this.filters.created_at.matchMode = newValue
-					this.selectionMode = this.convertForCalendar?.[newValue]
-					this.showTime = this.showTimeOrNot?.[newValue] ?? true
-					this.calendarValue=null
-				}
-			},
+        this.toLoadRetry = async () => {
+          await this.$store.dispatch("transfers/deleteSingleTransfer", {
+            transfer: this.selectedForDelete
+          })
+          this.$toast.add({severity: 'success', summary: "Success!", detail: "Transfer Deleted Successfully", life: 3000})
+          this.DiscardDeletedPrompt()
+        }
+      },
 
-			calendarValue:{
-				immediate:true,
-				handler: function(newValue){
-					
-					this.filters.created_at.value = newValue
-				}
-			},
-		}
-	}
+      onPage(event) {
+        if (event.page + 1 == Math.floor(this.myTransfers.length / 10) && this.outOfFetch > 0) {
+          this.loadData()
+        }
+      },
+
+      async initData() {
+        this.message.failed = "Loading failed, retry?"
+
+        await this.$store.dispatch("transfers/getTransfers", {
+          currentOffset: 0,
+          limit: this.row * 2
+        })
+      },
+
+      async loadData() {
+        this.toLoadHidden = async () => {
+          // The Ui will first need 2 pages in order for pagination to work,
+          // Because it's triggered by pressing the button which does it in the background
+          // so we have to get data*2 then the current ui in order for the press next button to work
+          const tranfers = await this.$store.dispatch("transfers/getTransfers", {
+            currentOffset: this.row * 2,
+            limit: this.row * 2
+          })
+          this.outOfFetch = tranfers.length
+        }
+      },
+
+      noRetry() {
+        this.loading1 = false
+      },
+
+      onDecline(newValue) {
+        this.promptDeleted = newValue
+      },
+
+      storeCreatedAtMode(newValue) {
+        this.filters.created_at.matchMode = newValue
+      },
+
+      storeCreatedAtValue(newValue) {
+        this.filters.created_at.value = newValue
+        this.filterValueToSearch = newValue
+      },
+
+      storeScheduleTimeMode(newValue) {
+        this.filters.schedule_time.matchMode = newValue
+      },
+
+      storeScheduleTimeValue(newValue) {
+        this.filters.schedule_time.value = newValue
+        this.filterValueToSearch = newValue
+      },
+
+      storeCompleteTimeMode(newValue) {
+        this.filters.complete_time.matchMode = newValue
+      },
+
+      storeCompleteTimeValue(newValue) {
+        this.filters.complete_time.value = newValue
+        this.filterValueToSearch = newValue
+      }
+    },
+
+    watch: {
+      selectedForDelete(newValue) {
+        // First Exclamation mark means return false if there's data
+        // Second means return true if there's data
+        this.promptDeleted = !!newValue
+      },
+
+      mySelected() {
+        if (this.mySelected <= 0) {
+          this.promptDeleted = false
+        }
+      },
+    }
+  }
 </script>
