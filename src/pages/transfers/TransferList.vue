@@ -24,30 +24,41 @@
 
                 <template #filter="{ filterModel, filterCallback }">
                   <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
-                            placeholder="Search by Reference"></InputText>
+                            placeholder="Search by id"></InputText>
                 </template>
               </Column>
 
-              <Column :sortable="true" style="min-width:12rem" field="reference" header="Reference"></Column>
+              <Column field="reference" :sortable="true" style="min-width:12rem" header="Reference">
+              
+                <template #filter="{ filterModel, filterCallback }">
+                  <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
+                    placeholder="Search By Reference"
+                  ></InputText>
+                </template>
+              </Column>
 
-              <Column :sortable="true" style="min-width:12rem" field="transfer_type_id" header="Transfer Type">
+              <Column field="transfer_type_id" :sortable="true" style="min-width:12rem" header="Transfer Type">
                 <template #body="{ data }">
                   <TransferTypeField :data="data"></TransferTypeField>
                 </template>
                 
               </Column>
 
-              <Column :sortable="true" style="min-width:12rem" field="schedule_time" header="Schedule Time"
+              <Column field="scheduled_time" :sortable="true" style="min-width:14rem" header="Schedule Time"
                       :showFilterMatchModes="false">
+
+                <template #body="{ data }">
+                  {{ formatDate(data.scheduled_time) }}
+                </template>
                 <template #filter>
                   <CalendarTime @getValueMode="storeScheduleTimeMode" @getValue="storeScheduleTimeValue"></CalendarTime>
                 </template>
               </Column>
 
-              <Column :sortable="true" style="min-width:12rem" field="complete_time" header="Complete Time"
+              <Column :sortable="true" style="min-width:14rem" field="completed_time" header="Complete Time"
                       :showFilterMatchModes="false">
                 <template #body="{ data }">
-                  {{ formatDate(data.complete_time) }}
+                  {{ formatDate(data.completed_time) }}
                 </template>
 
                 <template #filter>
@@ -56,14 +67,14 @@
                 </template>
               </Column>
 
-              <Column field="recipient" header="Recipient" style="min-width:12rem">
+              <Column field="recipient" header="Recipient" style="min-width:14rem">
                 <template #filter="{ filterModel, filterCallback }">
                   <InputText v-model="filterModel.value" @input="filterCallback()"
                             placeholder="Search by Recipient"></InputText>
                 </template>
               </Column>
 
-              <Column field="transfer_status_id" :sortable="true" style="min-width:10rem" :showFilterMatchModes="false"
+              <Column field="transfer_status_id" :sortable="true" style="min-width:8rem" :showFilterMatchModes="false"
                       header="Status">
                 <template #body="{ data }">
                   <TransferStatusField :data='data'></TransferStatusField>
@@ -75,7 +86,7 @@
                 </template>
               </Column>
 
-              <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:12rem">
+              <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:14rem">
                 <template #body="{ data }">
                   {{ formatDate(data.created_at) }}
                 </template>
@@ -93,8 +104,6 @@
               </Column>
             </DataTable>
           
-          
-
           <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingTransfer"></RetryField>
           <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="onDecline"
                       :message="message"/>
@@ -136,9 +145,6 @@
   import TransferTypeField from "./components/TransferTypeField.vue"
 
   export default {
-    updated(){
-      console.log("updating")
-    },
     created() {
       this.toLoadHidden = this.initData
     },
@@ -166,8 +172,9 @@
         filters: {
           id: {value: null, matchMode: FilterMatchMode.CONTAINS},
           transfer_status_id: {value: null, matchMode: "MultipleMatchMode"},
-          schedule_time: {value: null, matchMode: "datesIn"},
-          complete_time: {value: null, matchMode: "datesIn"},
+          reference: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
+          scheduled_time: {value: null, matchMode: "datesIn"},
+          completed_time: {value: null, matchMode: "datesIn"},
           created_at: {value: null, matchMode: "datesIn"},
           recipient: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.CONTAINS}]}
         },
@@ -352,20 +359,20 @@
       },
 
       storeScheduleTimeMode(newValue) {
-        this.filters.schedule_time.matchMode = newValue
+        this.filters.scheduled_time.matchMode = newValue
       },
 
       storeScheduleTimeValue(newValue) {
-        this.filters.schedule_time.value = newValue
+        this.filters.scheduled_time.value = newValue
         this.filterValueToSearch = newValue
       },
 
       storeCompleteTimeMode(newValue) {
-        this.filters.complete_time.matchMode = newValue
+        this.filters.completed_time.matchMode = newValue
       },
 
       storeCompleteTimeValue(newValue) {
-        this.filters.complete_time.value = newValue
+        this.filters.completed_time.value = newValue
         this.filterValueToSearch = newValue
       }
     },

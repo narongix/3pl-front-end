@@ -7,8 +7,11 @@ export default {
     },
 
     formatDateFromScheduleDate(date){
-        const time = moment(date).format("MMM Do YYYY hh:mm:ss a")
-        return time
+        if(date){
+            const time = moment(date).format("Do MMM YYYY hh:mm a")
+            return time
+        }
+        return ""
     },
 
     convertToMs(date){

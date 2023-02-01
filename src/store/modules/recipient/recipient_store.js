@@ -34,7 +34,7 @@ export default{
 
         findRecipientId: (state)=>(contact)=>{
             const index = state.recipients.findIndex((e)=>{
-                const detail = `${e.full_name} - ${e.phone_number}`
+                const detail = `${e?.full_name} - ${e?.phone_number}`
                 return detail == contact
             })
             if(index>=0){
@@ -73,5 +73,10 @@ export default{
             commit("updateRecipientState", data)
             return data
         },
+
+        async createRecipient({commit}, {recipient}){
+            const newRecipient = await ApiService.createRecipient(recipient)
+            commit("updateRecipientState", [newRecipient])
+        }
     }
 }

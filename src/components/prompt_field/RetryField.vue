@@ -1,5 +1,5 @@
 <template>
-    <Dialog :visible="loading" :modal="true" :closable='false'>
+    <Dialog :visible="loading" :modal="true" :closable='false' @update:visibile="hideHandler">
         <ProgressSpinner v-if="!textLoading"/>
         <p v-else>{{ textLoading }}</p>
         <template #footer>
@@ -35,6 +35,12 @@
             }
         },
         methods:{
+            hideHandler(value){
+                if(!value){
+                    this.loading=false
+                }
+            },
+
             async loadData(){
                 try{
                     this.textLoading=null
@@ -75,8 +81,7 @@
                     }
                 },
                 immediate:true,
-            },
-
+            }
         }
     }
 </script>

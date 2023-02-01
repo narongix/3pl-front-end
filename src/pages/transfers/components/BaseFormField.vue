@@ -11,8 +11,7 @@
                     <p></p>
 
                     <div class="p-fluid formgrid grid">
-            
-                        <div class="field col-12 md:col-3 sm:col-12">
+                        <div class="field col-12 md:col-4 sm:col-12">
                             <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
                             <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
                                       id="scheduleDate" v-model="transferData.scheduledDate"
@@ -27,24 +26,43 @@
                               :options="transfer_type" :optionLabel="getTransferTypeName"
                               :class="{'p-invalid': validationField1.transfer_type_id.value}"
                               :placeholder="transferLoading? 'Loading' : 'Please select a transfer'"
-                              :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="true">
+                              :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="true"                              >
                             </Dropdown>
                             <small id="transfer_type_id-help" class="p-error" v-if="validationField1.transfer_type_id.value">Cannot be Empty</small>
                         </div>
 
-                        <div v-if="showRecipientField" class="field col-12 md:col-3 sm:col-12">
-                            <label for="recipient" :class="{'p-error': validationField1.contact_id.value}">Recipient</label>
-                            <DropDownPagination @onChanged="onReceipientChanged" :options="getRecipientsState" optionLabel="full_name" optionValue="contact_id"
-                              :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
-                              :validation="validationField1.contact_id.value"
-                              :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
-                              :maxLength="getRecipientLength"
-                              :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
-                              :SelectedValue="transferData.contact_id"
-                            >
+                        <div v-if="showRecipientField" class="field col-12 md:col-5 sm:col-12">
+                            <label for="recipient" :class="{'p-error': validationField1.recipient.value}">Recipient</label>
+                            <div class="field grid col-12 md:col-9 sm:col-12">
+                                <div class="col-11 pl-0">
+                                    <InputText v-model="transferData.recipient" @input="onInput" 
+                                    placeholder="Recipient" type="text" :disabled="FieldNotActive || disabledField['recipient']"
+                                    :class="{'p-error': validationField1.recipient.value}"
+                                    >
+                                    </InputText>
+
+                                    <OverlayPanel ref="myOverLayPanel">
+                                        <div>
+                                            <Button label="Create Template" class="p-button-link" @click="createRecipientTemplateNow"></Button>
+                                        </div>
+                                        <div>
+                                            <Button label="Create and edit" class="p-button-link" @click="openCreateRecipientTemplate"></Button>
+                                        </div>                                        
+                                    </OverlayPanel>
+                                </div>
                                 
-                            </DropDownPagination>
-                            <small id="recipient-help" class="p-error" v-if="validationField1.contact_id.value">Cannot be Empty</small>
+                                <div class="field col-1">
+                                    <Button icon="pi pi-bookmark" :disabled="FieldNotActive || disabledField['recipient']" 
+                                    class="p-button-rounded p-button-secondary p-button-text" @click="openRecipientPanel" 
+                                    v-tooltip="'Choose From Template'"/>
+                                </div>
+                            </div>
+                            <small id="recipient-help" class="p-error" v-if="validationField1.recipient.value">Cannot be Empty</small>
+                        </div>
+                        <div class="field col-12 md:col-3 sm:col-12">
+                            <label for="status">Status</label>
+                            <InputText :disabled="true" id="status" 
+                            type="text" v-model="myTransferStatus"></InputText>
                         </div>
                     </div>
                 </div>
@@ -108,12 +126,13 @@
                 :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
                 :maxLength="getProductLength"
                 :errorToastLoading="errorToastLoadingProducts" :messageLoad="messageLoadProducts"
-                :SelectedValue="product_id"
+                :SelectedValue="product_id" :showValue="option=>option.product_name"
                 >
-                    
+
                 </DropDownPagination>
                 <small id="product_id-help" class="p-error" v-if="validationField2.product_id.value!=null">{{ validationField2.product_id.value }}</small>
             </div>
+
             <div class="field col-12 md:col-12 sm:col-12">
                 <label for="demand" :class="{'p-error': validationField2.demand.value!=null}">Product Quantity</label>
                 <InputText :disabled="FieldNotActive" id="demand" type="text" v-model="demand" :class="{'p-invalid':validationField2.demand.value}"></InputText>
@@ -128,7 +147,31 @@
         </template>
     </Dialog>
 
+    <Dialog v-model:visible="promptFindRecipient" header="Choose from template" :style="{width: '350px'}">
+        <div class="grid">
+            <div class="col-12 md:col-12 sm:col-12">
+                <DropDownPagination @onChanged="onReceipientChanged" :options="getRecipientsState" optionLabel="full_name" optionValue="contact_id"
+                :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
+                :validation="validationField1.recipient.value"
+                :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
+                :maxLength="getRecipientLength"
+                :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
+                :SelectedValue="contact_id" :showValue="option=>option.full_name"
+                >
+                    
+                </DropDownPagination>
+            </div>
+        </div>
+
+        <template #footer>
+            <Button label="Discard" @click="changeRecipientState"></Button>
+            <Button label="Create" @click="onConfirmSelectRecipientState"></Button>
+        </template>
+    </Dialog>
+
     <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="changeDeletedStateDialog" :message="messageDeletePrompt"/>
+    <RecipientField v-model="transferData.recipient" v-model:state="state"></RecipientField>
+    <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
 </template>
 
 <style scoped>
@@ -147,6 +190,10 @@
     import TimeConvert from "@/components/utils/TimeConvert";
     import {FilterMatchMode, FilterOperator} from "primevue/api";
 
+    import { transferStatus } from '../../../domains/domain';
+    import RecipientField from './RecipientField.vue';
+    import RetryField from '../../../components/prompt_field/RetryField.vue';
+
     export default{
         props:{
             baseData: Object,
@@ -157,16 +204,20 @@
         
         emits:["onClickSubmit"],
         components:{
-            DropDownPagination,
-            PromptField
-        },
+    DropDownPagination,
+    PromptField,
+    RecipientField,
+    RetryField
+},
 
         data(){
             return {
-              filters:{
-                product_name: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.CONTAINS}]},
-                demand: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
-              },
+                state:false,
+
+                filters:{
+                    product_name: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.CONTAINS}]},
+                    demand: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
+                },
                 messageDeletePrompt:{
                     decline: "No",
                     accept: "Yes",
@@ -192,11 +243,28 @@
 
                 showRecipientField:false,
 
+                myTransferStatus: transferStatus[1],
+                promptFindRecipient:false,
+
+                contact_id: null,
+                toLoad: null,
+
+                message: {
+                    failed: "Failed to create, Retry?",
+                    yesButton: "Yes",
+                    noButton: "No"
+                },
+                
+                errorToast:{
+                    severity:"error",
+                    summary: "Error!",
+                    detail: "Failed Creating Recipient!"
+                },
+
                 transferData:{
                     scheduledDate: null,
-                    recipient: null,
                     transfer_type_id:null,
-                    contact_id: null,
+                    recipient: null,
                     transferProducts: [],
                 },
 
@@ -221,18 +289,18 @@
                         }
                     },
 
-                    contact_id:{
+                    recipient:{
                         value: null,
                         myFunction:()=>{
                             // id 2 = delivery
                             if(this.transferData.transfer_type_id!=2){
-                                return this.validationField1.contact_id.value=null
+                                return this.validationField1.recipient.value=null
                             }
                             
-                            if (this.transferData.contact_id){
-                                return this.validationField1.contact_id.value=null
+                            if(this.transferData.recipient){
+                                return this.validationField1.recipient.value=null
                             }
-                            this.validationField1.contact_id.value="Field cannot be empty!"
+                            this.validationField1.recipient.value="Field cannot be empty!"
                         }
                     },
 
@@ -360,6 +428,38 @@
         },
 
         methods:{
+            createRecipientTemplateNow(){
+                this.toLoad = async ()=>{
+                    const data = {
+                        first_name: this.transferData.recipient
+                    }
+                    await this.$store.dispatch("recipient/createRecipient", {
+                        recipient: data
+                    })
+                }
+                this.$refs.myOverLayPanel.hide()
+            },
+
+            openCreateRecipientTemplate(){
+                this.changeRecipientTemplateState()
+            },
+
+            changeRecipientTemplateState(){
+                this.state=!this.state
+            },
+
+            onInput(input){
+                if(!this.transferData.recipient){
+                    return this.$refs.myOverLayPanel.hide(input)
+                }
+
+                this.$refs.myOverLayPanel.show(input)
+            },
+            
+            openRecipientPanel(){
+                this.changeRecipientState()
+            },
+
             initializeData(){
                 this.transferData={
                     id: this.data?.id,
@@ -367,16 +467,17 @@
                     recipient: this.data?.recipient ?? null,
                     transfer_type_id: this.data?.transfer_type_id,
                     transferProducts: this.data?.transfer_products? [...this.data.transfer_products] : [],
-                    contact_id: this.data?.contact_id
                 }
                 this.originalLength = this.data.transfer_products?.length ?? 0
+                this.myTransferStatus = transferStatus?.[this.data?.transfer_status_id] ?? transferStatus[1]
+                this.contact_id = this.$store.getters["recipient/findRecipientId"](this.transferData?.recipient)
             },
 
             findProductAfterSelected(){
                 // TODO: Either cache the product ID or develop an algorithm for this,
                 // also this code belongs to MyTransferDetails.vue not in the shared component
                 const myIndex = this.getProducts.findIndex((e)=>e.product_id == this.product_id)
-                this.demand = parseInt(this.demand) || ""
+                this.demand = parseInt(this.demand) ?? "1"
 
                 this.tempMove = {...(this.transferData.transferProducts?.[this.editedIndex] ?? this.getProducts[myIndex])}
                 this.tempMove.product_id = this.product_id ?? null
@@ -388,13 +489,13 @@
                 const index = this.onValidateField2()
                 // < 0 = If there's no error
                 if(index<0){
-                    this.cleanseField2
+                    this.cleanseField2()
                     this.findProductAfterSelected()
                     this.transferData.transferProducts.push(this.tempMove)
                     this.addedTransferProducts.push({
                         product_id: this.product_id,
                         demand: this.demand
-                    })
+                    }) 
                     this.changeStateDiaglog()
                 }
             },
@@ -574,7 +675,16 @@
             },
 
             onReceipientChanged(contact_id){
-                this.transferData.contact_id = contact_id
+                this.contact_id=contact_id
+            },
+            
+            changeRecipientState(){
+                this.promptFindRecipient = !this.promptFindRecipient
+            },
+
+            onConfirmSelectRecipientState(){
+                this.transferData.recipient = this.$store.getters["recipient/getRecipientFullDetail"](this.contact_id)
+                this.changeRecipientState()
             }
         },
         
@@ -617,6 +727,7 @@
                 if(newVal!=2){
                     this.showRecipientField = false
                     this.transferData.contact_id = null
+                    this.transferData.recipient = null
                 }else{
                     this.showRecipientField = true
                 }
