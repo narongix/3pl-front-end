@@ -1,7 +1,7 @@
 <template>
   <CountDown v-slot="myCountDown" @countDownTime="countDownMessage" @activateAPI="searchName">
     <Dropdown :options="dataList" :optionLabel="optionLabel" v-model="selectedData" :optionValue="optionValue"
-              :disabled="FieldNotActive"
+              :disabled="disabled"
               :id="id"
               :class="{'p-invalid': validation}"
               :placeholderSearch="placeholderSearch"
@@ -11,7 +11,7 @@
               :virtualScrollerOptions="{lazy:true, onLazyLoad: onload, showLoader:true, loading: loading, itemSize:38}"
     >
       <template #option="slotProps">
-        <p :onload="myCountDown.stopCountDown()">{{ slotProps.option.product_name }}</p>
+        <p :onload="myCountDown.stopCountDown()">{{ showValue(slotProps.option) }}</p>
       </template>
 
       <template #emptyfilter>
@@ -35,8 +35,7 @@
     },
     props: {
       myModel: Object,
-      FieldNotActive: Boolean,
-      disabledField: Boolean,
+      disabled: Boolean,
       validation: Boolean,
       optionLabel: String,
       placeholderSearch: String,
@@ -49,7 +48,8 @@
       whenLoad: Function,
       whenSearch: Function,
       maxLength: Number,
-      SelectedValue: undefined
+      SelectedValue: undefined,
+      showValue: Function,
     },
     data() {
       return {
@@ -139,7 +139,7 @@
         if (!newValue) {
           clearTimeout(this.countdownTracker);
         }
-      },
+      }
     }
   }
 </script>

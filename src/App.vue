@@ -105,12 +105,13 @@ export default {
                 //         // {label: 'PrimeFlex', icon: 'pi pi-fw pi-desktop', url: 'https://www.primefaces.org/primeflex/', target: '_blank'},
                 //     ]
                 // },
+                this.isLogin? null :
 				{
 					label: 'Pages', icon: 'pi pi-fw pi-clone',
 					items: [
 						// {label: 'Crud', icon: 'pi pi-fw pi-user-edit', to: '/crud'},
 						// {label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/timeline'},
-            {label: 'Login', icon: 'pi pi-fw pi-sign-in', to: '/login'}
+                            {label: 'Login', icon: 'pi pi-fw pi-sign-in', to: '/login'}
                         // {label: 'Error', icon: 'pi pi-fw pi-times-circle', to: '/error'},
                         // {label: 'Not Found', icon: 'pi pi-fw pi-exclamation-circle', to: '/notfound'},
                         // {label: 'Access Denied', icon: 'pi pi-fw pi-lock', to: '/access'},
@@ -258,6 +259,9 @@ export default {
 				'p-input-filled': this.$primevue.config.inputStyle === 'filled',
 				'p-ripple-disabled': this.$primevue.config.ripple === false
             }];
+        },
+        isLogin(){
+            return this.$state.getters["isLoggedIn"]
         },
         logo() {
             return (this.$appState.darkTheme) ? "images/logo-white.svg" : "images/logo.svg";

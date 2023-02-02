@@ -168,7 +168,7 @@ FilterService.register("dateRanges", (rowValue, filterValue)=>{
     if(filterValue && (filterValue?.length ?? false)>0){
         const rowMs = Date.parse(rowValue)
         const filterMs = filterValue.map((e)=>Date.parse(e))
-        
+
         return rowMs >=filterMs[0] && rowMs <= filterMs[1] 
     }
     return true
