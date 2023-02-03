@@ -1,4 +1,6 @@
 import ApiService from "../../../service/ApiService";
+import store from "../../index";
+import TimeConvert from "../../../components/utils/TimeConvert";
 
 export default{
     namespaced: true,
@@ -8,26 +10,34 @@ export default{
         }
     },
     getters:{
-        getStockedList(){
-            return stockedList
+        getStockedList(state){
+            return state.stockedList
         }
     },
-    methods:{
-        onUpdateStockedList(state, stockedList){
-            stockedList.forEach(element => {
-                const index = state.stockedList.findIndex((e)=> e.product_id == element.product_id)
-                if(index<0){
-                    state.stockedList.push(element)
-                }else{
-                    state.stockedList[index] = element
-                }
-            });
+    mutations:{
+        onReplacedStockedList(state, stockedList){
+            state.stockedList = [...stockedList]
+        },
+
+        onClearState(state){
+            state.stockedList.length=0
         }
     },
     actions:{
-        async onfetchedStockedList({ commit }){
-            const data = await ApiService.getStockedDetailReport()
-            commit("onUpdateStockedList", data)
-        }
+        async onfetchedStockedList({ commit }, {from_date, to_date}){
+            const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
+            const newToDate = TimeConvert.formatDateToStockFormat(to_date)
+
+            const data = await ApiService.getStockedDetailReport({
+                params:{
+                    user_id: store.getters["auth/user"]?.odoo_id,
+                    from_date: newFromDate,
+                    to_date: newToDate
+                }
+            })
+            // Don't user update because of the fact that old data can be in different 
+            // date
+            commit("onReplacedStockedList", data)
+        },
     }
 }

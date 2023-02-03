@@ -81,6 +81,11 @@ const routes = [
                 component: ()=> import("./pages/transfers/MyTransferDetail.vue"),
             },
             {
+                path: "/stockDetailreport",
+                name: "StockDetailReport",
+                component: ()=> import("./pages/stocked_detail_report/StockDetailReportPage.vue")
+            },
+            {
                 path: '/products',
                 component: ProductList,
     

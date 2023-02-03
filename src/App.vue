@@ -47,6 +47,7 @@ export default {
                     items: [
                         {label: 'Transfers', icon: 'pi pi-fw pi-transfer', to: '/transfers'},
                         // { label: 'Inventory Adjustments', icon: 'pi pi-fw pi-inven-adjust', to: '/inventory-adjustment'}
+                        {label: "Stock Detail Report", to: "/stockDetailreport"}
                     ]
                 },
                 {
