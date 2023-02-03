@@ -247,11 +247,24 @@ const router = createRouter({
 
 router.beforeEach((to,from)=>{
     const token = store.getters["auth/getToken"]
+    const user = store.getters["auth/user"]
+
     if(!token && to.name !== "login"){
         return {name:"login"}
     }
+
+    if(!user && to.name !=="login"){
+        return {name: "login"}
+    }
+
     // If page is refresh and theres no token and it's not at login page
     if(from == START_LOCATION && !token && to.name!='login'){
+        return {name: "login"}
+    }
+    
+    // If page is refresh and user data is null, and it's not at login page
+    // Redirect to login 
+    if(from == START_LOCATION && !user && to.name!='login'){
         return {name: "login"}
     }
 })

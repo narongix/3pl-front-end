@@ -22,7 +22,6 @@ export default {
     formatDateToStockFormat(date){
         if(date){
             const time = moment(date).format("YYYY-MM-DD")
-            console.log("time: "+time)
             return time
         }
         return ''

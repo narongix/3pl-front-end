@@ -1,6 +1,5 @@
 import ApiService from '../../../service/ApiService.js';
 import LocalStorageKeys from "../../../domains/LocalStorageKeys.js";
-import router from '../../../router.js';
 
 export default {
     namespaced: true,
@@ -14,11 +13,7 @@ export default {
     getters: {
         user(state) {
             if (!state.user) {
-                state.user = Object.assign({}, localStorage.getItem(LocalStorageKeys.userKey))
-                // Double check if user is still there, otherwise redirect to login
-                if(!state.user){
-                    router.replace({name:"login"})
-                }
+                state.user = Object.assign(state.user ?? {}, JSON.parse(localStorage.getItem(LocalStorageKeys.userKey)))
             }
             return state.user;  
         },
