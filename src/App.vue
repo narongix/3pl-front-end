@@ -56,6 +56,7 @@ export default {
                         {label: 'Product Categories', icon: 'pi pi-fw pi-products', to: '/product-categories'},
                     ]
                 },
+                this.isLogin
                 // {
                 //     label: 'Reporting',
                 //     items: [
@@ -105,19 +106,6 @@ export default {
                 //         // {label: 'PrimeFlex', icon: 'pi pi-fw pi-desktop', url: 'https://www.primefaces.org/primeflex/', target: '_blank'},
                 //     ]
                 // },
-                this.isLogin? null :
-				{
-					label: 'Pages', icon: 'pi pi-fw pi-clone',
-					items: [
-						// {label: 'Crud', icon: 'pi pi-fw pi-user-edit', to: '/crud'},
-						// {label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/timeline'},
-                            {label: 'Login', icon: 'pi pi-fw pi-sign-in', to: '/login'}
-                        // {label: 'Error', icon: 'pi pi-fw pi-times-circle', to: '/error'},
-                        // {label: 'Not Found', icon: 'pi pi-fw pi-exclamation-circle', to: '/notfound'},
-                        // {label: 'Access Denied', icon: 'pi pi-fw pi-lock', to: '/access'},
-						// {label: 'Empty', icon: 'pi pi-fw pi-circle-off', to: '/empty'},
-					]
-				},
                 // {
                 //     label: 'Menu Hierarchy', icon: 'pi pi-fw pi-search',
                 //     items: [
@@ -261,7 +249,21 @@ export default {
             }];
         },
         isLogin(){
-            return this.$state.getters["isLoggedIn"]
+            const loggedIn = this.$state.getters["isLoggedIn"]
+            const page ={
+					label: 'Pages', icon: 'pi pi-fw pi-clone',
+					items: [
+						// {label: 'Crud', icon: 'pi pi-fw pi-user-edit', to: '/crud'},
+						// {label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/timeline'},
+                            {label: 'Login', icon: 'pi pi-fw pi-sign-in', to: '/login'}
+                        // {label: 'Error', icon: 'pi pi-fw pi-times-circle', to: '/error'},
+                        // {label: 'Not Found', icon: 'pi pi-fw pi-exclamation-circle', to: '/notfound'},
+                        // {label: 'Access Denied', icon: 'pi pi-fw pi-lock', to: '/access'},
+						// {label: 'Empty', icon: 'pi pi-fw pi-circle-off', to: '/empty'},
+					]
+				}
+
+            return loggedIn? null : page
         },
         logo() {
             return (this.$appState.darkTheme) ? "images/logo-white.svg" : "images/logo.svg";

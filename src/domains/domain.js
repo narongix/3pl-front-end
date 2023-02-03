@@ -4,7 +4,7 @@ const transferStatus = {
     3: "Processing",
     4: "Complete",
     5: "Waiting",
-    7: "Cancel"
+    7: "Canceled"
 }
 
 const transferId = {
@@ -13,7 +13,7 @@ const transferId = {
     Processing: 3,
     Complete: 4,
     Waiting: 5,
-    Cancel: 7
+    Canceled: 7
 }
 
 const transferType ={
