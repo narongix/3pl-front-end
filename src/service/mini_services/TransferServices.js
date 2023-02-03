@@ -1,54 +1,56 @@
-import axios from "axios"
 import ApiConfig from "../ApiConfig.js"
 
 export default{
     async getTransfers(params) {
-        const res = await axios.get(`/transfer`, ApiConfig.header({
-            myHeaders:{
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            fields:{
-                arams:params 
-            }
-        }))
+        const res = await ApiConfig.getMethods({
+            api: "/transfer",
+            contentType: "application/x-www-form-urlencoded",
+            params: params
+        })
 
         return res.data
     },
 
     async createTransfer(transfer){
-        let res = await axios.post("/transfer",transfer,ApiConfig.header({
-            myHeaders:{
-                "Content-Type": "application/json"
-            }
-        }))
+        const res = await ApiConfig.postMethods({
+            api: "/transfer",
+            data: transfer,
+            contentType: "application/json"
+        })
         return res.data
     },
 
     async getTransferDetails(id) {
-        const res = await axios.get("/transfer/details?transferId="+id, ApiConfig.header({}))
+        const res = await ApiConfig.getMethods({
+            api: "/transfer/details",
+            params:{
+                transferId: id
+            }
+        })
         return res.data;
     }, 
 
     async updateTransfer(data, id){
-        const res = await axios.patch(`/transfer/${ id }`, data, ApiConfig.header({
-            myHeaders:{
-                "Content-Type": "application/json"
-            }
-        }))
+        const res = await ApiConfig.patchMethods({
+            api: `/transfer/${ id }`,
+            data: data,
+            contentType: "application/json"
+        })
         return res.data
     },
 
     async deleteTransfer(data){
-        const res = await axios.delete("/transfer",ApiConfig.header({
-            fields:{
-                data:data
-            }
-        }))
+        const res = await ApiConfig.deleteMethods({
+            api: "/transfer",
+            data: data
+        })
         return res.data
     },
 
     async getTransferTypes(){
-        const res = await axios.get("/transfer_types", ApiConfig.header({}))
+        const res = await ApiConfig.getMethods({
+            api: "/transfer_types"
+        })
         return res.data
     },
 }

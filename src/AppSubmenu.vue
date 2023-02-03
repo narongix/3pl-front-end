@@ -67,7 +67,10 @@ export default {
 			});
 		},
 		visible(item) {
-			return (typeof item.visible === 'function' ? item.visible() : item.visible !== false);
+			if(item){
+				return (typeof item.visible === 'function' ? item.visible() : item.visible !== false);
+			}
+			return false
 		}
 	}
 }

@@ -42,7 +42,6 @@
                     if (newValue > 0) {
                         return this.countdownTracker = setTimeout(() => {
                             this.countdown -= 1;
-                            console.log("Reeee")
                           this.$emit("countDownTime", this.countdown)
                         }, 1000);
                     }

@@ -85,7 +85,8 @@
                 // When created new data 
                 this.message.failed="Error Creating Data, Retry?"
                 this.toLoad = async ()=>{
-                    transfer.scheduledDate=myTime.formatDateFromScheduleDate(transfer.scheduledDate)                    
+                    transfer.scheduledDate=myTime.formatDateFromScheduleDate(transfer.scheduledDate)    
+                                    
                     transfer.transferProducts = transfer.transferProducts.map((e)=>{
                         return {
                             "product_id":e.product_id,

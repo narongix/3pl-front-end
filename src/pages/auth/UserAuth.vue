@@ -18,7 +18,7 @@
                 <InputText id="email1" :class="{'p-invalid':validation.email.value}" v-model.trim="form.email" type="text"
                            class="w-full" placeholder="Email"
                            style="padding:1rem;"/>
-                <small class="p-error" v-if="validation.email.value">{{ validation.email.value }}</small>
+                <small class="p-error" v-if="validation.email.value && !stopShowed">{{ validation.email.value }}</small>
               </div>
 
               <div class="mb-3">
@@ -43,20 +43,14 @@
       </div>
     </div>
   </div>
-
-  <RetryField :toLoad="toLoad" :message="message"></RetryField>
 </template>
 
 <script>
   import {mapState} from "vuex";
-  import RetryField from "@/components/prompt_field/RetryField.vue";
   import localStorageKeys from "../../domains/LocalStorageKeys.js";
 
 
   export default {
-    components:{
-      RetryField
-    },
     data() {
       return {
         form: {
@@ -67,6 +61,7 @@
           email: {
             value: null,
             validate: () => {
+              this.stopShowed=false
               // If email is empty
               if (!(this.form.email)) {
                 return this.validation.email.value = "Please fill in the blank"
@@ -85,14 +80,9 @@
             }
           }
         },
-        checked: true,
 
-        toLoad: null,
-        message:{
-          failed: "Something went wrong, retry?",
-          yesButton: "Yes",
-          noButton: "No"
-        }
+        stopShowed: false,
+        checked: true,
       }
     },
 
@@ -111,32 +101,23 @@
         const validated = this.validate()
 
         if (validated) {
-          this.toLoad = async ()=>{
-            try {
-              const loginData = await this.$store.dispatch('auth/login', this.form)
-              // If uncheck
-              if (this.checked) {
-                localStorage.setItem(localStorageKeys.userKey, JSON.stringify(loginData.user))
-                localStorage.setItem(localStorageKeys.accessTokenkey, loginData.access_token)
-              }
-              else{
-                localStorage.removeItem(localStorageKeys.accessTokenkey)
-                localStorage.removeItem(localStorageKeys.userKey)
-              }
-
-              this.$router.replace({name:"dashboard"})
-            } catch (e) {
-              if(e == 401 || e == "401"){
-                this.validation.password.value = "Password And Email Not matched, Please try again"
-                this.validation.email.value = "Password And Email Not matched, Please try again"
-                this.form.password = ""
-              }
-
-              if(e==404 || e=="404"){
-                this.message.failed = "Can't find page, retry?"
-                throw e
-              }
+          try{
+            const loginData = await this.$store.dispatch('auth/login', this.form)
+            // If uncheck
+            if (this.checked) {
+              localStorage.setItem(localStorageKeys.userKey, JSON.stringify(loginData.user))
+              localStorage.setItem(localStorageKeys.accessTokenkey, loginData.access_token)
             }
+            else{
+              localStorage.removeItem(localStorageKeys.accessTokenkey)
+              localStorage.removeItem(localStorageKeys.userKey)
+            }
+
+            this.$router.replace({name:"dashboard"})
+          }catch(e){
+            this.validation.password.value = e.errorMessage
+            this.stopShowed=true
+            this.validation.email.value="rise"
           }
         }
       },

@@ -55,15 +55,15 @@
                 </template>
               </Column>
 
-              <Column :sortable="true" style="min-width:14rem" field="completed_time" header="Complete Time"
-                      :showFilterMatchModes="false">
+              <Column field="transfer_status_id" :sortable="true" style="min-width:8rem" :showFilterMatchModes="false"
+                      header="Status">
                 <template #body="{ data }">
-                  {{ formatDate(data.completed_time) }}
+                  <TransferStatusField :data='data'></TransferStatusField>
                 </template>
 
-                <template #filter>
-                    <CalendarTime @getValueMode="storeCompleteTimeMode"
-                                @getValue="storeCompleteTimeValue"></CalendarTime>
+                <template #filter = "{filterModel, filterCallback}">
+                  <MultiSelect :options="convertToList" v-model="filterModel.value" @change="onInputStatusId($event.value, filterCallback)" optionLabel="name" optionValue="id"
+                              class="p-column-filter" placeholder="Search by status"></MultiSelect>
                 </template>
               </Column>
 
@@ -74,15 +74,15 @@
                 </template>
               </Column>
 
-              <Column field="transfer_status_id" :sortable="true" style="min-width:8rem" :showFilterMatchModes="false"
-                      header="Status">
+              <Column field="completed_time" :sortable="true" style="min-width:14rem" header="Complete Time"
+                      :showFilterMatchModes="false">
                 <template #body="{ data }">
-                  <TransferStatusField :data='data'></TransferStatusField>
+                  {{ formatDate(data.completed_time) }}
                 </template>
 
-                <template #filter = "{filterModel, filterCallback}">
-                  <MultiSelect :options="convertToList" v-model="filterModel.value" @change="onInputStatusId($event.value, filterCallback)" optionLabel="name" optionValue="id"
-                              class="p-column-filter" placeholder="Search by status"></MultiSelect>
+                <template #filter>
+                    <CalendarTime @getValueMode="storeCompleteTimeMode"
+                                @getValue="storeCompleteTimeValue"></CalendarTime>
                 </template>
               </Column>
 
@@ -96,12 +96,14 @@
                 </template>
               </Column>
 
-              <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
+              
+
+              <!-- <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
                 <template #body="{ data }">
                   <Button icon="pi pi-trash" class="p-button-rounded p-button-warning m-0"
                           @click="onPressDeletedProduct(data)"/>
                 </template>
-              </Column>
+              </Column> -->
             </DataTable>
           
           <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingTransfer"></RetryField>

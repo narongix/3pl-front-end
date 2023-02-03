@@ -26,7 +26,12 @@
               yesButton: String,
               noButton: String
             },
-            errorToast: Object
+            errorToast: {
+                severity: String,
+                summary: String,
+                detail: String,
+                life: Number
+            }
         },
         data(){
             return {
@@ -49,7 +54,8 @@
                     this.loading=false
                 }catch(e){
                     console.log(e)
-                    this.textLoading = this.message.failed
+                    this.textLoading = e.errorMessage ?? this.message.failed
+
                     this.$toast.add(this.toast ?? {
                         severity: "error",
                         summary: "Failed",
