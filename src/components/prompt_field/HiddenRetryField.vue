@@ -16,8 +16,17 @@
         emits:["onClickedRetry"],
         props:{
             toLoad: Function,
-            message: Object,
-            errorToast: Object
+            message: {
+                noButton: String,
+                uesButton: String,
+                failed: String
+            },
+            errorToast: {
+                severity: String,
+                summary: String,
+                detail: String,
+                life: Number
+            }
         },
         data(){
             return {
