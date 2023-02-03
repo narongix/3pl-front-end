@@ -2,11 +2,10 @@ import ApiConfig from "../ApiConfig";
 
 export default{
     async getStockedDetailReport({params}){
-        const res = ApiConfig.getMethods({
+        const res = await ApiConfig.getMethods({
             api: "/stock_detailed",
             params: params
         })
-
         return res.data
     }
 }

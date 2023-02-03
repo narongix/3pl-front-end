@@ -15,10 +15,17 @@ export default {
     },
 
     convertToMs(date){
-        const time = this.formatDateFromScheduleDate(date)
-
-        const milliSecond = moment(time).valueOf()
+        const milliSecond = moment(date).valueOf()
         return milliSecond
     },
+
+    formatDateToStockFormat(date){
+        if(date){
+            const time = moment(date).format("YYYY-MM-DD")
+            console.log("time: "+time)
+            return time
+        }
+        return ''
+    }
 }
 
