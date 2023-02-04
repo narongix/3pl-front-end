@@ -10,11 +10,6 @@
                     :rowsPerPageOptions="[10, 20, 30]">
                     <template #loading v-if="isLoading">
                     </template>
-                    <!-- <Column field="Barcode" header="Barcode" style="min-width:15rem">
-                        <template #body="{ data }">
-                            <product-item :data="data"></product-item>
-                        </template>
-                    </Column> -->
                     <Column field="category_name" header="Category Name" style="min-width:12rem" :sortable="true">
                         <template #body="{ data }">
                             <categories-item :data="data" :class="{ shake: activateOrNot(data.id) }"></categories-item>

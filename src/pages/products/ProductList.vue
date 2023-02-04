@@ -20,7 +20,19 @@
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
                                 optionValue="value" @input="filterCallback()" />
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by barcode" />
+                                class="p-column-filter mt-3" placeholder="Search By Barcode" />
+                        </template>
+                    </Column>
+                    <Column field="product_id" header="Product ID" style="min-width:12rem" :sortable="true"
+                        :showFilterMatchModes="false">
+                        <template #body="{ data }">
+                            <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.product_id }}</p>
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
+                                @input="filterCallback()"/>
+                            <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
+                                class="p-column-filter mt-3" placeholder="Search By ID"/>
                         </template>
                     </Column>
                     <Column field="sku" header="VendorCode" style="min-width:12rem" :sortable="true"
@@ -28,12 +40,12 @@
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.sku }}</p>
                         </template>
-                        <!-- <template #filter="{ filterModel, filterCallback }">
+                        <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by vendorCode"/>
-                        </template> -->
+                                class="p-column-filter mt-3" placeholder="Search By VendorCode"/>
+                        </template>
                     </Column>
                     <Column field="product_name" header="Product Name" style="min-width:15rem" :sortable="true"
                         :showFilterMatchModes="false">
@@ -44,52 +56,43 @@
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
                                 optionValue="value" @input="filterCallback()" />
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by name" />
+                                class="p-column-filter mt-3" placeholder="Search By Name" />
                         </template>
                     </Column>
                     <Column field="upc" header="UPC" style="min-width:12rem" :sortable="true"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
-                            {{ data.upc }}
+                            <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.upc }}</p>
                         </template>
-                        <!-- <template #filter="{ filterModel, filterCallback }">
+                        <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by upc"/>
-                        </template> -->
+                                class="p-column-filter mt-3" placeholder="Search By UPC"/>
+                        </template>
                     </Column>
                     <Column field="category_name" header="Product Category" style="min-width:12rem" :sortable="true"
                         :showFilterMatchModes="false">
-                        <!-- <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
-                                @input="filterCallback()"/>
-                            <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by product category"/>
-                        </template> -->
-                    </Column>
-                    <Column field="onHands" header="On Hands" style="width:10%" :sortable="true"
-                        :showFilterMatchModes="false">
                         <template #body="{ data }">
-                            <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.onHands }}</p>
-                        </template>
-                        <!-- <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
-                                @input="filterCallback()"/>
-                            <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by on hands"/>
-                        </template> -->
-                    </Column>
-                    <Column field="sync_status" header="Sync Status" style="width:10%" :sortable="true"
-                        :showFilterMatchModes="false">
-                        <template #body="{ data }">
-                            <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.sync_status }}</p>
+                            <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.category_name }}</p>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
-                                optionValue="value" @input="filterCallback()" />
+                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
+                                @input="filterCallback()"/>
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search by status" />
+                                class="p-column-filter mt-3" placeholder="Search By Product Category"/>
+                        </template>
+                    </Column>
+                    <Column field="on_hands" header="On Hands" style="width:10%" :sortable="true"
+                        :showFilterMatchModes="false">
+                        <template #body="{ data }">
+                            <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.on_hands }}</p>
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
+                                @input="filterCallback()"/>
+                            <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
+                                class="p-column-filter mt-3" placeholder="Search By On Hands"/>
                         </template>
                     </Column>
                     <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
@@ -122,7 +125,6 @@
 import ProductItem from '../../components/ui/products/ProductItem.vue';
 import router from '../../router';
 import RetryField from "../../components/prompt_field/RetryField.vue"
-
 import { FilterMatchMode } from "primevue/api";
 
 export default {
@@ -139,13 +141,13 @@ export default {
             disabled: false,
             myData: [],
             filters: {
+                product_id: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 product_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-                sync_status: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 barcode: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-                // sku:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
-                // upc:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
-                // category_name:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
-                // onHands:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
+                sku:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
+                upc:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
+                category_name:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
+                on_hands:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
             },
             customFilter: [
                 { label: "Starts with", value: FilterMatchMode.STARTS_WITH },
@@ -173,7 +175,7 @@ export default {
             return this.loading1;
         }
     },
-    created() {
+    async created() {
         // TODO: Implement try catch and loading
         this.loadProducts();
         this.warnDisabled();
