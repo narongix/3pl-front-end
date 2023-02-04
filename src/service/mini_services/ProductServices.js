@@ -1,13 +1,24 @@
 import ApiConfig from "../ApiConfig"
 
-export default{
-    async getProducts(offset, limit){
-        const res = await ApiConfig.getMethods({api: "/product/list", 
-        params:{
-            offset: offset,
-            limit: limit
-        }
-    })
+export default {
+    async getProducts(offset, limit) {
+        const res = await ApiConfig.getMethods({
+            api: "/product/list",
+            params: {
+                offset: offset,
+                limit: limit
+            }
+        })
+        return res.data
+    },
+    // get detail history product 
+    async getDetailOnProduct(id) {
+        const res = await ApiConfig.getMethods({
+            api: `/product/list_detail`,
+            params: {
+                product_id: id
+            }
+        })
         return res.data
     },
 
@@ -22,7 +33,7 @@ export default{
 
     async updateOnProduct(product, id) {
         const res = await ApiConfig.patchMethods({
-            api: `/product/${ id }`,
+            api: `/product/${id}`,
             data: product,
             contentType: "application/json"
         })
@@ -40,7 +51,7 @@ export default{
     async getProdCategories(offset, limit) {
         const res = await ApiConfig.getMethods({
             api: '/category',
-            params:{
+            params: {
                 limit: limit,
                 offset: offset
             }
@@ -60,7 +71,7 @@ export default{
 
     async updateOnProductCategory(id, category) {
         const res = await ApiConfig.patchMethods({
-            api: `/category/${ id }`,
+            api: `/category/${id}`,
             data: category,
             contentType: "application/json"
         })

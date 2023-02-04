@@ -24,9 +24,7 @@ const routes = [
             {
                 path: '',
                 name: 'dashboard',
-                //if already logged in set component to dashboard, if not
-                // set component url to login
-                component: () => import('./components/Dashboard.vue')
+                component: ()=> import("./pages/transfers/TransferList.vue"),
             },
             {
                 path: '/formlayout',
@@ -68,7 +66,6 @@ const routes = [
                 path:"/transfers/create",
                 name: "TransferCreate",
                 component: ()=>import("./pages/transfers/CreateTransfer.vue"),
-                // component: CreateTransfer,
             },
             {
                 path: "/transfers/:id",

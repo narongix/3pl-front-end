@@ -20,9 +20,6 @@
                             <InputText id="sku" type="text" v-model.trim="sku.val" />
                             <!-- <text>&emsp;Operation Type data</text> -->
                         </div>
-                        <!-- <div class="field col-12 md:col-12">
-                            <Dropdown id="prod-cat" v-model="prodCategory" :options="prodCategories" optionLabel="category_name" placeholder="Select One"></Dropdown>
-                        </div> -->
                         <div class="field col-12 md:col-12">
                             <label for="category-name">Product Category</label>
                             <v-select id="category-name" :options="prodCategories" label="category_name"
@@ -71,7 +68,6 @@ export default {
             formIsValid: true,
             prodCategory: null,
             selectedCreated: null,
-
             submitted: false,
             toLoad: null,
             message: {
@@ -127,7 +123,8 @@ export default {
             }
             const actionPayload = {
                 name: this.productName.val,
-                sku: this.sku.val
+                sku: this.sku.val,
+                categoryId: this.prodCategory.id
             };
             this.toLoad = async () => {
                 const newProduct = await this.$store.dispatch('products/addProduct', actionPayload);
@@ -155,8 +152,7 @@ export default {
                 offset: 0
             })
         }
-    },
-
+    }
 }
 </script>
 <style>

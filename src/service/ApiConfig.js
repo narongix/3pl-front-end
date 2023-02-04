@@ -45,7 +45,7 @@ export default {
     },
 
     patchMethods({api, data, contentType}){
-        const res = axios.post(api, data, this.header({
+        const res = axios.patch(api, data, this.header({
                 fields:{},
                 myHeaders:{
                     "Content-Type": contentType
