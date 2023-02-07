@@ -20,7 +20,7 @@
                         <!-- <text>&emsp;Operation Type data</text> -->
                     </div>
                     <div class="field col-12 md:col-3">
-                        <label for="sku">Vendor Code (SKU)</label>
+                        <label for="sku">Internal Reference</label>
                         <InputText id="sku" type="text" :disabled="editDisabled" v-model="product.sku.newVal" />
                         <!-- <text>&emsp;Operation Type data</text> -->
                     </div>
