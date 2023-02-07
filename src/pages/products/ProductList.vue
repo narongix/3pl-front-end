@@ -35,7 +35,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By ID"/>
                         </template>
                     </Column>
-                    <Column field="sku" header="VendorCode" style="min-width:12rem" :sortable="true"
+                    <Column field="sku" header="Internal Reference" style="min-width:12rem" :sortable="true"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.sku }}</p>
@@ -44,7 +44,7 @@
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search By VendorCode"/>
+                                class="p-column-filter mt-3" placeholder="Search By Internal Reference"/>
                         </template>
                     </Column>
                     <Column field="product_name" header="Product Name" style="min-width:15rem" :sortable="true"
