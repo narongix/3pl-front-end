@@ -33,7 +33,7 @@
 
                     <Column field="product_id" header="Product Id" :sortable="true" style="min-width:15rem"></Column>
                     <Column field="product_name" header="Product Name" :sortable="true" style="min-width:15rem"></Column>
-                    <Column field="begining" header="Begining" :sortable="true"></Column>
+                    <Column field="beginning" header="Beginning" :sortable="true"></Column>
                     <Column field="incoming" header="Incoming" :sortable="true"></Column>
                     <Column field="outgoing" header="Outgoing" :sortable="true"></Column>
                     <Column field="adjusted" header="Adjusted" :sortable="true"></Column>
