@@ -1,6 +1,6 @@
 <template>
   <Dropdown v-model="calenderFilterMode" :options="customDate" optionLabel="label" optionValue="value"></Dropdown>
-  <Calendar class="mt-3" v-model="calendarValue" :selectionMode="selectionMode" :inline="true" :showTime="showTime" :onload="$emit('onLoad')"/>
+  <Calendar class="mt-3" v-model="calendarValue" :selectionMode="selectionMode" :inline="true" :showTime="showTime" :onload="$emit('onLoad')" :dateFormat="getFormatCalendar"/>
 </template>
 
 <script>
@@ -56,6 +56,10 @@
     formatDate(value) {
       return myTime.formatDateFromScheduleDate(value)
     },
+
+    getFormatCalendar(){
+        return myTime.getCalendarFormat
+    }
   },
   watch: {
     calenderFilterMode: {

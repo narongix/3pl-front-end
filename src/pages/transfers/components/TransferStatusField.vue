@@ -12,7 +12,7 @@
     }
 
     .Draft{
-        color: cornflowerblue;
+        color: #808080;
     }
 
     .submitted{
@@ -20,7 +20,7 @@
     }
 
     .Processing{
-      color: yellow;
+      color: blue;
     }
 
     .Complete{
@@ -31,8 +31,8 @@
       color: darkorange;
     }
 
-    .Cancel{
-      color: darkred;
+    .Canceled{
+      color: #A9A9A9;
     }
 </style>
 

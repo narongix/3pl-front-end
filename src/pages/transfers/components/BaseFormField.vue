@@ -15,7 +15,7 @@
                             <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
                             <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
                                       id="scheduleDate" v-model="transferData.scheduledDate"
-                                      :showTime="true" hourFormat="12" showButtonbar="true" dateFormat="dd M yy"/>
+                                      :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar"/>
                             <small id="scheduleDate-help" class="p-error" v-if="validationField1.scheduledDate.value">Cannot be Empty</small>
                         </div>
 
@@ -204,11 +204,11 @@
         
         emits:["onClickSubmit"],
         components:{
-    DropDownPagination,
-    PromptField,
-    RecipientField,
-    RetryField
-},
+            DropDownPagination,
+            PromptField,
+            RecipientField,
+            RetryField
+        },
 
         data(){
             return {
@@ -425,6 +425,10 @@
             findIndexUpdatedPositionLocalProduct(){
                 return this.editedIndex - (this.originalLength - this.deletedTransferProducts.length)
             },
+
+            getFormatCalendar(){
+                return TimeConvert.getCalendarFormat
+            }
         },
 
         methods:{
