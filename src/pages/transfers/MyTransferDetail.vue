@@ -108,7 +108,7 @@
 
 					await this.$store.dispatch("transfers/updateTransfer", {
 						recipient: this.transferDetail.recipient,
-						transfer_status_id: transferId.Cancel,
+						transfer_status_id: transferId.Canceled,
 						id : this.transferDetail.id,
 						created, 
 						updated, 
@@ -133,7 +133,7 @@
 				if(this.transferDetail.transfer_status_id == transferId.Draft){
 					this.isDraftStatus=true
 				}
-				else if(this.transferDetail.transfer_status_id == transferId.Cancel){
+				else if(this.transferDetail.transfer_status_id == transferId.Canceled){
 					this.isCancelStatus=true
 				}
 				
@@ -158,7 +158,6 @@
 						deleted})
 					this.changeEditState()
 					this.$toast.add({severity:"success",summary:"Success", detail:"Transfer Edited Successfully", life:3000})
-            
 				}
 			},
 
