@@ -10,14 +10,14 @@
             <DataTable :value="myTransfers" :paginator="true" class="p-datatable-sm" dataKey="id"
                     :rowHover="true" filterDisplay="menu" :loading="isLoading" responsiveLayout="scroll"
                     v-model:selection="mySelected" v-model:filters="filters" @page="onPage($event)" v-model:rows="row"
-                    :rowsPerPageOptions="[10,20,30]">
+                    :rowsPerPageOptions="[10,20,30]" sortField="created_at" :sortOrder="-1">
               <template #empty>
                 <p :onload="findData(MyCountDown.startCountdown)">No Transfer found.</p>
               </template>
 
               <Column selectionMode="multiple"></Column>
 
-              <Column field="id" header="Id" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
+              <Column field="sku" header="Internal Reference" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
                 <template #body="{ data }">
                   <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
                 </template>
@@ -86,7 +86,7 @@
                 </template>
               </Column>
 
-              <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:14rem">
+              <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:14rem" :sortable="true">
                 <template #body="{ data }">
                   {{ formatDate(data.created_at) }}
                 </template>

@@ -9,14 +9,14 @@
                         <label>From Date</label>
                         <Calendar :manualInput="false" 
                         v-model="fromDate" @date-select="onSelectDate"
-                        dateFormat="dd M yy" :hideOnDateTimeSelect="false" placeholder="Select begining of Date"></Calendar>
+                        :dateFormat="getCalendarFormat" :hideOnDateTimeSelect="false" placeholder="Select begining of Date"></Calendar>
                     </div>
                     
                     <div class="field col-12 md:col-4 sm:col-12">
                         <label>To Date</label>
                         <Calendar :manualInput="false" 
                         v-model="toDate" @date-select="onSelectDate"
-                        dateFormat="dd M yy" :hideOnDateTimeSelect="false" placeholder="Select End of Date"></Calendar>
+                        :dateFormat="getCalendarFormat" :hideOnDateTimeSelect="false" placeholder="Select End of Date"></Calendar>
                     </div>
                     <div class="md:col-2"></div>
                 </div>
@@ -101,7 +101,11 @@
         computed:{
             ...mapGetters({
                 getStockedList: "stockedDetailReport/getStockedList"
-            })
+            }),
+
+            getCalendarFormat(){
+                return TimeConvert.timeFormatForCalendar
+            }
             
         },
         methods:{

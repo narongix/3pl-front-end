@@ -1,5 +1,9 @@
 import moment from "moment"
-    
+
+const timeFormatForCalendar = "dd/mm/yy" 
+
+export {timeFormatForCalendar}
+
 export default {
     
     padTo2Digits(num){
@@ -8,7 +12,7 @@ export default {
 
     formatDateFromScheduleDate(date){
         if(date){
-            const time = moment(date).format("Do MMM YYYY hh:mm a")
+            const time = moment(date).format("DD/MM/YYYY hh:mm a")
             return time
         }
         return ""
