@@ -5,9 +5,18 @@
                 <h5>Products</h5>
                 <Button v-if="!isLoading" label="Create" class="p-button-success mr-2" @click="goToNewProduct" />
                 <p></p>
-                <DataTable :value="products" :paginator="true" class="p-datatable-sm" :rows="10" dataKey="product_id"
-                    :rowHover="true" filterDisplay="menu" :loading="loading1" responsiveLayout="scroll"
-                    :rowsPerPageOptions="[10, 20, 30]" v-model:filters="filters">
+                <DataTable 
+                    :value="products" 
+                    :paginator="true" 
+                    class="p-datatable-sm" 
+                    :rows="rows" dataKey="product_id"
+                    :rowHover="true" filterDisplay="menu" 
+                    :loading="loading1" 
+                    responsiveLayout="scroll"
+                    :rowsPerPageOptions="[10, 20, 30]" 
+                    v-model:filters="filters" 
+                    @page="onPage"
+                >
                     <template #loading v-if="isLoading">
                     </template>
                     <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="true"
@@ -23,7 +32,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By Barcode" />
                         </template>
                     </Column>
-                    <Column field="product_id" header="Product ID" style="min-width:12rem" :sortable="true"
+                    <Column field="product_id" header="Product ID" style="min-width:20rem" :sortable="true"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.product_id }}</p>
@@ -97,7 +106,7 @@
                     </Column>
                     <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
                         <template #body="slotProps">
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning"
                                 @click="confirmDeleteProduct(slotProps.data)" />
                         </template>
                     </Column>
@@ -134,6 +143,8 @@ export default {
     },
     data() {
         return {
+            offset: 0,
+            rows: 10,        
             product: null,
             loading1: true,
             productDialog: false,
@@ -193,7 +204,7 @@ export default {
         },
         async loadProducts() {
             await this.$store.dispatch("products/onFetchProducts", {
-                offset: 0,
+                offset: 0
             })
             this.loading1 = false;
         },
@@ -217,7 +228,16 @@ export default {
         },
         async initData() {
             await this.$store.dispatch("products/onFetchProducts", {
-                offset: 0
+                offset: 0,
+                limit: this.rows * 2
+            })
+            this.offset = this.rows * 2 ;
+        },
+        async onPage() {
+            this.offset = this.offset + 10;
+            await this.$store.dispatch("products/onFetchProducts", {
+                offset: this.offset,
+                limit: this.rows
             })
         }
     },

@@ -134,9 +134,9 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ getters, commit }, { offset, productName }) {
+        async onFetchProducts({ commit }, { offset, productName, limit }) {
             const myProductName = productName ? productName : ""
-            const products = await ApiService.getProducts(offset, getters["limit"], myProductName)
+            const products = await ApiService.getProducts(offset, limit, myProductName)
             commit("updateProductState", products)
             return products
         },
