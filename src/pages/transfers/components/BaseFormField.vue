@@ -64,6 +64,12 @@
                             <InputText :disabled="true" id="status" 
                             type="text" v-model="myTransferStatus"></InputText>
                         </div>
+
+                        <div class="field col-12 md:col-3 sm:col-12">
+                            <label for="InternalReference">Internal Reference</label>
+                            <InputText :disabled="FieldNotActive || disabledField['reference']" id="InternalReference" 
+                            type="text" v-model="transferData.reference"></InputText>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -158,14 +164,14 @@
                 :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
                 :SelectedValue="contact_id" :showValue="option=>option.full_name"
                 >
-                    
+
                 </DropDownPagination>
             </div>
         </div>
 
         <template #footer>
             <Button label="Discard" @click="changeRecipientState"></Button>
-            <Button label="Create" @click="onConfirmSelectRecipientState"></Button>
+            <Button label="Select" @click="onConfirmSelectRecipientState"></Button>
         </template>
     </Dialog>
 
@@ -266,6 +272,7 @@
                     transfer_type_id:null,
                     recipient: null,
                     transferProducts: [],
+                    reference: null,
                 },
 
                 validationField1:{
@@ -311,6 +318,13 @@
                                     return this.validationField1.transfer_type_id.value = null
                             }
                             return this.validationField1.transfer_type_id.value = "Cannot be Empty"
+                        }
+                    },
+
+                    reference:{
+                        value: null,
+                        myFunction: ()=>{
+                            return this.validationField1.transfer_type_id.value = null
                         }
                     }
                 },
@@ -471,6 +485,7 @@
                     recipient: this.data?.recipient ?? null,
                     transfer_type_id: this.data?.transfer_type_id,
                     transferProducts: this.data?.transfer_products? [...this.data.transfer_products] : [],
+                    reference: this.data?.reference ?? null
                 }
                 this.originalLength = this.data.transfer_products?.length ?? 0
                 this.myTransferStatus = transferStatus?.[this.data?.transfer_status_id] ?? transferStatus[1]

@@ -78,9 +78,10 @@ export default{
             return newTransfer
         },
 
-        async updateTransfer({ commit }, { recipient, id, transfer_status_id, created, updated, deleted }){
+        async updateTransfer({ commit }, { recipient, reference, id, transfer_status_id, created, updated, deleted }){
             const newTransfer = {
                 recipient: recipient,
+                reference: reference,
                 transfer_status_id: transfer_status_id,
                 addedTransferProducts: created,
                 deletedTransferProducts: deleted,

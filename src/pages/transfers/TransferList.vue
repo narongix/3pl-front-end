@@ -17,7 +17,7 @@
 
               <Column selectionMode="multiple"></Column>
 
-              <Column field="sku" header="Internal Reference" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
+              <Column field="sku" header="Id" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
                 <template #body="{ data }">
                   <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
                 </template>
@@ -28,7 +28,7 @@
                 </template>
               </Column>
 
-              <Column field="reference" :sortable="true" style="min-width:12rem" header="Reference">
+              <Column field="reference" header="Internal Reference" :sortable="true" style="min-width:12rem">
               
                 <template #filter="{ filterModel, filterCallback }">
                   <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"

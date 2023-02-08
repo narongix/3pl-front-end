@@ -4,7 +4,6 @@
 
 <style scoped>
     .main{
-        font-weight: 700;
         letter-spacing: 0.3px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
         border-radius: 5px;
@@ -26,6 +25,7 @@
     .Complete{
       color: forestgreen;
     }
+
 
     .Waiting{
       color: darkorange;

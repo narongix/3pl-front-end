@@ -48,6 +48,7 @@
 					source: true,
 					transfer_type_id: true,
 					destination: true,
+					reference: false,
 				},
                 baseData:{
                     titleForm: "Transfer Detail",
@@ -89,6 +90,7 @@
 
 					await this.$store.dispatch("transfers/updateTransfer", {
 						recipient: this.transferDetail.recipient,
+						reference: this.transferDetail.reference,
 						transfer_status_id: transferId.Submitted,
 						id : this.transferDetail.id,
 						created, 
