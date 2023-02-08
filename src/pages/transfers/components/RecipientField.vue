@@ -21,7 +21,7 @@
 
         <template #footer>
             <Button label="Discard" @click="onDiscard" class="p-button-raise p-button-danger"></Button>
-            <Button label="Select" @click="validateAndSubmit" class="p-button-raised p-button-success"></Button>
+            <Button label="Create" @click="validateAndSubmit" class="p-button-raised p-button-success"></Button>
         </template>
     </Dialog>
 

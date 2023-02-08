@@ -39,7 +39,8 @@
 					shipper: true,
 					source: false,
                     transfer_type_id: false,
-					destination: false
+					destination: false,
+                    reference: false
                 },
                 FieldNotActive: false,
 
