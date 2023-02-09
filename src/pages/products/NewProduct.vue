@@ -124,7 +124,7 @@ export default {
             const actionPayload = {
                 name: this.productName.val,
                 sku: this.sku.val,
-                categoryId: this.prodCategory.id
+                categoryId: this.prodCategory?.id ?? null
             };
             this.toLoad = async () => {
                 const newProduct = await this.$store.dispatch('products/addProduct', actionPayload);
