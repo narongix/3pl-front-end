@@ -15,20 +15,22 @@
                             <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
                             <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
                                       id="scheduleDate" v-model="transferData.scheduledDate"
-                                      :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar"/>
+                                      :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar" :class="{'myError': validationField1.scheduledDate.value}"/>
                             <small id="scheduleDate-help" class="p-error" v-if="validationField1.scheduledDate.value">Cannot be Empty</small>
                         </div>
 
                         <div class="field col-12 md:col-3 sm:col-12">
                             <label for="transfer_type_id" :class="{'p-error': validationField1.transfer_type_id.value}">Transfer Type</label>
+
                             <Dropdown :disabled="FieldNotActive || disabledField['transfer_type_id']" 
                               id="transfer_type_id" v-model="transferData.transfer_type_id"
                               :options="transfer_type" :optionLabel="getTransferTypeName"
                               :class="{'p-invalid': validationField1.transfer_type_id.value}"
                               :placeholder="transferLoading? 'Loading' : 'Please select a transfer'"
-                              :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="true"                              >
+                              :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="false"                              >
                             </Dropdown>
-                            <small id="transfer_type_id-help" class="p-error" v-if="validationField1.transfer_type_id.value">Cannot be Empty</small>
+
+                            <small id="transfer_type_id-help" class="p-error" v-if="validationField1.transfer_type_id.value">{{ validationField1.transfer_type_id.value }}</small>
                         </div>
 
                         <div v-if="showRecipientField" class="field col-12 md:col-5 sm:col-12">
@@ -40,6 +42,7 @@
                                     :class="{'p-error': validationField1.recipient.value}"
                                     >
                                     </InputText>
+                                    <small id="recipient-help" class="p-error" v-if="validationField1.recipient.value">Cannot be Empty</small>
 
                                     <OverlayPanel ref="myOverLayPanel">
                                         <div>
@@ -57,7 +60,6 @@
                                     v-tooltip="'Choose From Template'"/>
                                 </div>
                             </div>
-                            <small id="recipient-help" class="p-error" v-if="validationField1.recipient.value">Cannot be Empty</small>
                         </div>
                         <div class="field col-12 md:col-3 sm:col-12">
                             <label for="status">Status</label>
@@ -184,6 +186,9 @@
     .highlight{
         color: var(--primary-color);
     }
+    .myError{
+        border-color: red;
+    }
 </style>
 
 <script>
@@ -278,7 +283,7 @@
                 validationField1:{
                     transferProducts:{
                         value: null,
-                        myFunction: ()=>{
+                        myFunction: ()=>{                            
                             if(this.transferData?.transferProducts?.length>0){
                                 return this.validationField1.transferProducts.value = null
                             }
@@ -317,14 +322,14 @@
                             if(this.transferData.transfer_type_id){
                                     return this.validationField1.transfer_type_id.value = null
                             }
-                            return this.validationField1.transfer_type_id.value = "Cannot be Empty"
+                            this.validationField1.transfer_type_id.value = "Cannot be Empty"
                         }
                     },
 
                     reference:{
                         value: null,
                         myFunction: ()=>{
-                            return this.validationField1.transfer_type_id.value = null
+                            return this.validationField1.reference.value = null
                         }
                     }
                 },

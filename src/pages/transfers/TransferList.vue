@@ -10,7 +10,9 @@
             <DataTable :value="myTransfers" :paginator="true" class="p-datatable-sm" dataKey="id"
                     :rowHover="true" filterDisplay="menu" :loading="isLoading" responsiveLayout="scroll"
                     v-model:selection="mySelected" v-model:filters="filters" @page="onPage($event)" v-model:rows="row"
-                    :rowsPerPageOptions="[10,20,30]" sortField="created_at" :sortOrder="-1">
+                    :rowsPerPageOptions="[10,20,30]" sortField="created_at" :sortOrder="-1" :totalRecords="getTotalRecords"
+                    >
+
               <template #empty>
                 <p :onload="findData(MyCountDown.startCountdown)">No Transfer found.</p>
               </template>
@@ -82,7 +84,8 @@
 
                 <template #filter>
                     <CalendarTime @getValueMode="storeCompleteTimeMode"
-                                @getValue="storeCompleteTimeValue"></CalendarTime>
+                                @getValue="storeCompleteTimeValue">
+                    </CalendarTime>
                 </template>
               </Column>
 
@@ -95,15 +98,6 @@
                   <CalendarTime @getValueMode="storeCreatedAtMode" @getValue="storeCreatedAtValue" @onLoad="loadCalendarParam"></CalendarTime>
                 </template>
               </Column>
-
-              
-
-              <!-- <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
-                <template #body="{ data }">
-                  <Button icon="pi pi-trash" class="p-button-rounded p-button-warning m-0"
-                          @click="onPressDeletedProduct(data)"/>
-                </template>
-              </Column> -->
             </DataTable>
           
           <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingTransfer"></RetryField>
@@ -148,7 +142,7 @@
 
   export default {
     created() {
-      this.toLoadHidden = this.initData
+      this.toLoadRetry = this.initData
     },
     components: {
       CalendarTime,
@@ -223,6 +217,7 @@
         myTransfers: "transfers/getTransfers",
         hasTransfers: "transfers/hasTransfers",
         LoginStatus: "isLoggedIn",
+        getTotalRecords: "transfers/getTotalRecords"
       }),
 
       convertToList() {
@@ -316,7 +311,7 @@
       },
 
       onPage(event) {
-        if (event.page + 1 == Math.floor(this.myTransfers.length / 10) && this.outOfFetch > 0) {
+        if (event.page + 1 == event.pageCount && this.outOfFetch > 0) {
           this.loadData()
         }
       },
@@ -324,20 +319,18 @@
       async initData() {
         this.message.failed = "Loading failed, retry?"
 
-        await this.$store.dispatch("transfers/getTransfers", {
-          currentOffset: 0,
+        await this.$store.dispatch("transfers/initializeTransfers", {
           limit: this.row * 2
         })
+
+        await this.$store.dispatch("transfers/getTotalRecords")
       },
 
       async loadData() {
         this.toLoadHidden = async () => {
-          // The Ui will first need 2 pages in order for pagination to work,
-          // Because it's triggered by pressing the button which does it in the background
-          // so we have to get data*2 then the current ui in order for the press next button to work
           const tranfers = await this.$store.dispatch("transfers/getTransfers", {
-            currentOffset: this.row * 2,
-            limit: this.row * 2
+            currentOffset: this.row,
+            limit: this.row
           })
           this.outOfFetch = tranfers.length
         }

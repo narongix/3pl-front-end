@@ -24,12 +24,12 @@
                 <DataTable :value="getStockedList" class="p-datatable-sm" dataKey="product_id"
                 :rowHover="true" fiterDisplay="menu" responsiveLayout="scroll" v-model:rows="row"
                 :rowsPerPageOptions="[10, 20, 30]" v-model:selection="mySelected" :paginator="true"
-                @page="onPage($event)"
+                @page="onPage($event)" selectionMode="single"
                 >
                     <template #empty>
                         <p>No StockDetail Report found. Please select dates to fetch.</p>
                     </template>
-                    <Column selectionMode="multiple"></Column>
+                    <Column selectionMode="single"></Column>
 
                     <Column field="product_id" header="Product Id" :sortable="true" style="min-width:15rem"></Column>
                     <Column field="product_name" header="Product Name" :sortable="true" style="min-width:15rem"></Column>
@@ -43,6 +43,7 @@
         </div>
     </div>
 
+    <ProductDialogMoveLines v-model="showProductMoveLine" :productId="productId"></ProductDialogMoveLines>
     <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToast"></RetryField>
     <HiddenRetryField :toLoad="toLoadHidden" :message="messageHidden" :errorToast="errorToastHidden"></HiddenRetryField>
 </template>
@@ -52,15 +53,17 @@
     import HiddenRetryField from '../../components/prompt_field/HiddenRetryField.vue';
     import RetryField from '../../components/prompt_field/RetryField.vue';
     import TimeConvert from '../../components/utils/TimeConvert';
+import ProductDialogMoveLines from './components/ProductDialogMoveLines.vue';
 
     export default{
         components:{
             RetryField,
-            HiddenRetryField
+            HiddenRetryField,
+            ProductDialogMoveLines
         },
         data(){
             return {
-                mySelected: [],
+                mySelected: null,
                 row: 10,
 
                 fromDate: null,
@@ -69,6 +72,10 @@
                 offset: 0,
 
                 toLoadHidden: null,
+
+                showProductMoveLine: false,
+                productId: null,
+
                 messageHidden: {
                     noButton: "No",
                     yesButton: "Yes",
@@ -80,8 +87,6 @@
                     detail: "Error Loading Stocked Detail Report",
                     life: 3000
                 },
-
-
 
                 toLoadRetry: null,
                 message: {
@@ -110,7 +115,7 @@
         },
         methods:{
             async onPage(event){
-                if (event.page + 1 == Math.floor(this.getStockedList.length / 10 && this.outOfFetch!=0 && this.validate())) {
+                if (event.page + 1 == event.pageCount && this.outOfFetch!=0 && this.validate()) {
                     this.toLoadHidden = async()=>{
                         const length = await this.$store.dispatch("stockedDetailReport/onfetchAndUpdateStockedList", {
                             from_date: this.fromDate,
@@ -145,6 +150,13 @@
             validate(){
                 const isValidate = this.toDate && this.fromDate && TimeConvert.convertToMs(this.toDate) >= TimeConvert.convertToMs(this.fromDate)
                 return isValidate
+            }
+        },
+
+        watch:{
+            mySelected(newValue){
+                this.productId = newValue.product_id
+                this.showProductMoveLine = newValue!=null
             }
         }
     }

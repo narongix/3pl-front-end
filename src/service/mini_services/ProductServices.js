@@ -12,12 +12,10 @@ export default {
         return res.data
     },
     // get detail history product 
-    async getDetailOnProduct(id) {
+    async getDetailOnProduct(params) {
         const res = await ApiConfig.getMethods({
             api: `/product/list_detail`,
-            params: {
-                product_id: id
-            }
+            params: params
         })
         return res.data
     },

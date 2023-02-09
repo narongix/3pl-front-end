@@ -82,11 +82,22 @@ export default {
         },
     },
     actions: {
+        async getDetailProductOnStockDetail({commit}, {productId, limit, offset}){
+            const params = {
+                product_id: productId,
+                limit: limit, 
+                offset: offset,
+            }
+            const response = await ApiService.getDetailOnProduct(params);
+            commit("updateProductState", [response])
+            return response
+        },
+
         async getDetailProduct({commit}, productId) {
             const data = {
-                id: productId
+                product_id: productId
             }
-            const response = await ApiService.getDetailOnProduct(data.id);
+            const response = await ApiService.getDetailOnProduct(data);
             commit("updateProductState", [response])
         },
         async addProduct(context, payload) {
