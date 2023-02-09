@@ -6,7 +6,8 @@ export default{
     namespaced: true,
     state(){
         return {
-            stockedList: []
+            stockedList: [],
+            myFilter: {}
         }
     },
     getters:{
@@ -28,6 +29,7 @@ export default{
         },
 
         onReplacedStockedList(state, stockedList){
+            
             state.stockedList = [...stockedList]
         },
 
@@ -36,7 +38,7 @@ export default{
         }
     },
     actions:{
-        async onfetchAndUpdateStockedList({commit}, {from_date, to_date, limit, offset}){
+        async onfetchAndUpdateStockedList({commit, state}, {from_date, to_date, limit, offset}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
             const newToDate = TimeConvert.formatDateToStockFormat(to_date)
 
@@ -46,7 +48,8 @@ export default{
                     from_date: newFromDate,
                     to_date: newToDate,
                     limit: limit ?? 10,
-                    offset: offset ?? 0
+                    offset: offset ?? 0,
+                    ...state.myFilter
                 }
             })
 
@@ -54,9 +57,15 @@ export default{
             return data.length
         },
 
-        async onfetchedAndReplaceStockedList({ commit }, {from_date, to_date, limit, offset}){
+        async onfetchedAndReplaceStockedList({ commit, state }, {from_date, to_date, limit, offset, listFilter}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
             const newToDate = TimeConvert.formatDateToStockFormat(to_date)
+
+            state.myFilter={}
+            for(let i=0; i<listFilter?.length ?? 0; i++){
+                const name = `product_ids[${i}]`
+                state.myFilter[name] = listFilter[i]
+            }
 
             const data = await ApiService.getStockedDetailReport({
                 params:{
@@ -64,7 +73,8 @@ export default{
                     from_date: newFromDate,
                     to_date: newToDate,
                     limit: limit ?? 10,
-                    offset: offset ?? 0
+                    offset: offset ?? 0,
+                    ...state.myFilter
                 }
             })
             // Don't user update because of the fact that old data can be in different 
