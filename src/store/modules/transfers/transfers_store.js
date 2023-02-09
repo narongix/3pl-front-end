@@ -7,11 +7,16 @@ export default{
             transfers:[],
             offset: 0,
             loading:false,
+            totalRecords: null,
         }
     },
     getters:{
         getTransfers(state){
             return state.transfers;
+        },
+
+        getTotalRecords(state){
+            return state.totalRecords;
         },
         
         hasTransfers(state){
@@ -48,10 +53,29 @@ export default{
         onClearState(state){
             state.transfers.length=0
             state.offset=0
+        },
+        
+        updateTotalTransfer(state, quantity){
+            const myQuantity = parseInt(quantity) ?? state.transfer.length
+            state.totalRecords = myQuantity
         }
     },
+
     actions:{
-        async getTransfers({ commit, state }, { currentOffset, limit, params }){
+        async initializeTransfers({ commit, state }, {limit, params }){
+            const data = await ApiService.getTransfers({
+                offset: state.offset,
+                limit: limit, 
+                ...params
+            })
+            
+            state.offset = limit*2
+
+            commit("updateTransferState", data)
+            return data
+        },
+
+        async getTransfers({commit, state}, {currentOffset, limit, params}){
             state.offset = state.offset + currentOffset
 
             const data = await ApiService.getTransfers({
@@ -108,6 +132,11 @@ export default{
 
         resetOffset({ state }){
             state.offset = 0
+        },
+
+        async getTotalRecords({commit}){
+            const data = await ApiService.getTransferTotalRecords();
+            commit("updateTotalTransfer", data.total_transfers)
         }
     },
 }
