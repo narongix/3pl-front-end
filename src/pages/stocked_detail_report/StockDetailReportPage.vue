@@ -21,23 +21,28 @@
                     <div class="md:col-2"></div>
                 </div>
 
-                <DataTable :value="getStockedList" class="p-datatable-sm" dataKey="product_id"
-                :rowHover="true" fiterDisplay="menu" responsiveLayout="scroll" v-model:rows="row"
-                :rowsPerPageOptions="[10, 20, 30]" v-model:selection="mySelected" :paginator="true"
-                @page="onPage($event)" selectionMode="single"
+                <DataTable :value="getStockedList" ref="dt" class="p-datatable-sm" dataKey="product_id"
+                    :rowHover="true" fiterDisplay="menu" responsiveLayout="scroll" v-model:rows="row"
+                    :rowsPerPageOptions="[10, 20, 30]" v-model:selection="mySelected" :paginator="true"
+                    @page="onPage($event)" selectionMode="single"
                 >
+                    <template #header>
+                        <div style="text-align: left">
+                            <Button icon="pi pi-external-link" label="Export" @click="exportStock($event)" />
+                        </div>
+                    </template>
                     <template #empty>
                         <p>No StockDetail Report found. Please select dates to fetch.</p>
                     </template>
                     <Column selectionMode="single"></Column>
 
-                    <Column field="product_id" header="Product Id" :sortable="true" style="min-width:15rem"></Column>
-                    <Column field="product_name" header="Product Name" :sortable="true" style="min-width:15rem"></Column>
-                    <Column field="beginning" header="Beginning" :sortable="true"></Column>
-                    <Column field="incoming" header="Incoming" :sortable="true"></Column>
-                    <Column field="outgoing" header="Outgoing" :sortable="true"></Column>
-                    <Column field="adjusted" header="Adjusted" :sortable="true"></Column>
-                    <Column field="ending" header="Ending" :sortable="true"></Column>
+                    <Column field="product_id" header="Product Id" exportHeader="Product Id" exportFooter="Product Id" :sortable="true" style="min-width:15rem"></Column>
+                    <Column field="product_name" header="Product Name" exportHeader="Product Name" exportFooter="Product Name" :sortable="true" style="min-width:15rem"></Column>
+                    <Column field="beginning" header="Beginning" exportHeader="Beginning" exportFooter="Beginning" :sortable="true"></Column>
+                    <Column field="incoming" header="Incoming" exportHeader="Incoming" exportFooter="Incoming" :sortable="true"></Column>
+                    <Column field="outgoing" header="Outgoing" exportHeader="Outgoing" exportFooter="Outgoing" :sortable="true"></Column>
+                    <Column field="adjusted" header="Adjusted" exportHeader="Adjusted" exportFooter="Adjusted" :sortable="true"></Column>
+                    <Column field="ending" header="Ending" exportHeader="Ending" exportFooter="Ending" :sortable="true"></Column>
                 </DataTable>
             </div>
         </div>
@@ -53,7 +58,7 @@
     import HiddenRetryField from '../../components/prompt_field/HiddenRetryField.vue';
     import RetryField from '../../components/prompt_field/RetryField.vue';
     import TimeConvert from '../../components/utils/TimeConvert';
-import ProductDialogMoveLines from './components/ProductDialogMoveLines.vue';
+    import ProductDialogMoveLines from './components/ProductDialogMoveLines.vue';
 
     export default{
         components:{
@@ -150,6 +155,9 @@ import ProductDialogMoveLines from './components/ProductDialogMoveLines.vue';
             validate(){
                 const isValidate = this.toDate && this.fromDate && TimeConvert.convertToMs(this.toDate) >= TimeConvert.convertToMs(this.fromDate)
                 return isValidate
+            },
+            exportStock() {
+                this.$refs.dt.exportCSV();
             }
         },
 

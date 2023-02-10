@@ -17,7 +17,7 @@
                     </Column>
                     <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
                         <template #body="slotProps">
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning m-0"
                                 @click="confirmDeleteProduct(slotProps.data)" />
                         </template>
                     </Column>
