@@ -7,7 +7,6 @@ export default{
             contentType: "application/x-www-form-urlencoded",
             params: params
         })
-
         return res.data
     },
 

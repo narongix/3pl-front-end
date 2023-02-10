@@ -318,7 +318,6 @@
 
       async initData() {
         this.message.failed = "Loading failed, retry?"
-
         await this.$store.dispatch("transfers/initializeTransfers", {
           limit: this.row * 2
         })
