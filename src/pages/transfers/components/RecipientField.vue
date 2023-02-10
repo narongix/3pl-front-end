@@ -124,6 +124,7 @@
                             recipient: this.form
                         })
                     }
+                    this.diaglogState=false
                 }
             },
             validate(){
