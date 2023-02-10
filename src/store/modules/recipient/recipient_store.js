@@ -40,7 +40,7 @@ export default{
             if(index>=0){
                 return state.recipients[index].contact_id   
             }
-            return state.recipients[0].contact_id
+            return state.recipients?.[0]?.contact_id
         },
         getLimit(){
             return 10
