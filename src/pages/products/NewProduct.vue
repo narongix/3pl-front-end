@@ -16,7 +16,7 @@
                             <!-- <text>&emsp;Contact data</text> -->
                         </div>
                         <div class="field col-12 md:col-12">
-                            <label for="sku">Vendor Code (SKU)</label>
+                            <label for="sku">Internal Reference</label>
                             <InputText id="sku" type="text" v-model.trim="sku.val" />
                             <!-- <text>&emsp;Operation Type data</text> -->
                         </div>

@@ -32,7 +32,7 @@ export default {
     data() {
         return {
             layoutMode: 'static',
-            staticMenuInactive: false,
+            staticMenuInactive: true,
             overlayMenuActive: false,
             mobileMenuActive: false,
             menu : [
@@ -58,107 +58,6 @@ export default {
                     ]
                 },
                 this.isLogin
-                // {
-                //     label: 'Reporting',
-                //     items: [
-                //         {label: 'Inventory Report', icon: 'pi pi-fw pi-inven-report', to: '/inventory-report'},
-                //         {label: 'Product Moves', icon: 'pi pi-fw pi-inven-report', to: '/product-moves'},
-                //     ]
-                // },
-                // {
-                //     label: 'Billing',
-                //     items: [
-                //         {label: 'Billing Summary', icon: 'pi pi-fw pi-billing-summary', to: '/billing-summary'},
-                //         {label: 'Billing History', icon: 'pi pi-fw pi-billing-history', to: '/billing-history'},
-                //     ]
-                // },
-				// {
-				// 	label: 'UI Components', icon: 'pi pi-fw pi-sitemap',
-				// 	items: [
-				// 		{label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/formlayout'},
-				// 		{label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/input'},
-                //         // {label: "Float Label", icon: "pi pi-fw pi-bookmark", to: "/floatlabel"},
-                //         {label: "Invalid State", icon: "pi pi-fw pi-exclamation-circle", to: "/invalidstate"},
-				// 		{label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/button'},
-				// 		{label: 'Table', icon: 'pi pi-fw pi-table', to: '/table'},
-				// 		// {label: 'List', icon: 'pi pi-fw pi-list', to: '/list'},
-				// 		// {label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/tree'},
-				// 		// {label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/panel'},
-				// 		// {label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/overlay'},
-                //         // {label: "Media", icon: "pi pi-fw pi-image", to: "/media"},
-				// 		{label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/menu'},
-				// 		// {label: 'Message', icon: 'pi pi-fw pi-comment', to: '/messages'},
-				// 		// {label: 'File', icon: 'pi pi-fw pi-file', to: '/file'},
-				// 		{label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/chart'},
-				// 		{label: 'Misc', icon: 'pi pi-fw pi-circle-off', to: '/misc'},
-				// 	]
-				// },
-                // {
-                //     label: 'PrimeBlocks',
-                //     items: [
-                //         // {label: 'Free Blocks', icon: 'pi pi-fw pi-eye', to: '/blocks', badge: "NEW"},
-                //         {label: 'All Blocks', icon: 'pi pi-fw pi-globe', url: 'https://www.primefaces.org/primeblocks-vue', target: '_blank'}
-                //     ]
-                // },
-                // {
-                //     label: 'Utilities',
-                //     items: [
-                //         {label: 'PrimeIcons', icon: 'pi pi-fw pi-prime', to: '/icons'},
-                //         // {label: 'PrimeFlex', icon: 'pi pi-fw pi-desktop', url: 'https://www.primefaces.org/primeflex/', target: '_blank'},
-                //     ]
-                // },
-                // {
-                //     label: 'Menu Hierarchy', icon: 'pi pi-fw pi-search',
-                //     items: [
-                //         {
-                //             label: 'Submenu 1', icon: 'pi pi-fw pi-bookmark',
-                //             items: [
-                //                 {
-                //                     label: 'Submenu 1.1', icon: 'pi pi-fw pi-bookmark',
-                //                     items: [
-                //                         {label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark'},
-                //                         {label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark'},
-                //                         {label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark'},
-                //                     ]
-                //                 },
-                //                 {
-                //                     label: 'Submenu 1.2', icon: 'pi pi-fw pi-bookmark',
-                //                     items: [
-                //                         {label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark'},
-                //                         {label: 'Submenu 1.2.2', icon: 'pi pi-fw pi-bookmark'}
-                //                     ]
-                //                 },
-                //             ]
-                //         },
-                //         {
-                //             label: 'Submenu 2', icon: 'pi pi-fw pi-bookmark',
-                //             items: [
-                //                 {
-                //                     label: 'Submenu 2.1', icon: 'pi pi-fw pi-bookmark',
-                //                     items: [
-                //                         {label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark'},
-                //                         {label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark'},
-                //                         {label: 'Submenu 2.1.3', icon: 'pi pi-fw pi-bookmark'},
-                //                     ]
-                //                 },
-                //                 {
-                //                     label: 'Submenu 2.2', icon: 'pi pi-fw pi-bookmark',
-                //                     items: [
-                //                         {label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark'},
-                //                         {label: 'Submenu 2.2.2', icon: 'pi pi-fw pi-bookmark'}
-                //                     ]
-                //                 }
-                //             ]
-                //         }
-                //     ]
-                // },
-                // {
-                //     label: 'Get Started', 
-                //     items: [
-                //         {label: 'Documentation', icon: 'pi pi-fw pi-question', command: () => {window.location = "#/documentation"}},
-                //         {label: 'View Source', icon: 'pi pi-fw pi-search', command: () => {window.location = "https://github.com/primefaces/sakai-vue"}}
-                //     ]
-                // }
             ]
         }
     },

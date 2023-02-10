@@ -253,7 +253,6 @@ router.beforeEach((to,from)=>{
     if(!user && to.name !=="login"){
         return {name: "login"}
     }
-
     // If page is refresh and theres no token and it's not at login page
     if(from == START_LOCATION && !token && to.name!='login'){
         return {name: "login"}

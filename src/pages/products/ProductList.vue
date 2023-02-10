@@ -9,8 +9,10 @@
                     :value="products" 
                     :paginator="true" 
                     class="p-datatable-sm" 
-                    :rows="rows" dataKey="product_id"
-                    :rowHover="true" filterDisplay="menu" 
+                    :rows="rows" 
+                    dataKey="product_id"
+                    :rowHover="true" 
+                    filterDisplay="menu" 
                     :loading="loading1" 
                     responsiveLayout="scroll"
                     :rowsPerPageOptions="[10, 20, 30]" 
@@ -106,7 +108,7 @@
                     </Column>
                     <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
                         <template #body="slotProps">
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning m-0"
                                 @click="confirmDeleteProduct(slotProps.data)" />
                         </template>
                     </Column>
