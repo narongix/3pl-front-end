@@ -245,24 +245,29 @@ const router = createRouter({
 router.beforeEach((to,from)=>{
     const token = store.getters["auth/getToken"]
     const user = store.getters["auth/user"]
+    const isloggedIn = (store.getters["auth/isLoggedIn"])
 
-    if(!token && to.name !== "login"){
+    // if user doesn't have token and the page the user redirect to isn't login
+    const noDataToken = !token && to.name !== "login"
+
+    // if user doesn't have data and the page the user redirect to isn't login
+    const noDataUser = !user && to.name !== "login"
+
+    if(isloggedIn && to.name=='login'){
+        return {name: from.name}
+    }   
+
+    if(noDataToken || noDataUser){
         return {name:"login"}
     }
 
-    if(!user && to.name !=="login"){
+    // If page is refresh and theres no token or no data, and it's not at login page
+    // Or if the page is refresh is get unauthenticated
+    if(from == START_LOCATION && (noDataToken || noDataUser)){
         return {name: "login"}
     }
-    // If page is refresh and theres no token and it's not at login page
-    if(from == START_LOCATION && !token && to.name!='login'){
-        return {name: "login"}
+
     }
-    
-    // If page is refresh and user data is null, and it's not at login page
-    // Redirect to login 
-    if(from == START_LOCATION && !user && to.name!='login'){
-        return {name: "login"}
-    }
-})
+)
 
 export default router;

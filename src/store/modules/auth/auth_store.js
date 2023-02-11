@@ -39,6 +39,10 @@ export default {
         setUser(state, payload) {
             state.user = payload.user;
             state.isLoggedIn = payload.isLoggedIn;
+        },
+
+        setLoggedInState(state, myState){
+            state.isLoggedIn = myState
         }
     },
     actions: {
@@ -63,6 +67,11 @@ export default {
             });
 
             return loginData
+        },
+
+        // Incase there is token expire
+        setLoggedInMode({ commit }, state){
+          commit("setLoggedInState", state)
         }
     }
 }
