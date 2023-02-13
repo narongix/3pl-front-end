@@ -147,6 +147,7 @@ export default {
         },
         async onFetchProducts({ commit }, { offset, productName, limit }) {
             const myProductName = productName ? productName : ""
+
             const products = await ApiService.getProducts(offset, limit, myProductName)
             commit("updateProductState", products)
             return products
