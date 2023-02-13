@@ -81,5 +81,8 @@ export default{
             // date
             commit("onReplacedStockedList", data)
         },
-    }
+        clearSockDetailReport({ commit }){
+            commit("onClearState")
+        }
+    },
 }
