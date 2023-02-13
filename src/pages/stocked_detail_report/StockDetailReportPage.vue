@@ -83,6 +83,9 @@
     import ProductDialogMoveLines from './components/ProductDialogMoveLines.vue';
     
     export default{
+        unmounted(){
+            this.$store.dispatch("stockedDetailReport/clearSockDetailReport")
+        },
         components:{
             RetryField,
             HiddenRetryField,
