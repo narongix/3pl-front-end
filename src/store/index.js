@@ -13,7 +13,7 @@ const store = createStore({
         auth: authModule,
         recipient: recipientModule,
         transferType: transferTypeModule,
-        stockedDetailReport: stockedDetailReportModule
+        stockedDetailReport: stockedDetailReportModule,
     },
     actions:{
         clearAllStates({ commit }){
