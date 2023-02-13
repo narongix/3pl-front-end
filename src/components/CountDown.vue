@@ -19,8 +19,8 @@
         },
         methods:{
             async startCountdown(){
-                this.countdown=4
-                return this.countdown=3
+                this.countdown=3
+                return this.countdown=2
             },
 
             stopCountDown(){

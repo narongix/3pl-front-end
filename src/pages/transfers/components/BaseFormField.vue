@@ -683,6 +683,8 @@
             async findProduct(filterValue){ 
                 await this.$store.dispatch("products/onFetchProducts", {
                     offset: 0,
+                    //TODO: Find a better solution to get a large amount of products
+                    limit: 50,
                     productName: filterValue
                 })
             },
