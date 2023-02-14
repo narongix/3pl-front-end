@@ -446,7 +446,7 @@
             },
 
             getFormatCalendar(){
-                return TimeConvert.getCalendarFormat
+                return TimeConvert.getCalendarFormat()
             }
         },
 
