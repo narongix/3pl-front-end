@@ -27,37 +27,6 @@ const routes = [
                 component: ()=> import("./pages/transfers/TransferList.vue"),
             },
             {
-                path: '/formlayout',
-                name: 'formlayout',
-                component: () => import('./components/FormLayoutDemo.vue')
-            },
-            {
-                path: '/input',
-                name: 'input',
-                component: () => import('./components/InputDemo.vue')
-            },
-            {
-                path: '/floatlabel',
-                name: 'floatlabel',
-                component: () => import('./components/FloatLabelDemo.vue')
-            },
-            {
-                path: '/invalidstate',
-                name: 'invalidstate',
-                component: () => import('./components/InvalidStateDemo.vue')
-            },
-            {
-                path: '/button',
-                name: 'button',
-                component: () => import('./components/ButtonDemo.vue')
-            },
-
-            {
-                path: '/table',
-                name: 'table',
-                component: () => import('./components/TableDemo.vue')
-            },
-            {
                 path: '/transfers',
                 name: "TransferList",   
                 component: ()=> import("./pages/transfers/TransferList.vue"),
@@ -112,113 +81,16 @@ const routes = [
             },
 
             {
-                path: '/list',
-                name: 'list',
-                component: () => import('./components/ListDemo.vue')
-            },
-            {
-                path: '/tree',
-                name: 'tree',
-                component: () => import('./components/TreeDemo.vue')
-            },
-            {
-                path: '/panel',
-                name: 'panel',
-                component: () => import('./components/PanelsDemo.vue')
-            },
-            {
-                path: '/overlay',
-                name: 'overlay',
-                component: () => import('./components/OverlayDemo.vue')
-            },
-            {
-                path: '/media',
-                name: 'media',
-                component: () => import('./components/MediaDemo.vue')
-            },
-            {
-                path: '/menu',
-                component: () => import('./components/MenuDemo.vue'),
-                children: [
-                    {
-                        path: '',
-                        component: () => import('./components/menu/PersonalDemo.vue')
-                    },
-                    {
-                        path: '/menu/seat',
-                        component: () => import('./components/menu/SeatDemo.vue')
-                    },
-                    {
-                        path: '/menu/payment',
-                        component: () => import('./components/menu/PaymentDemo.vue')
-                    },
-                    {
-                        path: '/menu/confirmation',
-                        component: () => import('./components/menu/ConfirmationDemo.vue')
-                    },
-                ],
-            },
-            {
-                path: '/messages',
-                name: 'messages',
-                component: () => import('./components/MessagesDemo.vue')
-            },
-            {
-                path: '/file',
-                name: 'file',
-                component: () => import('./components/FileDemo.vue')
-            },
-            {
-                path: '/chart',
-                name: 'chart',
-                component: () => import('./components/ChartDemo.vue')
-            },
-            {
-                path: '/misc',
-                name: 'misc',
-                component: () => import('./components/MiscDemo.vue')
-            },
-            {
-                path: '/crud',
-                name: 'crud',
-                component: () => import('./pages/CrudDemo.vue')
-            },
-            {
-                path: '/timeline',
-                name: 'timeline',
-                component: () => import('./pages/TimelineDemo.vue')
-            },
-            {
                 path: '/empty',
                 name: 'empty',
                 component: () => import('./components/EmptyPage.vue')
             },
-            {
-                path: '/documentation',
-                name: 'documentation',
-                component: () => import('./components/Documentation.vue')
-            },
-            {
-                path: '/blocks',
-                name: 'blocks',
-                component: () => import('./components/BlocksDemo.vue')
-            },
-            {
-                path: '/icons',
-                name: 'icons',
-                component: () => import('./components/IconsDemo.vue')
-            }
         ]
     },
     {
         path: '/login',
         name: 'login',
         component: () => import('./pages/auth/UserAuth.vue')
-    },
-    {
-        path: '/landing',
-        name: 'landing',
-        component: () => import('./pages/LandingDemo.vue')
     },
     {
         path: '/error',
@@ -245,7 +117,7 @@ const router = createRouter({
 router.beforeEach((to,from)=>{
     const token = store.getters["auth/getToken"]
     const user = store.getters["auth/user"]
-    const isloggedIn = (store.getters["auth/isLoggedIn"])
+    const isloggedIn = (store.getters["auth/isLoggedIn"]) ?? false
 
     // if user doesn't have token and the page the user redirect to isn't login
     const noDataToken = !token && to.name !== "login"
@@ -254,20 +126,25 @@ router.beforeEach((to,from)=>{
     const noDataUser = !user && to.name !== "login"
 
     if(isloggedIn && to.name=='login'){
-        return {name: from.name}
+        return {name: from.name ?? 'dashboard'}
     }   
 
-    if(noDataToken || noDataUser){
+    if(noDataToken || noDataUser || !isloggedIn && to.name!='login'){
         return {name:"login"}
     }
 
     // If page is refresh and theres no token or no data, and it's not at login page
-    // Or if the page is refresh is get unauthenticated
-    if(from == START_LOCATION && (noDataToken || noDataUser)){
+    // Or if the page is refresh and get unauthenticated
+    if(from == START_LOCATION && (noDataToken || noDataUser) && to.name!='login'){
         return {name: "login"}
     }
+})
 
+router.afterEach((to, from)=>{
+    const isloggedIn = (store.getters["auth/isLoggedIn"])
+    if(from== START_LOCATION && isloggedIn && to.name=='login'){
+        return {name: "TransferList"}
     }
-)
+})
 
 export default router;

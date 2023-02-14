@@ -3,6 +3,7 @@
 // export const userKey = "user"
 const LocalStoragekeys = {
     accessTokenkey: "accessToken",
-    userKey: "user"
+    userKey: "user",
+    loggedInIndicatorKey: "isLoggedIn"
 }
 export default LocalStoragekeys

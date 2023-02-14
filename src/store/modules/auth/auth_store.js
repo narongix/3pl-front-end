@@ -19,6 +19,9 @@ export default {
         },
 
         isLoggedIn(state) {
+            const myValue = JSON.parse(localStorage.getItem(LocalStorageKeys.loggedInIndicatorKey))
+            state.isLoggedIn =  myValue ?? false
+        
             return state.isLoggedIn;
         },
 
@@ -43,6 +46,7 @@ export default {
 
         setLoggedInState(state, myState){
             state.isLoggedIn = myState
+            localStorage.setItem(LocalStorageKeys.loggedInIndicatorKey, JSON.stringify(myState))
         }
     },
     actions: {
@@ -54,6 +58,7 @@ export default {
             context.state.isLoggedIn = false
 
             localStorage.removeItem(LocalStorageKeys.userKey)
+            localStorage.removeItem(LocalStorageKeys.loggedInIndicatorKey)
             localStorage.removeItem(LocalStorageKeys.accessTokenkey)
         },
 

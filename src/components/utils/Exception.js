@@ -9,8 +9,6 @@ async function authException(exception){
             errorMessage: exception?.response?.data?.errorMessage
         }
 
-        store.dispatch("exception/setErrorCode", data.status)
-
         // If Unauthenticated
         if(data.status == 401){
             store.dispatch('auth/setLoggedInMode', false)
