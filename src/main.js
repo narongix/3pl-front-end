@@ -104,6 +104,7 @@ import vSelect from "vue-select";
 
 import { FilterService, FilterMatchMode } from "primevue/api"
 
+
 router.beforeEach(function(to, from, next) {
     window.scrollTo(0, 0);
     next();
