@@ -149,7 +149,7 @@
             }),
 
             getCalendarFormat(){
-                return TimeConvert.timeFormatForCalendar
+                return TimeConvert.getCalendarFormat()
             }
             
         },

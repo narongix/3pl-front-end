@@ -2,10 +2,7 @@ import moment from "moment"
 
 const timeFormatForCalendar = "dd/mm/yy" 
 
-export {timeFormatForCalendar}
-
 export default {
-    
     padTo2Digits(num){
         return num.toString().padStart(2, '0')
     },
@@ -29,6 +26,10 @@ export default {
             return time
         }
         return ''
+    },
+
+    getCalendarFormat(){
+        return timeFormatForCalendar
     }
 }
 
