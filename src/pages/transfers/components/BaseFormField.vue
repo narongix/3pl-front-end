@@ -128,13 +128,13 @@
         <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-12 sm:col-12">
                 <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
-                <DropDownPagination @onChanged="onProductChanged" :options="getProducts" optionLabel="product_name" optionValue="product_id"
+                <DropDownPagination v-model="product_id" :options="getProducts" optionLabel="product_name" optionValue="product_id"
                 :disabled="FieldNotActive" id="product_id" placeholder="Please select a product" 
                 :validation="validationField2.product_id.value"
                 :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
                 :maxLength="getProductLength"
                 :errorToastLoading="errorToastLoadingProducts" :messageLoad="messageLoadProducts"
-                :SelectedValue="product_id" :showValue="option=>option.product_name"
+                :showOption="displayOptionProduct"
                 >
 
                 </DropDownPagination>
@@ -158,13 +158,14 @@
     <Dialog v-model:visible="promptFindRecipient" header="Choose from template" :style="{width: '350px'}">
         <div class="grid">
             <div class="col-12 md:col-12 sm:col-12">
-                <DropDownPagination @onChanged="onReceipientChanged" :options="getRecipientsState" optionLabel="full_name" optionValue="contact_id"
+                <DropDownPagination v-model="myContact" :options="getRecipientsState" optionLabel="full_name" optionValue="full_name"
                 :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
                 :validation="validationField1.recipient.value"
                 :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
                 :maxLength="getRecipientLength"
                 :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
-                :SelectedValue="contact_id" :showValue="option=>option.full_name"
+                :showOption="option=>option.full_name ?? option.full_name"
+                :showValue="showValueRecipient"
                 >
 
                 </DropDownPagination>
@@ -223,6 +224,8 @@
 
         data(){
             return {
+                myContact: null,
+
                 state:false,
 
                 filters:{
@@ -257,7 +260,6 @@
                 myTransferStatus: transferStatus[1],
                 promptFindRecipient:false,
 
-                contact_id: null,
                 toLoad: null,
 
                 message: {
@@ -451,6 +453,14 @@
         },
 
         methods:{
+            showValueRecipient(value){
+                return value ?? "Empty"
+            },
+
+            displayOptionProduct(option){
+                return `${ option?.sku } - ${ option?.product_name }`
+            },
+            
             createRecipientTemplateNow(){
                 this.toLoad = async ()=>{
                     const data = {
@@ -494,7 +504,6 @@
                 }
                 this.originalLength = this.data.transfer_products?.length ?? 0
                 this.myTransferStatus = transferStatus?.[this.data?.transfer_status_id] ?? transferStatus[1]
-                this.contact_id = this.$store.getters["recipient/findRecipientId"](this.transferData?.recipient)
             },
 
             findProductAfterSelected(){
@@ -683,8 +692,9 @@
             async findProduct(filterValue){ 
                 await this.$store.dispatch("products/onFetchProducts", {
                     offset: 0,
-                    //TODO: Find a better solution to get a large amount of products
-                    limit: 50,
+                    // TODO: Find a better solution to get a large amount of products
+                    // Possibly, implement pagination on search result
+                    limit: 30,
                     productName: filterValue
                 })
             },
@@ -695,21 +705,13 @@
                     searchString: filterValue
                 })
             },
-
-            onProductChanged(id){
-                this.product_id=id
-            },
-
-            onReceipientChanged(contact_id){
-                this.contact_id=contact_id
-            },
             
             changeRecipientState(){
                 this.promptFindRecipient = !this.promptFindRecipient
             },
 
             onConfirmSelectRecipientState(){
-                this.transferData.recipient = this.$store.getters["recipient/getRecipientFullDetail"](this.contact_id)
+                this.transferData.recipient = this.myContact
                 this.changeRecipientState()
             }
         },
@@ -752,7 +754,6 @@
             "transferData.transfer_type_id"(newVal){
                 if(newVal!=2){
                     this.showRecipientField = false
-                    this.transferData.contact_id = null
                     this.transferData.recipient = null
                 }else{
                     this.showRecipientField = true

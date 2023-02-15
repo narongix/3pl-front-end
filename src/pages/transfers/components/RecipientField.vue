@@ -98,10 +98,14 @@
             }
         },
         methods:{
-            onDiscard(){
+            removeAllData(){
                 this.form.first_name=null,
                 this.form.last_name=null,
-                this.form.phone_number=null,
+                this.form.phone_number=null
+            },
+
+            onDiscard(){
+                this.removeAllData()
                 this.changeDiaglogState()
             },
             
@@ -123,8 +127,11 @@
                         await this.$store.dispatch("recipient/createRecipient", {
                             recipient: this.form
                         })
+                        const newContact = this.form.first_name + " " + this.form.last_name + " - " + this.form.phone_number
+                        this.$emit("update:modelValue", newContact)
+                        this.removeAllData()
+                        this.changeDiaglogState()
                     }
-                    this.diaglogState=false
                 }
             },
             validate(){
