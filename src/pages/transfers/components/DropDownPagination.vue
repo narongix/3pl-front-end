@@ -10,8 +10,11 @@
               @filter="onFilter($event, myCountDown.stopCountDown)" @blur="stopLoading"
               :virtualScrollerOptions="{lazy:true, onLazyLoad: onload, showLoader:true, loading: loading, itemSize:38}"
     >
+      <template #value="slotProps">
+        <p v-if="showValue">{{ showValue?.(slotProps.value) }}</p>
+      </template>
       <template #option="slotProps">
-        <p :onload="myCountDown.stopCountDown()">{{ showValue(slotProps.option) }}</p>
+        <p :onload="myCountDown.stopCountDown()">{{ showOption(slotProps.option) }}</p>
       </template>
 
       <template #emptyfilter>
@@ -34,6 +37,7 @@
       CountDown
     },
     props: {
+      modelValue: null,
       myModel: Object,
       disabled: Boolean,
       validation: Boolean,
@@ -48,12 +52,11 @@
       whenLoad: Function,
       whenSearch: Function,
       maxLength: Number,
-      SelectedValue: undefined,
-      showValue: Function,
+      showOption: Function,
+      showValue: Function
     },
     data() {
       return {
-        selectedData: null,
         filterValue: null,
         loading: false,
         offset: 0,
@@ -65,6 +68,17 @@
 
         emptyMessage: "No results",
       };
+    },
+    computed:{
+      selectedData:{
+        get(){
+          return this.modelValue
+        },
+        set(value){
+          this.$emit("update:modelValue", value)
+          this.$emit("onChanged", value);
+        }
+      }
     },
     methods: {
       onFilter(event) {
@@ -119,20 +133,6 @@
         handler: function (newVal) {
           this.dataList = [...newVal];
           this.emptyMessage="No Results!"
-        }
-      },
-      SelectedValue: {
-        immediate: true,
-        handler: function (newVal) {
-          if (newVal) {
-            this.selectedData = newVal
-          }
-        }
-      },
-      selectedData: {
-        immediate: true,
-        handler: function (newVal) {
-          this.$emit("onChanged", newVal);
         }
       },
       filterValue(newValue) {

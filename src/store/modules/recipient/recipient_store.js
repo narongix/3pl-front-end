@@ -32,16 +32,16 @@ export default{
             }
         },
 
-        findRecipientId: (state)=>(contact)=>{
-            const index = state.recipients.findIndex((e)=>{
-                const detail = `${e?.full_name} - ${e?.phone_number}`
-                return detail == contact
-            })
-            if(index>=0){
-                return state.recipients[index].contact_id   
-            }
-            return state.recipients?.[0]?.contact_id
-        },
+        // findRecipientId: (state)=>(contact)=>{
+        //     const index = state.recipients.findIndex((e)=>{
+        //         const detail = `${e?.full_name} - ${e?.phone_number}`
+        //         return detail == contact
+        //     })
+        //     if(index>=0){
+        //         return state.recipients[index].contact_id   
+        //     }
+        //     return state.recipients?.[0]?.contact_id
+        // },
         getLimit(){
             return 10
         }
