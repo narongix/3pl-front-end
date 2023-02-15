@@ -458,7 +458,7 @@
             },
 
             displayOptionProduct(option){
-                return `${ option?.sku } - ${ option?.product_name }`
+                return option?.product_name
             },
             
             createRecipientTemplateNow(){
