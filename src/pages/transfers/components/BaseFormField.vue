@@ -229,7 +229,7 @@
                 state:false,
 
                 filters:{
-                    product_name: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.CONTAINS}]},
+                    product_name: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
                     demand: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
                 },
                 messageDeletePrompt:{
