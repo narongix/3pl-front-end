@@ -7,12 +7,13 @@
               :placeholderSearch="placeholderSearch"
               :filter="true"
               :selectOnFocus="true"
-              @filter="onFilter($event, myCountDown.stopCountDown)" @blur="stopLoading"
+              @filter="onFilter($event)" @blur="stopLoading"
               :virtualScrollerOptions="{lazy:true, onLazyLoad: onload, showLoader:true, loading: loading, itemSize:38}"
     >
       <template #value="slotProps">
         <p v-if="showValue">{{ showValue?.(slotProps.value) }}</p>
       </template>
+
       <template #option="slotProps">
         <p v-if="showOption" :onload="myCountDown.stopCountDown()">{{ showOption?.(slotProps.option) }}</p>
         <p else :onload="myCountDown.stopCountDown()"> {{ slotProps.option }}</p>
@@ -42,7 +43,6 @@
     },
     props: {
       modelValue: null,
-      myModel: Object,
       disabled: Boolean,
       validation: Boolean,
       optionLabel: String,
@@ -52,7 +52,6 @@
       options: Array,
       onLazyLoad: Function,
       limit: Number,
-      placeholderField: String,
       whenLoad: Function,
       whenSearch: Function,
       maxLength: Number,
@@ -81,7 +80,6 @@
         },
         set(value){
           this.$emit("update:modelValue", value)
-          this.$emit("onChanged", value);
         }
       }
     },

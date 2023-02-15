@@ -163,8 +163,6 @@
         promptDeleted: false,
         selectedForDelete: null,
 
-        outOfFetch: 1,
-
         row: 10,
 
         filters: {
@@ -313,7 +311,7 @@
       },
 
       onPage(event) {
-        if (event.page + 1 == event.pageCount && this.outOfFetch > 0) {
+        if (event.page + 1 == event.pageCount) {
           this.loadData()
         }
       },
@@ -329,11 +327,10 @@
 
       async loadData() {
         this.toLoadHidden = async () => {
-          const tranfers = await this.$store.dispatch("transfers/getTransfers", {
+          await this.$store.dispatch("transfers/getTransfers", {
             currentOffset: this.row,
             limit: this.row
           })
-          this.outOfFetch = tranfers.length
         }
       },
 
