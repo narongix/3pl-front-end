@@ -458,6 +458,9 @@
             },
 
             displayOptionProduct(option){
+                if(option.sku != 'false'){
+                    return `${ option?.sku } - ${ option?.product_name }`
+                }
                 return option?.product_name
             },
             
