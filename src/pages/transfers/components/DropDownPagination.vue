@@ -14,7 +14,8 @@
         <p v-if="showValue">{{ showValue?.(slotProps.value) }}</p>
       </template>
       <template #option="slotProps">
-        <p :onload="myCountDown.stopCountDown()">{{ showOption(slotProps.option) }}</p>
+        <p v-if="showOption" :onload="myCountDown.stopCountDown()">{{ showOption?.(slotProps.option) }}</p>
+        <p else :onload="myCountDown.stopCountDown()"> {{ slotProps.option }}</p>
       </template>
 
       <template #emptyfilter>
