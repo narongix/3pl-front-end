@@ -34,18 +34,6 @@
                                 class="p-column-filter mt-3" placeholder="Search By Barcode" />
                         </template>
                     </Column>
-                    <Column field="product_id" header="Product ID" style="min-width:20rem" :sortable="true"
-                        :showFilterMatchModes="false">
-                        <template #body="{ data }">
-                            <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.product_id }}</p>
-                        </template>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
-                                @input="filterCallback()"/>
-                            <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search By ID"/>
-                        </template>
-                    </Column>
                     <Column field="sku" header="Internal Reference" style="min-width:12rem" :sortable="true"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
@@ -154,7 +142,6 @@ export default {
             disabled: false,
             myData: [],
             filters: {
-                product_id: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 product_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 barcode: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 sku:{value: null, matchMode: FilterMatchMode.STARTS_WITH},
