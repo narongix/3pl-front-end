@@ -1,4 +1,4 @@
-<template>
+<template>  
   <CountDown v-slot="MyCountDown" @activateAPI="activateAPI()">
     <div class="grid">
       <div class="col-12">
@@ -18,8 +18,8 @@
               </template>
 
               <Column selectionMode="multiple"></Column>
-
-              <Column field="sku" header="Id" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
+              <!-- //TODO: Id for future -->
+              <!-- <Column field="sku" header="Id" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
                 <template #body="{ data }">
                   <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
                 </template>
@@ -28,10 +28,12 @@
                   <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
                             placeholder="Search by id"></InputText>
                 </template>
-              </Column>
+              </Column> -->
 
-              <Column field="reference" header="Internal Reference" :sortable="true" style="min-width:12rem">
-              
+              <Column field="reference" header="Internal Reference" :sortable="true" style="min-width:12rem" :showFilterMatchModes="false">
+                <template #body="{ data }">
+                  <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
+                </template>
                 <template #filter="{ filterModel, filterCallback }">
                   <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
                     placeholder="Search By Reference"

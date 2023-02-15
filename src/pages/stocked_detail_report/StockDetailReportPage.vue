@@ -51,7 +51,7 @@
                     </template>
                     <Column selectionMode="single"></Column>
 
-                    <Column field="product_id" header="Product Id" exportHeader="Product Id" exportFooter="Product Id" :sortable="true" style="min-width:15rem"></Column>
+                    <!-- <Column field="product_id" header="Product Id" exportHeader="Product Id" exportFooter="Product Id" :sortable="true" style="min-width:15rem"></Column> -->
                     <Column field="product_name" header="Product Name" exportHeader="Product Name" exportFooter="Product Name" :sortable="true" style="min-width:15rem"></Column>
                     <Column field="sku" header="Internal Reference" exportHeader="Internal Reference" exportFooter="Internal Reference" :sortable="true" style="min-width:10rem"></Column>
                     <Column field="beginning" header="Beginning" exportHeader="Beginning" exportFooter="Beginning" :sortable="true"></Column>
@@ -230,7 +230,7 @@
         },
         watch:{
             mySelected(newValue){
-                this.productId = newValue.product_id
+                // this.productId = newValue.product_id
                 this.showProductMoveLine = newValue!=null
             },
             row:{
