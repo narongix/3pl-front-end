@@ -72,9 +72,6 @@
         
         methods:{
             async initData(){
-                await this.$store.dispatch("products/onFetchProducts",{
-                    offset: 0
-                })
                 await this.$store.dispatch("transferType/getTransferType")
                 await this.$store.dispatch("recipient/getRecipients", {
                     offset: 0,

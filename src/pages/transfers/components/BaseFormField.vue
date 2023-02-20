@@ -128,13 +128,13 @@
         <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-12 sm:col-12">
                 <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
-                <DropDownPagination v-model="product_id" :options="getProducts" optionLabel="product_name" optionValue="product_id"
+                <DropDownPagination v-model="product_id" :options="getProducts" optionLabel="search_key" optionValue="product_id"
                 :disabled="FieldNotActive" id="product_id" placeholder="Please select a product" 
                 :validation="validationField2.product_id.value"
                 :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
                 :maxLength="getProductLength"
                 :errorToastLoading="errorToastLoadingProducts" :messageLoad="messageLoadProducts"
-                :showOption="displayOptionProduct"
+                :showOption="option => option.search_key"
                 >
 
                 </DropDownPagination>
@@ -165,7 +165,7 @@
                 :maxLength="getRecipientLength"
                 :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
                 :showOption="option=>option.full_name ?? option.full_name"
-                :showValue="showValueRecipient"
+                :showValue="showValueRecipient" :offset="offset ?? 0"
                 >
 
                 </DropDownPagination>
@@ -212,6 +212,7 @@
             FieldNotActive: Boolean,
             data: Object,
             disabledField: Object,
+            offset: Number
         },
         
         emits:["onClickSubmit"],
@@ -456,13 +457,6 @@
             showValueRecipient(value){
                 return value ?? "Empty"
             },
-
-            displayOptionProduct(option){
-                if(option.sku != 'false'){
-                    return `${ option?.sku } - ${ option?.product_name }`
-                }
-                return option?.product_name
-            },
             
             createRecipientTemplateNow(){
                 this.toLoad = async ()=>{
@@ -698,7 +692,7 @@
                     // TODO: Find a better solution to get a large amount of products
                     // Possibly, implement pagination on search result
                     limit: 30,
-                    productName: filterValue
+                    searchKey: filterValue
                 })
             },
 

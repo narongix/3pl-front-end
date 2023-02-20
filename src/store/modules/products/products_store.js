@@ -145,10 +145,9 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ commit }, { offset, productName, limit }) {
-            const myProductName = productName ? productName : ""
-
-            const products = await ApiService.getProducts(offset, limit, myProductName)
+        async onFetchProducts({ commit }, { offset, productName, limit, searchKey }) {
+            
+            const products = await ApiService.getProducts(offset, limit, productName, searchKey)
             commit("updateProductState", products)
             return products
         },
