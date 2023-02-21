@@ -11,7 +11,7 @@
         },
         computed:{
             converToName(){
-                return transferType?.[this.data.transfer_type_id] ?? "Error"
+                return transferType?.[this.data?.transfer_type_id] ?? null
             }
         }
     }

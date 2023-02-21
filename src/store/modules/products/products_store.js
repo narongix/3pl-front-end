@@ -4,10 +4,15 @@ export default {
     state() {
         return {
             products: [],
+            maxProductLength: 0,
             prodCategories: [],
         }
     },
     getters: {
+        getProductLength(state){
+            return state.maxProductLength
+        },
+
         getProductState(state) {
             return state.products;
         },
@@ -22,6 +27,10 @@ export default {
         }
     },
     mutations: {
+        setProductLength(state, productLength){
+            state.maxProductLength = productLength
+        },
+
         setProducts(state, productState) {
             state.products = productState.products;
         },
@@ -80,8 +89,13 @@ export default {
             const index = state.prodCategories.findIndex(e => e.id == productState.id)
             state.prodCategories.splice(index, 1)
         },
+
     },
     actions: {
+        async getProductLength({ commit }){
+            const maxProductLength = await ApiService.getProductLength()
+            commit("setProductLength", maxProductLength.total_products)
+        },
         async getDetailProductOnStockDetail({commit}, {productId, limit, offset, barcode}){
             const params = {
                 product_id: productId ?? null,

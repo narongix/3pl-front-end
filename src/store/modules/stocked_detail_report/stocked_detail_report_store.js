@@ -56,7 +56,7 @@ export default{
             })
 
             commit("onUpdateStockedList", data)
-            return data.length
+            return data
         },
 
         async onfetchedAndReplaceStockedList({ commit, dispatch }, {from_date, to_date, limit, offset, barcodes, sku}){
@@ -80,6 +80,7 @@ export default{
             // Don't user update because of the fact that old data can be in different 
             // date
             commit("onReplacedStockedList", data)
+            return data
         },
 
         clearSockDetailReport({ commit }){

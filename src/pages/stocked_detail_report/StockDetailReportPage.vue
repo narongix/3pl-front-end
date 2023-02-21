@@ -20,8 +20,8 @@
                     <div class="md:col-4"></div>
                 </div>
 
-                <DataTable :value="getStockedList" ref="dt" class="p-datatable-sm" dataKey="barcode"
-                    :rowHover="true" filterDisplay="row" responsiveLayout="scroll" v-model:rows="row"
+                <DataTable :value="dataList" ref="dt" class="p-datatable-sm" dataKey="product_id"
+                    :rowHover="true" fiterDisplay="menu" responsiveLayout="scroll" v-model:rows="row"
                     :rowsPerPageOptions="[10, 20, 30]" v-model:selection="mySelected" :paginator="true"
                     @page="onPage($event)" selectionMode="single" :metaKeySelection="false">
                     <template #header>
@@ -41,10 +41,10 @@
                                     placeholder="Filter by Barcode"
                                     :whenLoad="whenLoadProduct"
                                     :whenSearch="whenSearchProduct"
-                                    :maxLength="getProductLength"
+                                    :maxLength="getProductCurrentLength"
                                     :displayOption ="myOption=>myOption.barcode"
                                     :v-model:offset="myFilterOffset" 
-                                    @onChange="onSelectDate"
+                                    @onChange="onSelected"
                                 >
 
                                 </MultiSelectPagination>
@@ -61,10 +61,10 @@
                                     placeholder="Filter by product name"
                                     :whenLoad="whenLoadProduct"
                                     :whenSearch="whenSearchProduct"
-                                    :maxLength="getProductLength"
+                                    :maxLength="getProductCurrentLength"
                                     :displayOption ="myOption=>myOption.product_name"
                                     :v-model:offset="myFilterOffset" 
-                                    @onChange="onSelectDate">
+                                    @onChange="onSelected">
 
                                 </MultiSelectPagination>
                             </div>
@@ -90,7 +90,7 @@
         </div>
     </div>
 
-    <ProductDialogMoveLines v-model="showProductMoveLine" :barcode="productId"></ProductDialogMoveLines>
+    <ProductDialogMoveLines v-model="showProductMoveLine" :productId="productId"></ProductDialogMoveLines>
     <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToast"></RetryField>
     <HiddenRetryField :toLoad="toLoadHidden" :message="messageHidden" :errorToast="errorToastHidden"></HiddenRetryField>
 </template>
@@ -139,6 +139,7 @@
                     myProductSku: [],
                 },
                 
+                dataList: [],
                 menuProps:{
                     closeOnClick: true,
                     closeOnContentClick: false,
@@ -152,8 +153,6 @@
 
                 fromDate: null,
                 toDate: null,
-                outOfFetch: 3,
-                offset: 0,
 
                 toLoadHidden: null,
 
@@ -193,13 +192,14 @@
             ...mapGetters({
                 getStockedList: "stockedDetailReport/getStockedList",
                 getProducts: "products/getProductState",
+                getProductMaxLength: "products/getProductLength"
             }),
 
             getCalendarFormat(){
                 return TimeConvert.getCalendarFormat()
             },
 
-            getProductLength(){
+            getProductCurrentLength(){
                 return this.getProducts.length
             },
         },
@@ -221,42 +221,45 @@
             },
 
             async onPage(event){
-                if ((event.page + 1) == event.pageCount && this.outOfFetch!=0 && this.validate()) {
-                    await this.loadData()
-                }
-            },
-
-            async loadData(){
-                this.toLoadHidden = async()=>{
-                    const length = await this.$store.dispatch("stockedDetailReport/onfetchAndUpdateStockedList", {
+                this.toLoadRetry = async()=>{
+                    const stockReport = await this.$store.dispatch("stockedDetailReport/onfetchAndUpdateStockedList", {
                         from_date: this.fromDate,
                         to_date: this.toDate,
-                        limit: this.row*2,
-                        offset: this.offset,
+                        limit: this.row,
+                        offset: event.first,
                         barcodes:this.myFilters.myBarcode,
                         sku: this.myFilters.myProductSku
                     })
-                    this.offset = this.offset + this.row*2
-                    if(length==0){
-                        this.outOfFetch=0
-                    }
+                 
+                    const offset= event.first
+                    const limit = event.rows    
+                    this.updateList({offset: offset, row:limit, tempList: stockReport})   
                 }
             },
-
+            
             async onSelectDate(){
                 if(this.validate()){
                     this.toLoadRetry = async()=>{
-                        await this.$store.dispatch("stockedDetailReport/onfetchedAndReplaceStockedList", {
+                        const stockList = await this.$store.dispatch("stockedDetailReport/onfetchedAndReplaceStockedList", {
                             from_date: this.fromDate,
                             to_date: this.toDate,
-                            limit: this.row*2,
+                            limit: this.row,
                             offset:0,
                             barcodes:this.myFilters.myBarcode,
                             sku: this.myFilters.myProductSku
                         })
+
+                        await this.$store.dispatch("products/getProductLength")
+                        
+                        this.initingOrigList()
+
+                        this.updateList({
+                            offset: 0,
+                            row: this.row,
+                            tempList: stockList
+                        })
                     }
                     this.offset = this.row*2
-                    this.outOfFetch=3
                 }
             },
 
@@ -270,47 +273,53 @@
 
             onSelected(value){
                 if(this.validate()){
-                    this.offset=0
                     this.toLoadRetry= async()=>{
-                        await this.$store.dispatch("stockedDetailReport/onfetchedAndReplaceStockedList",{
+                        const stockList = await this.$store.dispatch("stockedDetailReport/onfetchedAndReplaceStockedList",{
                             from_date: this.fromDate,
                             to_date: this.toDate,
-                            limit: this.row*2,
+                            limit: this.row,
                             offset:0,
-                            listFilter: value
+                            listFilter: value,
+                            barcodes:this.myFilters.myBarcode,
+                            sku: this.myFilters.myProductSku
                         })
+                        if(this.myFilters.myBarcode.length==0 && this.myFilters.myProductSku.length==0){
+                            this.initingOrigList()
+                           return this.updateList({offset: 0, row: this.row, tempList: stockList})
+                        }
+                        this.initingFilteredList(stockList)
                     }
                 }
             },
 
-            onDeselecting(value){
-                if(this.validate()){
-                    this.offset=0
-                    this.toLoadRetry= async()=>{
-                        await this.$store.dispatch("stockedDetailReport/onfetchedAndReplaceStockedList",{
-                            from_date: this.fromDate,
-                            to_date: this.toDate,
-                            limit: this.row*2,
-                            offset:0,
-                            listFilter: value
-                        })
-                    }
-                }            
+            initingFilteredList(myList){
+                this.dataList.length=myList.length
+                for(let i=0;i<myList.length;i++){
+                    this.dataList[i] = myList[i]
+                }
+            },
+
+            initingOrigList(){
+                for(let i=0; i<this.getProductMaxLength; i++){
+                    this.dataList.push({product_id: i})
+                }
+            },
+
+            updateList({offset, row, tempList}){
+                let index=0
+                for(let i=offset; i<row+offset; i++){
+                if(!(tempList?.[index])){
+                    break
+                }
+                    this.dataList[i]={temp_id: this.dataList?.[i]?.temp_id,...tempList[index]}
+                    index++
+                }
             },
         },
         watch:{
             mySelected(newValue){
-                this.productId = newValue?.barcode
+                this.productId = newValue?.product_id
                 this.showProductMoveLine = newValue!=null
-            },
-            row:{
-                immediate: true,
-                handler: async function(){
-                    if(this.validate()){
-                        this.outOfFetch = 3
-                        await this.loadData()
-                    }
-                }
             },
             showProductMoveLine(newValue){
                 if(!newValue){

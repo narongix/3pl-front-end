@@ -61,7 +61,7 @@
     export default{
     props: {
         modelValue: Boolean,
-        barcode: String,
+        productId: String,
     },
     emits: ["update:modelValue"],
     data() {
@@ -90,7 +90,7 @@
         }),
 
         getProductDetail() {
-            const index = this.getProducts.findIndex((e) => e.barcode == this.barcode);
+            const index = this.getProducts.findIndex((e) => e.product_id == this.productId);
             if (index < 0) {
                 this.$router.back;
             }
@@ -132,7 +132,7 @@
         async initData() {
             this.toLoadRetry = async ()=>{
                 await this.$store.dispatch("products/getDetailProductOnStockDetail", { 
-                    barcode: this.barcode, 
+                    productId: this.productId, 
                     limit:this.row*2, 
                     offset: this.offset
                 });
@@ -144,7 +144,7 @@
         async loadData(){
             this.toLoadHidden = async ()=>{
                 const data = await this.$store.dispatch("products/getDetailProductOnStockDetail", {
-                    productId: this.barcode,
+                    productId: this.productId,
                     limit: this.row,
                     offset: this.offset
                 })
@@ -172,7 +172,7 @@
         }
     },
     watch: {
-        barcode(newValue) {
+        productId(newValue) {
             // TODO: Intergrate product movesline
             // with stock detail product
             if (newValue) {

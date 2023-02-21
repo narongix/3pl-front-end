@@ -3,25 +3,22 @@
         <div class="col-12">
             <div class="card">
                 <h5>Products</h5>
-                <Button v-if="!isLoading" label="Create" class="p-button-success mr-2" @click="goToNewProduct" />
+                <Button label="Create" class="p-button-success mr-2" @click="goToNewProduct" />
                 <p></p>
                 <DataTable 
-                    :value="products" 
+                    :value="dataList" 
                     :paginator="true" 
                     class="p-datatable-sm" 
                     :rows="rows" 
                     dataKey="product_id"
                     :rowHover="true" 
                     filterDisplay="menu" 
-                    :loading="loading1" 
                     responsiveLayout="scroll"
                     :rowsPerPageOptions="[10, 20, 30]" 
                     v-model:filters="filters" 
                     @page="onPage"
                 >
-                    <template #loading v-if="isLoading">
-                    </template>
-                    <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="true"
+                    <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <product-item :data="data"
@@ -34,7 +31,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By Barcode" />
                         </template>
                     </Column>
-                    <Column field="sku" header="Internal Reference" style="min-width:12rem" :sortable="true"
+                    <Column field="sku" header="Internal Reference" style="min-width:12rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.sku }}</p>
@@ -46,7 +43,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By Internal Reference"/>
                         </template>
                     </Column>
-                    <Column field="product_name" header="Product Name" style="min-width:15rem" :sortable="true"
+                    <Column field="product_name" header="Product Name" style="min-width:15rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.product_name }}</p>
@@ -58,7 +55,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By Name" />
                         </template>
                     </Column>
-                    <Column field="upc" header="UPC" style="min-width:12rem" :sortable="true"
+                    <Column field="upc" header="UPC" style="min-width:12rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.upc }}</p>
@@ -70,7 +67,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By UPC"/>
                         </template>
                     </Column>
-                    <Column field="category_name" header="Product Category" style="min-width:12rem" :sortable="true"
+                    <Column field="category_name" header="Product Category" style="min-width:12rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.category_name }}</p>
@@ -82,7 +79,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By Product Category"/>
                         </template>
                     </Column>
-                    <Column field="on_hands" header="On Hands" style="width:10%" :sortable="true"
+                    <Column field="on_hands" header="On Hands" style="width:10%" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.on_hands }}</p>
@@ -125,6 +122,7 @@ import ProductItem from '../../components/ui/products/ProductItem.vue';
 import router from '../../router';
 import RetryField from "../../components/prompt_field/RetryField.vue"
 import { FilterMatchMode } from "primevue/api";
+import { mapGetters } from 'vuex';
 
 export default {
     components: {
@@ -133,14 +131,12 @@ export default {
     },
     data() {
         return {
-            offset: 0,
             rows: 10,        
             product: null,
-            loading1: true,
             productDialog: false,
             deleteProductDialog: false,
             disabled: false,
-            myData: [],
+            dataList: [],
             filters: {
                 product_name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 barcode: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -168,18 +164,17 @@ export default {
         }
     },
     computed: {
+        ...mapGetters({
+            getProductLength: "products/getProductLength"
+        }),
+
         products() {
             return this.$store.getters['products/getProductState'];
-        },
-        isLoading() {
-            return this.loading1;
         }
     },
     async created() {
-        // TODO: Implement try catch and loading
-        this.loadProducts();
-        this.warnDisabled();
         this.toLoadProduct = this.initData
+        this.warnDisabled();
     },
     methods: {
         activateOrNot(product_name) {
@@ -190,12 +185,6 @@ export default {
             setTimeout(() => {
                 this.disabled = false;
             }, 1500)
-        },
-        async loadProducts() {
-            await this.$store.dispatch("products/onFetchProducts", {
-                offset: 0
-            })
-            this.loading1 = false;
         },
         goToNewProduct() {
             router.push('/products/new/');
@@ -211,23 +200,54 @@ export default {
                     id: this.product.product_id,
                 };
                 await this.$store.dispatch('products/deleteProduct', actionPayload);
+                this.onDeleteList(this.product.product_id)
+
                 this.product = {};
                 this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
             }
         },
+
         async initData() {
-            await this.$store.dispatch("products/onFetchProducts", {
+            const products = await this.$store.dispatch("products/onFetchProducts", {
                 offset: 0,
-                limit: this.rows * 2
-            })
-            this.offset = this.rows * 2 ;
-        },
-        async onPage() {
-            this.offset = this.offset + 10;
-            await this.$store.dispatch("products/onFetchProducts", {
-                offset: this.offset,
                 limit: this.rows
             })
+            
+            await this.$store.dispatch("products/getProductLength")
+        
+            for(let i=0; i<this.getProductLength; i++){
+                this.dataList.push({product_id: i})
+            }
+            this.updateList({offset:0, row: this.rows, tempList: products})
+        },
+        async onPage(event) {
+            this.toLoadProduct = async ()=>{
+                const products = await this.$store.dispatch("products/onFetchProducts", {
+                    offset: event.first,
+                    limit: this.rows
+                })
+                const offset = event.first
+                const limit = event.rows
+                this.updateList({offset: offset, row:limit, tempList: products})
+            }
+        },
+
+        updateList({offset, row, tempList}){
+            let index=0
+            for(let i=offset; i<row+offset; i++){
+                if(!(tempList?.[index])){
+                    break
+                }
+                this.dataList[i]=tempList[index]
+                index++
+            }
+        },
+
+        onDeleteList(id){
+            const index = this.dataList.findIndex((e)=>e.product_id == id)
+            if(index>=0){
+                this.dataList.splice(index, 1)
+            }
         }
     },
 }
