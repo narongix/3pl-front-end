@@ -34,6 +34,9 @@
 <script>
   import CountDown from "@/components/CountDown.vue";
   export default {
+    created(){
+      this.myOffset = this.offset ?? 0
+    },
     components:{
       CountDown
     },
@@ -54,19 +57,20 @@
       whenSearch: Function,
       maxLength: Number,
       showOption: Function,
-      showValue: Function
+      showValue: Function,
+      offset: Number
     },
     data() {
       return {
         filterValue: null,
         loading: false,
-        offset: 0,
+        myOffset: 0,
         countdownTracker: null,
         countdown: null,
         lastType: null,
         dataList: [],
         outOfFetch: 1,
-
+      
         emptyMessage: "No results",
       };
     },
@@ -85,13 +89,17 @@
       onFilter(event) {
         this.filterValue = event.value;
       },
+
       async onload(event) {
         try {
           if (event.last == this.maxLength && this.outOfFetch > 0) {
             this.loading = true;
-            this.offset = this.offset + this.limit;
-            const fetchLength = await this.whenLoad(this.offset, this.outOfFetch);
-            this.outOfFetch = fetchLength;
+            setTimeout(async ()=>{
+              const fetchLength = await this.whenLoad(this.myOffset, this.outOfFetch);
+              this.myOffset = this.myOffset + this.limit;
+              this.outOfFetch = fetchLength;
+            }, 10)
+            
             this.loading = false;
           }
         } catch (e) {
