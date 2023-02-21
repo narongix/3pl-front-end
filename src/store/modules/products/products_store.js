@@ -82,9 +82,10 @@ export default {
         },
     },
     actions: {
-        async getDetailProductOnStockDetail({commit}, {productId, limit, offset}){
+        async getDetailProductOnStockDetail({commit}, {productId, limit, offset, barcode}){
             const params = {
-                product_id: productId,
+                product_id: productId ?? null,
+                barcode: barcode ?? null,
                 limit: limit, 
                 offset: offset,
             }
@@ -145,9 +146,15 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ commit }, { offset, productName, limit, searchKey }) {
+        async onFetchProducts({ commit }, { offset, productName, limit, searchKey}) {
+            const params = {
+                offset: offset,
+                limit: limit,
+                product_name: productName,
+                search_key: searchKey
+            }
             
-            const products = await ApiService.getProducts(offset, limit, productName, searchKey)
+            const products = await ApiService.getProducts(params)
             commit("updateProductState", products)
             return products
         },
