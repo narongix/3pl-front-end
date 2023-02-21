@@ -79,7 +79,15 @@ export default{
         },
 
         async createTransfers({commit}, { tempTransfer }){
-            const newTransfer = await ApiService.createTransfer(tempTransfer)
+            const reformatTransfer = {
+                scheduled_date: tempTransfer.scheduledDate,
+                transfer_type_id: tempTransfer.transfer_type_id,
+                transferProducts: tempTransfer.transferProducts,
+                recipient: tempTransfer.recipient,
+                reference: tempTransfer.reference
+            }
+
+            const newTransfer = await ApiService.createTransfer(reformatTransfer)
             commit("updateTransferState", [newTransfer])
 
             return newTransfer
