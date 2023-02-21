@@ -58,7 +58,7 @@
     },
 
     getFormatCalendar(){
-        return myTime.getCalendarFormat
+        return myTime.getCalendarFormat()
     }
   },
   watch: {

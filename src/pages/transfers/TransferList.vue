@@ -6,12 +6,13 @@
           <h5>Transfers</h5>
           <Button v-if="!isLoading" label="Create" class="p-button-success mr-2" @click="goToCreateTransfer"/>
           <p></p>
-          
-            <DataTable :value="myTransfers" :paginator="true" class="p-datatable-sm" dataKey="id"
-                    :rowHover="true" filterDisplay="menu" :loading="isLoading" responsiveLayout="scroll"
-                    v-model:selection="mySelected" v-model:filters="filters" @page="onPage($event)" v-model:rows="row"
-                    :rowsPerPageOptions="[10,20,30]" sortField="created_at" :sortOrder="-1" :totalRecords="getTotalRecords"
-                    >
+
+          <!-- NOTE: Possible to implement sort and load api through @sort -->
+          <DataTable :value="dataList" :paginator="true" class="p-datatable-sm" dataKey="id"
+            :rowHover="true" filterDisplay="menu" :loading="isLoading" responsiveLayout="scroll"
+            v-model:selection="mySelected" v-model:filters="filters" @page="onPage($event)" v-model:rows="row"
+            :rowsPerPageOptions="[10,20,30]" :totalRecords="getTotalRecords" removableSort
+            >
 
               <template #empty>
                 <p :onload="findData(MyCountDown.startCountdown)">No Transfer found.</p>
@@ -19,7 +20,7 @@
 
               <Column selectionMode="multiple"></Column>
               <!-- //TODO: Id for future -->
-              <!-- <Column field="sku" header="Id" style="min-width:12rem" :sortable="true" :showFilterMatchModes="false">
+              <!-- <Column field="sku" header="Id" style="min-width:12rem" :sortable="false" :showFilterMatchModes="false">
                 <template #body="{ data }">
                   <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
                 </template>
@@ -30,7 +31,7 @@
                 </template>
               </Column> -->
 
-              <Column field="reference" header="Internal Reference" :sortable="true" style="min-width:12rem" :showFilterMatchModes="false">
+              <Column field="reference" header="Internal Reference" :sortable="false" style="min-width:12rem" :showFilterMatchModes="false">
                 <template #body="{ data }">
                   <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
                 </template>
@@ -41,25 +42,25 @@
                 </template>
               </Column>
 
-              <Column field="transfer_type_id" :sortable="true" style="min-width:12rem" header="Transfer Type">
+              <Column field="transfer_type_id" :sortable="false" style="min-width:12rem" header="Transfer Type">
                 <template #body="{ data }">
                   <TransferTypeField :data="data"></TransferTypeField>
                 </template>
                 
               </Column>
 
-              <Column field="scheduled_time" :sortable="true" style="min-width:14rem" header="Schedule Time"
+              <Column field="scheduled_time" :sortable="false" style="min-width:14rem" header="Schedule Time"
                       :showFilterMatchModes="false">
 
                 <template #body="{ data }">
-                  {{ formatDate(data.scheduled_time) }}
+                  {{ formatDate(data?.scheduled_time) }}
                 </template>
                 <template #filter>
                   <CalendarTime @getValueMode="storeScheduleTimeMode" @getValue="storeScheduleTimeValue"></CalendarTime>
                 </template>
               </Column>
 
-              <Column field="transfer_status_id" :sortable="true" style="min-width:8rem" :showFilterMatchModes="false"
+              <Column field="transfer_status_id" :sortable="false" style="min-width:8rem" :showFilterMatchModes="false"
                       header="Status">
                 <template #body="{ data }">
                   <TransferStatusField :data='data'></TransferStatusField>
@@ -78,10 +79,10 @@
                 </template>
               </Column>
 
-              <Column field="completed_time" :sortable="true" style="min-width:14rem" header="Complete Time"
+              <Column field="completed_time" :sortable="false" style="min-width:14rem" header="Complete Time"
                       :showFilterMatchModes="false">
                 <template #body="{ data }">
-                  {{ formatDate(data.completed_time) }}
+                  {{ formatDate(data?.completed_time) }}
                 </template>
 
                 <template #filter>
@@ -91,9 +92,9 @@
                 </template>
               </Column>
 
-              <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:14rem" :sortable="true">
+              <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:14rem" :sortable="false">
                 <template #body="{ data }">
-                  {{ formatDate(data.created_at) }}
+                  {{ formatDate(data?.created_at) }}
                 </template>
 
                 <template #filter>
@@ -102,11 +103,11 @@
               </Column>
             </DataTable>
           
+
+          
           <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingTransfer"></RetryField>
           <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="onDecline"
                       :message="message"/>
-          <HiddenRetryField :toLoad="toLoadHidden" :message="messageLoading"
-                            :errorToast="errorToastLoadingTransfer"></HiddenRetryField>
         </div>
       </div>
       <TransferStatusField></TransferStatusField>
@@ -134,7 +135,6 @@
   import myTime from "../../components/utils/TimeConvert.js"
   import RetryField from "../../components/prompt_field/RetryField.vue"
   import PromptField from "../../components/prompt_field/PromptField.vue"
-  import HiddenRetryField from "../../components/prompt_field/HiddenRetryField.vue"
   import TransferStatusField from "./components/TransferStatusField.vue"
 
   import {transferStatus} from "../../domains/domain"
@@ -151,10 +151,9 @@
       TransferItem,
       RetryField,
       PromptField,
-      HiddenRetryField,
       TransferStatusField,
       CountDown,
-      TransferTypeField
+      TransferTypeField,
     },
     data() {
       return {
@@ -162,6 +161,8 @@
         mySelected: [],
         promptDeleted: false,
         selectedForDelete: null,
+
+        dataList: [],
 
         row: 10,
 
@@ -176,7 +177,6 @@
         },
 
         toLoadRetry: null,
-        toLoadHidden: null,
 
         filterValueToSearch: null,
         filterParamsToSearch: null,
@@ -187,16 +187,7 @@
         message: {
           failed: "Error Deleting Transfer, Try again",
           yesButton: "Yes",
-          noButton: "No",
-          decline: "No",
-          accept: "Yes",
-          prompt: null
-        },
-
-        messageLoading: {
-          failed: "Error loading Transfer, Try again",
-          yesButton: "Yes",
-          noButton: "No",
+          noButton: "No"
         },
 
         errorToastDeletingTransfer: {
@@ -311,27 +302,35 @@
       },
 
       onPage(event) {
-        if (event.page + 1 == event.pageCount) {
-          this.loadData()
-        }
+        this.toLoadRetry = async () => {
+            const transfers = await this.$store.dispatch("transfers/getTransfers", {
+              currentOffset: event.first,
+              limit: this.row
+            })
+            const offset= event.first
+            const limit = event.rows
+            this.updateList({offset: offset, row:limit, tempList: transfers})
+          }
       },
 
       async initData() {
         this.message.failed = "Loading failed, retry?"
-        await this.$store.dispatch("transfers/initializeTransfers", {
-          limit: this.row * 2
+        const transfer = await this.$store.dispatch("transfers/getTransfers", {
+          limit: this.row * 2,
+          offset: 0
         })
 
         await this.$store.dispatch("transfers/getTotalRecords")
-      },
-
-      async loadData() {
-        this.toLoadHidden = async () => {
-          await this.$store.dispatch("transfers/getTransfers", {
-            currentOffset: this.row,
-            limit: this.row
-          })
+        
+        for(let i=0; i<this.getTotalRecords; i++){
+          this.dataList.push({id: i, temp_id: i})
         }
+        
+        this.updateList({
+          offset: 0, 
+          row: this.row, 
+          tempList: transfer
+        })
       },
 
       noRetry() {
@@ -367,7 +366,18 @@
       storeCompleteTimeValue(newValue) {
         this.filters.completed_time.value = newValue
         this.filterValueToSearch = newValue
-      }
+      },
+
+      updateList({offset, row, tempList}){
+        let index=0
+        for(let i=offset; i<row+offset; i++){
+          if(!(tempList?.[index])){
+            break
+          }
+            this.dataList[i]=tempList[index]
+            index++
+        }
+      },
     },
 
     watch: {
@@ -381,7 +391,7 @@
         if (this.mySelected <= 0) {
           this.promptDeleted = false
         }
-      },
+      }
     }
   }
 </script>
