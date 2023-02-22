@@ -18,7 +18,6 @@
 
 <script>
     import BaseFieldForm from './components/BaseFormField.vue'
-    import myTime from '../../components/utils/TimeConvert.js'
     import { mapGetters } from 'vuex'
     import RetryField from '../../components/prompt_field/RetryField.vue'
 
@@ -76,6 +75,7 @@
                 await this.$store.dispatch("recipient/getRecipients", {
                     offset: 0,
                 })
+                await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
             },
 
             async onFormSubmit(transfer){
@@ -83,8 +83,6 @@
                 // When created new data 
                 this.message.failed="Error Creating Data, Retry?"
                 this.toLoad = async ()=>{
-                    transfer.scheduledDate=myTime.formatDateFromScheduleDate(transfer.scheduledDate)    
-                                    
                     transfer.transferProducts = transfer.transferProducts.map((e)=>{
                         return {
                             "product_id":e.product_id,

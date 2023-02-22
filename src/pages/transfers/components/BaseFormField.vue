@@ -13,6 +13,8 @@
                     <div class="p-fluid formgrid grid">
                         <div class="field col-12 md:col-4 sm:col-12">
                             <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
+
+                            <!-- A bug from the dev team, not from the code's fault -->
                             <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
                                       id="scheduleDate" v-model="transferData.scheduledDate"
                                       :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar" :inputClass="{'p-invalid': validationField1.scheduledDate.value}"/>
@@ -153,7 +155,7 @@
 
         <template #footer>
             <Button label="Discard" class="p-button-secondary p-button-text" @click="changeStateDiaglog"></Button>
-            <Button v-if="editedIndex!=null" :disabled="productLoading" label="Udate" class="p-button-text" @click="updateField"></Button>
+            <Button v-if="editedIndex!=null" :disabled="productLoading" label="Update" class="p-button-text" @click="updateField"></Button>
             <Button v-else :disabled="productLoading" label="Create" class="p-button-text" @click="createTransferProduct"></Button>
         </template>
     </Dialog>
@@ -332,10 +334,6 @@
                     reference:{
                         value: null,
                         myFunction: ()=>{
-                            const haveData = this.transferData.reference
-                            if(!haveData){
-                                return this.validationField1.reference.value="Field Cannot be empty"
-                            }
                             return this.validationField1.reference.value = null
                         }
                     }

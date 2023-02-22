@@ -19,8 +19,7 @@
               </template>
 
               <Column selectionMode="multiple"></Column>
-              <!-- //TODO: Id for future -->
-              <!-- <Column field="sku" header="Id" style="min-width:12rem" :sortable="false" :showFilterMatchModes="false">
+              <Column field="id" header="Id" style="min-width:8rem" :sortable="false" :showFilterMatchModes="false">
                 <template #body="{ data }">
                   <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
                 </template>
@@ -29,12 +28,9 @@
                   <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
                             placeholder="Search by id"></InputText>
                 </template>
-              </Column> -->
+              </Column>
 
               <Column field="reference" header="Internal Reference" :sortable="false" style="min-width:12rem" :showFilterMatchModes="false">
-                <template #body="{ data }">
-                  <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
-                </template>
                 <template #filter="{ filterModel, filterCallback }">
                   <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
                     placeholder="Search By Reference"
@@ -46,15 +42,15 @@
                 <template #body="{ data }">
                   <TransferTypeField :data="data"></TransferTypeField>
                 </template>
-                
               </Column>
 
               <Column field="scheduled_time" :sortable="false" style="min-width:14rem" header="Schedule Time"
                       :showFilterMatchModes="false">
 
                 <template #body="{ data }">
-                  {{ formatDate(data?.scheduled_time) }}
+                  <p>{{ formatDate(data?.scheduled_time) }}</p>
                 </template>
+
                 <template #filter>
                   <CalendarTime @getValueMode="storeScheduleTimeMode" @getValue="storeScheduleTimeValue"></CalendarTime>
                 </template>

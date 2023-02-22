@@ -15,11 +15,13 @@
                             <small class="p-error" v-if="submitted && !productName.val">Product is required.</small>
                             <!-- <text>&emsp;Contact data</text> -->
                         </div>
+                        
                         <div class="field col-12 md:col-12">
-                            <label for="sku">Internal Reference</label>
-                            <InputText id="sku" type="text" v-model.trim="sku.val" />
-                            <!-- <text>&emsp;Operation Type data</text> -->
+                            <label for="sku" :class="{'p-error': validationField.sku.val}">Internal Reference</label>
+                            <InputText id="sku" type="text" v-model.trim="sku.val" :class="{'p-invalid': validationField.sku.value}" />
+                            <small id="sku-help" class="p-error" v-if="validationField.sku.value">{{ validationField.sku.value }}</small>
                         </div>
+
                         <div class="field col-12 md:col-12">
                             <label for="category-name">Product Category</label>
                             <v-select id="category-name" :options="prodCategories" label="category_name"
@@ -58,6 +60,18 @@ export default {
     },
     data() {
         return {
+            validationField:{
+                sku:{
+                    value: null,
+                    validate: ()=>{
+                        const haveData = this.sku.val
+                        if(!haveData){
+                            return this.validationField.sku.value="Reference is required"
+                        }
+                        this.validationField.sku.value=null
+                    }
+                }
+            },
             promptCreated: false,
             productName: {
                 val: null,
@@ -137,6 +151,17 @@ export default {
             if (this.productName.val === '' || this.productName.val === null) {
                 this.formIsValid = false;
                 this.productName.isValid = false;
+            }
+
+            const myList = []
+            for(const i in this.validationField){
+                this.validationField[i].validate()
+                const error = this.validationField[i].value!=null
+                myList.push(error)
+            }
+            const index = myList.findIndex((e)=>e)
+            if(index>=0){
+                this.formIsValid=false
             }
         },
         async loadProdCategories() {

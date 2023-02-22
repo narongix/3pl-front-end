@@ -80,7 +80,7 @@ export default{
 
         async createTransfers({commit}, { tempTransfer }){
             const reformatTransfer = {
-                scheduled_date: tempTransfer.scheduledDate,
+                scheduled_time: tempTransfer.scheduledDate,
                 transfer_type_id: tempTransfer.transfer_type_id,
                 transferProducts: tempTransfer.transferProducts,
                 recipient: tempTransfer.recipient,
