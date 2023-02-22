@@ -15,7 +15,7 @@
                             <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
                             <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
                                       id="scheduleDate" v-model="transferData.scheduledDate"
-                                      :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar" :class="{'myError': validationField1.scheduledDate.value}"/>
+                                      :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar" :inputClass="{'p-invalid': validationField1.scheduledDate.value}"/>
                             <small id="scheduleDate-help" class="p-error" v-if="validationField1.scheduledDate.value">Cannot be Empty</small>
                         </div>
 
@@ -39,7 +39,7 @@
                                 <div class="col-11 pl-0">
                                     <InputText v-model="transferData.recipient" @input="onInput" 
                                     placeholder="Recipient" type="text" :disabled="FieldNotActive || disabledField['recipient']"
-                                    :class="{'p-error': validationField1.recipient.value}"
+                                    :class="{'p-invalid': validationField1.recipient.value}"
                                     >
                                     </InputText>
                                     <small id="recipient-help" class="p-error" v-if="validationField1.recipient.value">Cannot be Empty</small>
@@ -68,9 +68,10 @@
                         </div>
 
                         <div class="field col-12 md:col-3 sm:col-12">
-                            <label for="InternalReference">Internal Reference</label>
+                            <label for="InternalReference" :class="{'p-error': validationField1.reference.value}">Internal Reference</label>
                             <InputText :disabled="FieldNotActive || disabledField['reference']" id="InternalReference" 
-                            type="text" v-model="transferData.reference"></InputText>
+                            type="text" v-model.trim="transferData.reference" :class="{'p-invalid': validationField1.reference.value}"></InputText>
+                            <small id="InternalReference-help" class="p-error" v-if="validationField1.reference.value">{{ validationField1.reference.value }}</small>
                         </div>
                     </div>
                 </div>
@@ -105,6 +106,8 @@
                         <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name"></InputText>
                       </template>
                     </Column>
+                    <Column field="sku" header="Internal Reference" style="min-width:12rem"></Column>
+                    <Column field="barcode" header="Barcode" style="min-width:15rem"></Column>
                     <Column field="demand" header="Demands" :sortable="true" style="min-width:12rem">
                         <template #body="{ data }">
                             <p :class="{highlight: !FieldNotActive}">{{ data.demand }}</p>
@@ -186,9 +189,6 @@
 <style scoped>
     .highlight{
         color: var(--primary-color);
-    }
-    .myError{
-        border-color: red;
     }
 </style>
 
@@ -332,6 +332,10 @@
                     reference:{
                         value: null,
                         myFunction: ()=>{
+                            const haveData = this.transferData.reference
+                            if(!haveData){
+                                return this.validationField1.reference.value="Field Cannot be empty"
+                            }
                             return this.validationField1.reference.value = null
                         }
                     }
