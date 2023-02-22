@@ -126,6 +126,9 @@
 				await this.$store.dispatch("recipient/getRecipients",{
 					offset: 0
 				})
+
+				await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
+
 				
 				this.transferDetail = await this.getTransferDetail()
 
