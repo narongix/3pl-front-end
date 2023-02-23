@@ -173,6 +173,8 @@
     },
     watch: {
         productId(newValue) {
+            // TODO: Intergrate product movesline
+            // with stock detail product
             if (newValue) {
                 this.initData();
             }

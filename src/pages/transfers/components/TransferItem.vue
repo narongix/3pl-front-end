@@ -1,17 +1,17 @@
 <template>
-    <a @click="pushing" style="cursor: pointer;">{{ data.id }}</a>
+    <a @click="pushing" style="cursor: pointer;">{{ data?.id }}</a>
 </template>
 <script>
     export default {
         props: ["data"],
         methods:{
             pushing(){
-                this.$router.push({name:"TransferDetail", params:{id: this.data.id}})
+                this.$router.push({name:"TransferDetail", params:{id: this.data?.id}})
             }
         },
         computed: {
             transferLink() {
-                return this.$route.path + '/' + this.data.id;     
+                return this.$route.path + '/' + this.data?.id;     
             }
         },
     }

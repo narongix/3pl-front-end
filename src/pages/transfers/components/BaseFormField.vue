@@ -13,9 +13,11 @@
                     <div class="p-fluid formgrid grid">
                         <div class="field col-12 md:col-4 sm:col-12">
                             <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
+
+                            <!-- A bug from the dev team, not from the code's fault -->
                             <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
                                       id="scheduleDate" v-model="transferData.scheduledDate"
-                                      :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar" :class="{'myError': validationField1.scheduledDate.value}"/>
+                                      :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar" :inputClass="{'p-invalid': validationField1.scheduledDate.value}"/>
                             <small id="scheduleDate-help" class="p-error" v-if="validationField1.scheduledDate.value">Cannot be Empty</small>
                         </div>
 
@@ -39,7 +41,7 @@
                                 <div class="col-11 pl-0">
                                     <InputText v-model="transferData.recipient" @input="onInput" 
                                     placeholder="Recipient" type="text" :disabled="FieldNotActive || disabledField['recipient']"
-                                    :class="{'p-error': validationField1.recipient.value}"
+                                    :class="{'p-invalid': validationField1.recipient.value}"
                                     >
                                     </InputText>
                                     <small id="recipient-help" class="p-error" v-if="validationField1.recipient.value">Cannot be Empty</small>
@@ -68,9 +70,10 @@
                         </div>
 
                         <div class="field col-12 md:col-3 sm:col-12">
-                            <label for="InternalReference">Internal Reference</label>
+                            <label for="InternalReference" :class="{'p-error': validationField1.reference.value}">Internal Reference</label>
                             <InputText :disabled="FieldNotActive || disabledField['reference']" id="InternalReference" 
-                            type="text" v-model="transferData.reference"></InputText>
+                            type="text" v-model.trim="transferData.reference" :class="{'p-invalid': validationField1.reference.value}"></InputText>
+                            <small id="InternalReference-help" class="p-error" v-if="validationField1.reference.value">{{ validationField1.reference.value }}</small>
                         </div>
                     </div>
                 </div>
@@ -105,6 +108,8 @@
                         <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name"></InputText>
                       </template>
                     </Column>
+                    <Column field="sku" header="Internal Reference" style="min-width:12rem"></Column>
+                    <Column field="barcode" header="Barcode" style="min-width:15rem"></Column>
                     <Column field="demand" header="Demands" :sortable="true" style="min-width:12rem">
                         <template #body="{ data }">
                             <p :class="{highlight: !FieldNotActive}">{{ data.demand }}</p>
@@ -128,13 +133,13 @@
         <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-12 sm:col-12">
                 <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
-                <DropDownPagination v-model="product_id" :options="getProducts" optionLabel="product_name" optionValue="product_id"
+                <DropDownPagination v-model="product_id" :options="getProducts" optionLabel="search_key" optionValue="product_id"
                 :disabled="FieldNotActive" id="product_id" placeholder="Please select a product" 
                 :validation="validationField2.product_id.value"
                 :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
                 :maxLength="getProductLength"
                 :errorToastLoading="errorToastLoadingProducts" :messageLoad="messageLoadProducts"
-                :showOption="displayOptionProduct"
+                :showOption="option => option.search_key"
                 >
 
                 </DropDownPagination>
@@ -150,7 +155,7 @@
 
         <template #footer>
             <Button label="Discard" class="p-button-secondary p-button-text" @click="changeStateDiaglog"></Button>
-            <Button v-if="editedIndex!=null" :disabled="productLoading" label="Udate" class="p-button-text" @click="updateField"></Button>
+            <Button v-if="editedIndex!=null" :disabled="productLoading" label="Update" class="p-button-text" @click="updateField"></Button>
             <Button v-else :disabled="productLoading" label="Create" class="p-button-text" @click="createTransferProduct"></Button>
         </template>
     </Dialog>
@@ -165,7 +170,7 @@
                 :maxLength="getRecipientLength"
                 :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
                 :showOption="option=>option.full_name ?? option.full_name"
-                :showValue="showValueRecipient"
+                :showValue="showValueRecipient" :offset="offset ?? 0"
                 >
 
                 </DropDownPagination>
@@ -186,9 +191,6 @@
 <style scoped>
     .highlight{
         color: var(--primary-color);
-    }
-    .myError{
-        border-color: red;
     }
 </style>
 
@@ -212,6 +214,7 @@
             FieldNotActive: Boolean,
             data: Object,
             disabledField: Object,
+            offset: Number
         },
         
         emits:["onClickSubmit"],
@@ -456,13 +459,6 @@
             showValueRecipient(value){
                 return value ?? "Empty"
             },
-
-            displayOptionProduct(option){
-                if(option.sku != 'false'){
-                    return `${ option?.sku } - ${ option?.product_name }`
-                }
-                return option?.product_name
-            },
             
             createRecipientTemplateNow(){
                 this.toLoad = async ()=>{
@@ -698,7 +694,7 @@
                     // TODO: Find a better solution to get a large amount of products
                     // Possibly, implement pagination on search result
                     limit: 30,
-                    productName: filterValue
+                    searchKey: filterValue
                 })
             },
 

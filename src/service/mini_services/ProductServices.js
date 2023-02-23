@@ -1,14 +1,17 @@
 import ApiConfig from "../ApiConfig"
 
 export default {
-    async getProducts(offset, limit, productName) {
+    async getProductLength(){
+        const res = await ApiConfig.getMethods({
+            api:"/product/total"
+        })
+        return res.data
+    },
+    
+    async getProducts(params) {
         const res = await ApiConfig.getMethods({
             api: "/product/list",
-            params: {
-                offset: offset,
-                limit: limit,
-                product_name: productName
-            }
+            params: params
         })
         return res.data
     },

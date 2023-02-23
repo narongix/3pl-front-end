@@ -7,7 +7,6 @@ export default{
     state(){
         return {
             stockedList: [],
-            myFilter: {}
         }
     },
     getters:{
@@ -29,7 +28,6 @@ export default{
         },
 
         onReplacedStockedList(state, stockedList){
-            
             state.stockedList = [...stockedList]
         },
 
@@ -38,9 +36,12 @@ export default{
         }
     },
     actions:{
-        async onfetchAndUpdateStockedList({commit, state}, {from_date, to_date, limit, offset}){
+        async onfetchAndUpdateStockedList({commit, dispatch}, {from_date, to_date, limit, offset, barcodes, sku}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
             const newToDate = TimeConvert.formatDateToStockFormat(to_date)
+
+            const newProductIds = dispatch("convertListToObject", {myList: sku, name: "skus"}) ?? null
+            const newBarCodes = dispatch("convertListToObject", {myList: barcodes, name: "barcodes"}) ?? null
 
             const data = await ApiService.getStockedDetailReport({
                 params:{
@@ -49,23 +50,21 @@ export default{
                     to_date: newToDate,
                     limit: limit ?? 10,
                     offset: offset ?? 0,
-                    ...state.myFilter
+                    ...newProductIds,
+                    ...newBarCodes
                 }
             })
 
             commit("onUpdateStockedList", data)
-            return data.length
+            return data
         },
 
-        async onfetchedAndReplaceStockedList({ commit, state }, {from_date, to_date, limit, offset, listFilter}){
+        async onfetchedAndReplaceStockedList({ commit, dispatch }, {from_date, to_date, limit, offset, barcodes, sku}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
             const newToDate = TimeConvert.formatDateToStockFormat(to_date)
 
-            state.myFilter={}
-            for(let i=0; i<listFilter?.length ?? 0; i++){
-                const name = `product_ids[${i}]`
-                state.myFilter[name] = listFilter[i]
-            }
+            const newProductIds = await dispatch("convertListToObject", {myList: sku, name: "skus"}) ?? null
+            const newBarCodes = await dispatch("convertListToObject", {myList: barcodes, name: "barcodes"}) ?? null
 
             const data = await ApiService.getStockedDetailReport({
                 params:{
@@ -74,15 +73,27 @@ export default{
                     to_date: newToDate,
                     limit: limit ?? 10,
                     offset: offset ?? 0,
-                    ...state.myFilter
+                    ...newBarCodes,
+                    ...newProductIds
                 }
             })
             // Don't user update because of the fact that old data can be in different 
             // date
             commit("onReplacedStockedList", data)
+            return data
         },
+
         clearSockDetailReport({ commit }){
             commit("onClearState")
+        },
+
+        convertListToObject(_, {myList, name}){
+            const myObject = {}
+            for(let i=0; i<myList?.length ?? 0; i++){
+                const newName = `${name}[${i}]`
+                myObject[newName] = myList[i]
+            }
+            return myObject
         }
     },
 }

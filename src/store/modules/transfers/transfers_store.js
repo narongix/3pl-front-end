@@ -5,7 +5,6 @@ export default{
     state(){
         return{
             transfers:[],
-            offset: 0,
             loading:false,
             totalRecords: null,
         }
@@ -52,7 +51,6 @@ export default{
 
         onClearState(state){
             state.transfers.length=0
-            state.offset=0
         },
         
         updateTotalTransfer(state, quantity){
@@ -62,25 +60,12 @@ export default{
     },
 
     actions:{
-        async initializeTransfers({ commit, state }, {limit, params }){
-           const data = await ApiService.getTransfers({
-                offset: state.offset,
-                limit: limit, 
-                ...params
-            })
-            state.offset = limit
-
-            commit("updateTransferState", data)
-            return data
-        },
-
-        async getTransfers({commit, state}, {currentOffset, limit, params}){
+        async getTransfers({ commit }, {currentOffset, limit, params}){
             const data = await ApiService.getTransfers({
-                offset: state.offset,
+                offset: currentOffset,
                 limit: limit, 
                 ...params
             })
-            state.offset = state.offset + currentOffset
 
             commit("updateTransferState", data)
             return data
@@ -94,7 +79,15 @@ export default{
         },
 
         async createTransfers({commit}, { tempTransfer }){
-            const newTransfer = await ApiService.createTransfer(tempTransfer)
+            const reformatTransfer = {
+                scheduled_time: tempTransfer.scheduledDate,
+                transfer_type_id: tempTransfer.transfer_type_id,
+                transferProducts: tempTransfer.transferProducts,
+                recipient: tempTransfer.recipient,
+                reference: tempTransfer.reference
+            }
+
+            const newTransfer = await ApiService.createTransfer(reformatTransfer)
             commit("updateTransferState", [newTransfer])
 
             return newTransfer
@@ -126,10 +119,6 @@ export default{
                 "transferId": transfers[0]["id"]
             })
             commit("deleteTransferState", transfers)
-        },
-
-        resetOffset({ state }){
-            state.offset = 0
         },
 
         async getTotalRecords({commit}){

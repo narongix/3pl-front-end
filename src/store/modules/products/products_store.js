@@ -4,10 +4,15 @@ export default {
     state() {
         return {
             products: [],
+            maxProductLength: 0,
             prodCategories: [],
         }
     },
     getters: {
+        getProductLength(state){
+            return state.maxProductLength
+        },
+
         getProductState(state) {
             return state.products;
         },
@@ -22,6 +27,10 @@ export default {
         }
     },
     mutations: {
+        setProductLength(state, productLength){
+            state.maxProductLength = productLength
+        },
+
         setProducts(state, productState) {
             state.products = productState.products;
         },
@@ -80,11 +89,17 @@ export default {
             const index = state.prodCategories.findIndex(e => e.id == productState.id)
             state.prodCategories.splice(index, 1)
         },
+
     },
     actions: {
-        async getDetailProductOnStockDetail({commit}, {productId, limit, offset}){
+        async getProductLength({ commit }){
+            const maxProductLength = await ApiService.getProductLength()
+            commit("setProductLength", maxProductLength.total_products)
+        },
+        async getDetailProductOnStockDetail({commit}, {productId, limit, offset, barcode}){
             const params = {
-                product_id: productId,
+                product_id: productId ?? null,
+                barcode: barcode ?? null,
                 limit: limit, 
                 offset: offset,
             }
@@ -145,10 +160,15 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ commit }, { offset, productName, limit }) {
-            const myProductName = productName ? productName : ""
-
-            const products = await ApiService.getProducts(offset, limit, myProductName)
+        async onFetchProducts({ commit }, { offset, productName, limit, searchKey}) {
+            const params = {
+                offset: offset,
+                limit: limit,
+                product_name: productName,
+                search_key: searchKey
+            }
+            
+            const products = await ApiService.getProducts(params)
             commit("updateProductState", products)
             return products
         },

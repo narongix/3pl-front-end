@@ -1,11 +1,5 @@
 import { createRouter, createWebHashHistory, START_LOCATION } from 'vue-router';
 import App from './App.vue';
-import ProductList from './pages/products/ProductList.vue';
-import ProductDetail from './pages/products/ProductDetail.vue';
-import NewProduct from './pages/products/NewProduct.vue';
-import ProductCategory from './pages/products/ProductCategory.vue' ;
-import NewProductCategory from './pages/products/NewProductCategory.vue';
-import ProductCategoryDetail from './pages/products/ProductCategoryDetail.vue';
 import store from "@/store";
 
 
@@ -53,31 +47,31 @@ const routes = [
             },
             {
                 path: '/products',
-                component: ProductList,
+                component: ()=>import('./pages/products/ProductList.vue'),
     
             },
             {
                 path: '/products/:id',
-                component: ProductDetail
+                component: ()=>import('./pages/products/ProductDetail.vue')
             },
             {
                 path: '/products/new/',
-                component: NewProduct
+                component: ()=>import('./pages/products/CreateProductPage.vue')
             },
             {
                 path: '/product-categories',
                 name: "productCategoriesList",
-                component: ProductCategory,
+                component: ()=>import('./pages/products/ProductCategory.vue'),
     
             },
             {
                 path: '/product-categories/new/',
-                component: NewProductCategory,
+                component: ()=>import('./pages/products/NewProductCategory.vue'),
     
             },
             {
                 path: '/product-categories/:id',
-                component: ProductCategoryDetail
+                component: ()=>import('./pages/products/ProductCategoryDetail.vue')
             },
 
             {
