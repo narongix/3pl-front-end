@@ -93,8 +93,13 @@
                     </Column>
                     <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
                         <template #body="slotProps">
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning m-0"
+                            <Button v-if="slotProps.data.product_name" icon="pi pi-trash" class="p-button-rounded p-button-warning m-0"
                                 @click="confirmDeleteProduct(slotProps.data)" />
+                                <div else>
+                                    <p></p>
+                                    <p></p>
+                                    <p></p>
+                                </div>
                         </template>
                     </Column>
                 </DataTable>
