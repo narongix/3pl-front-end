@@ -36,7 +36,7 @@
   import CountDown from "@/components/CountDown.vue";
   export default {
     created(){
-      this.myOffset = this.offset ?? 0
+      this.myOffset = this.maxLength ?? 0
     },
     components:{
       CountDown
@@ -57,7 +57,6 @@
       maxLength: Number,
       showOption: Function,
       showValue: Function,
-      offset: Number
     },
     data() {
       return {
@@ -96,9 +95,8 @@
               const fetchLength = await this.whenLoad(this.myOffset, this.outOfFetch);
               this.myOffset = this.myOffset + this.limit;
               this.outOfFetch = fetchLength;
+              this.loading = false;
             }, 10)
-            
-            this.loading = false;
           }
         } catch (e) {
           this.outOfFetch = 1
