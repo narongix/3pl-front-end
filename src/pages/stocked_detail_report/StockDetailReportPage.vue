@@ -43,7 +43,8 @@
                                     :whenSearch="whenSearchProduct"
                                     :maxLength="getProductCurrentLength"
                                     :displayOption ="myOption=>myOption.barcode"
-                                    :v-model:offset="myFilterOffset" 
+                                    v-model:offset="myFilterOffset" 
+                                    :limit="10"
                                     @onChange="onSelected"
                                 >
 
@@ -63,7 +64,8 @@
                                     :whenSearch="whenSearchProduct"
                                     :maxLength="getProductCurrentLength"
                                     :displayOption ="myOption=>myOption.product_name"
-                                    :v-model:offset="myFilterOffset" 
+                                    v-model:offset="myFilterOffset"
+                                    :limit="10"
                                     @onChange="onSelected">
 
                                 </MultiSelectPagination>
@@ -117,7 +119,7 @@
             this.toLoadRetry = async()=>{
                 await this.$store.dispatch("products/onFetchProducts",{
                     offset: 0,
-                    limit: 15
+                    limit: 10
                 })
             }
         },
@@ -133,7 +135,7 @@
                 //     barcode: {value: null, matchMode: FilterMatchMode.STARTS_WITH},
                 //     product_name: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
                 // },
-                myFilterOffset: 0,
+                myFilterOffset: 10,
                 myFilters:{
                     myBarcode: [],
                     myProductSku: [],
