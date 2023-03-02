@@ -72,6 +72,10 @@
                         <label for="height">Height</label>
                         <InputText id="height" type="text" v-model="product.height.newVal" :disabled=true />
                     </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="dimension">Dimensions</label>
+                        <InputText id="dimension" type="text" v-model="product.dimensions.newVal" :disabled=true />
+                    </div>
                     <div class="field col-12 md:col-6">
                     </div>
                 </div>
@@ -106,9 +110,9 @@ import TimeConvert from "../../components/utils/TimeConvert";
 
 export default {
     created() {
+        // TODO: REFACTOR LOAD DATA
         this.loadData();
         this.loadProdCategories();
-        this.getData();
     },
     components: {
         PromptField
@@ -201,11 +205,6 @@ export default {
         }
     },
     methods: {
-        // product history detail 
-        async getData() {
-            await this.$store.dispatch("products/getDetailProduct", this.$route.params.id);
-            this.productHistory = this.listDetail.product_moves
-        },
         onDecline() {
             this.promptCreated = false
         },
@@ -316,7 +315,15 @@ export default {
                     newVal: this.products.height,
                     isValid: true,
                 },
+                dimensions: {
+                    val: this.products.dimensions,
+                    newVal: this.products.dimensions,
+                    isValid: true,
+                }
             })
+
+            await this.$store.dispatch("products/getDetailProduct", this.$route.params.id);
+            this.productHistory = this.listDetail.product_moves
         },
         async newCategory(name) {
             this.selectedCreated = name
