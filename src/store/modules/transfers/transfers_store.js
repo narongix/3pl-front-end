@@ -40,6 +40,17 @@ export default{
             });
         },
 
+        addTransferState(state, newTransfers){
+            newTransfers.forEach(function (element){
+                const index = state.transfers.findIndex(e=>e.id == element)
+                if(index<0){
+                    state.transfers.unshift(element)
+                }else{
+                    state.transfer[index]=element
+                }
+            })
+        },
+
         deleteTransferState(state, transfers){
             transfers.forEach((e)=>{
                 const index = state.transfers.findIndex(element=>element.id == e.id)
@@ -60,7 +71,7 @@ export default{
     },
 
     actions:{
-        async getTransfers({ commit }, {currentOffset, limit, params}){
+        async getTransfers({ commit, state }, {currentOffset, limit, params}){
             const data = await ApiService.getTransfers({
                 offset: currentOffset,
                 limit: limit, 
@@ -68,7 +79,7 @@ export default{
             })
 
             commit("updateTransferState", data)
-            return data
+            return state.transfers
         },
         
         async getTransferDetail({ commit }, { transferId }){
@@ -88,7 +99,7 @@ export default{
             }
 
             const newTransfer = await ApiService.createTransfer(reformatTransfer)
-            commit("updateTransferState", [newTransfer])
+            commit("addTransferState", [newTransfer])
 
             return newTransfer
         },
@@ -105,6 +116,7 @@ export default{
             const newTransferV2 = await ApiService.updateTransfer(newTransfer, id)
             
             commit("updateTransferState", [newTransferV2])
+            return newTransferV2
         },
 
         async deleteSingleTransfer({commit}, { transfer }){
