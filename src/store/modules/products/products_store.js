@@ -34,9 +34,11 @@ export default {
         setProducts(state, productState) {
             state.products = productState.products;
         },
+        
         setProdCategories(state, productState) {
             state.prodCategories = productState.prodCategories;
         },
+
         onAddProduct(state, productState) {
             productState.forEach(element => {
                 const index = state.products.findIndex((e) => e.product_id == element.product_id)
@@ -47,6 +49,7 @@ export default {
                 }
             });  
         },
+        
         updateProductState(state, productState) {
             productState.forEach(element => {
                 const index = state.products.findIndex((e) => e.product_id == element.product_id)
@@ -57,14 +60,17 @@ export default {
                 }
             });
         },
+
         deleteProductState(state, productState) {
             const index = state.products.findIndex(product => product.product_id == productState.id)
             state.products.splice(index, 1)
         },
+
         onClearState(state) {
             state.products.length = 0
             state.prodCategories.length = 0
         },
+
         onAddProductCategory(state, payload) {
             payload.forEach((element) => {
                 const index = state.prodCategories.findIndex(category => category.id == element.id);
@@ -160,7 +166,7 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ commit }, { offset, productName, limit, searchKey}) {
+        async onFetchProducts({ commit, state }, { offset, productName, limit, searchKey}) {
             const params = {
                 offset: offset,
                 limit: limit,
@@ -170,7 +176,8 @@ export default {
             
             const products = await ApiService.getProducts(params)
             commit("updateProductState", products)
-            return products
+
+            return state.products
         },
         async getProdCategories(context) {
             try {
