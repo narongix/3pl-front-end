@@ -200,6 +200,11 @@ export default {
                     newVal: null,
                     isValid: true,
                 },
+                dimensions: {
+                    val: null,
+                    newVal: null,
+                    isValid: true,
+                },
                 updatedFields: [],
             }
         }

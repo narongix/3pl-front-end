@@ -62,7 +62,6 @@ const routes = [
                 path: '/product-categories',
                 name: "productCategoriesList",
                 component: ()=>import('./pages/products/ProductCategory.vue'),
-    
             },
             {
                 path: '/product-categories/new/',
@@ -79,6 +78,22 @@ const routes = [
                 name: 'empty',
                 component: () => import('./components/EmptyPage.vue')
             },
+
+            {
+                path: "/billing",
+                children:[
+                    {
+                        path: "",
+                        name:"billing",
+                        component: ()=>import("./pages/billing/BillingList.vue")
+                    },
+                    {
+                        path: "detail",
+                        name: "billingDetail",
+                        component: ()=>import("./pages/billing/BillingDetail.vue")
+                    }
+                ]
+            }
         ]
     },
     {

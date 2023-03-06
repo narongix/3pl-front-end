@@ -57,6 +57,12 @@ export default {
                         {label: 'Product Categories', icon: 'pi pi-fw pi-products', to: '/product-categories'},
                     ]
                 },
+                {
+                    label: 'Billing',
+                    items:[
+                        {label: 'Billing statement', icon: 'pi pi-fw pi-products', to: '/billing'}
+                    ]
+                },
                 this.isLogin
             ]
         }
