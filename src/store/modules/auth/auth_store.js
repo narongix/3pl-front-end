@@ -36,6 +36,14 @@ export default {
         getToken(state){
             const token = state.oneTimeAccessToken ?? localStorage.getItem(LocalStorageKeys.accessTokenkey)
             return token
+        },
+
+        getUserId(state){
+            if (!state.user) {
+                state.user = Object.assign(state.user ?? {}, JSON.parse(localStorage.getItem(LocalStorageKeys.userKey)))
+            }
+            
+            return state.user.id;  
         }
     },
     mutations: {

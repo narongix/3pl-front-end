@@ -21,5 +21,11 @@ const transferType ={
     2: "Delivery"
 }
 
-export { transferStatus, transferType, transferId }
+const billStatus = {
+    1: "Pending",
+    2: "Submitted",
+    3: "Closed"
+}
+
+export { transferStatus, transferType, transferId, billStatus }
 

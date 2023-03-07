@@ -7,7 +7,7 @@
 	:disabledField="disabledField"
 	>
 		
-		<template #myTop>
+		<template #myTop="">
 			<RetryField :toLoad="toLoad" :message="message"></RetryField>
 		</template>
 
