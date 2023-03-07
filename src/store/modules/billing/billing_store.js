@@ -71,8 +71,35 @@ export default{
                 year: year,
                 transferType: transferType
             });
-            state.billingList
+            state.billingList;
             return data;
+        },
+
+        async onFetchVolume({ state }, {offset, limit, month, year}){
+            const data = await ApiService.getVolumeTotal({
+                offset: offset,
+                limit: limit,
+                month: month,
+                year: year,
+                userId: store.getters['auth/getUserId']
+            });
+
+            state.billingList;
+
+            return data;
+        },
+
+        async onFetchVolumeWithProductId({state}, {offset, limit, month, year}){
+            const data = await ApiService.getVolumeByProductId({
+                offst: offset,
+                limit: limit,
+                month: month,
+                year: year
+            });
+            
+            state.billingList;
+
+            return data
         }
     }
 }

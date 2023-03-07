@@ -1,6 +1,5 @@
 <template>
     <slot :value="myList" :update="updateList">
-
     </slot>
 </template>
 
@@ -23,7 +22,7 @@
 
                 this.updateList({
                     offset: 0,
-                    row: this.row,
+                    row: this.row ?? 10,
                     tempList: values
                 })
             },

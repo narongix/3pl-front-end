@@ -81,18 +81,23 @@ const routes = [
 
             {
                 path: "/billing",
-                children:[
-                    {
-                        path: "",
-                        name:"billing",
-                        component: ()=>import("./pages/billing/BillingList.vue")
-                    },
-                    {
-                        path: "detail",
-                        name: "billingDetail",
-                        component: ()=>import("./pages/billing/BillingDetail.vue")
-                    }
-                ]
+                name:"billing",
+                component: ()=>import("./pages/billing/BillingList.vue"),
+            },
+            {
+                path:"/billing/detail",
+                name: "billingDetail",
+                component: ()=>import("./pages/billing/BillingDetail.vue"),            
+            },
+            {
+                path:"/billing/detail/volume",
+                name: "volumeList",
+                component: ()=>import("./pages/billing/BillingVolumeList.vue"),
+            },
+            {
+                path:"/billing/detail/volume/productDetail",
+                name: "volumeProductDetail",
+                component: ()=>import("./pages/billing/BillingVolumeProduct.vue"),
             }
         ]
     },

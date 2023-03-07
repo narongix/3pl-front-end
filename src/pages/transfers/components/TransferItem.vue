@@ -8,11 +8,6 @@
             pushing(){
                 this.$router.push({name:"TransferDetail", params:{id: this.data?.id}})
             }
-        },
-        computed: {
-            transferLink() {
-                return this.$route.path + '/' + this.data?.id;     
-            }
-        },
+        }
     }
 </script>
