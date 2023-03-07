@@ -11,7 +11,6 @@
         },
         computed:{
             getDate(){
-                const date = new Date(this.data.created_at)
                return TimeConvert.formatDateFromScheduleDate(new Date(this.data.created_at))
             }
         }

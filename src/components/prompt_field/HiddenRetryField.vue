@@ -1,12 +1,9 @@
-
 <template>
-    
     <Dialog :visible="popUpPrompt" :modal="true" :closable='true'>
         <p>{{ textLoading }}</p>
         <template #footer>
             <Button :label="message.noButton" class="p-button-secondary p-button-text" @click="noRetry"></Button>
             <Button :label="message.yesButton" class="p-button-text p-button-sucess" @click="loadData" @mousedown="unFocus"></Button>
-            
         </template>
     </Dialog>
 </template>
@@ -18,7 +15,7 @@
             toLoad: Function,
             message: {
                 noButton: String,
-                uesButton: String,
+                uesButton: String,  
                 failed: String
             },
             errorToast: {

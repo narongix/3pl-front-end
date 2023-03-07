@@ -76,7 +76,6 @@
                     
                     <ColumnGroup type="footer">
                         <Row>
-                            <!-- <Column footer="Total" :colspan="4" footerStyle="text-align:right"></Column> -->
                             <Column footer=""></Column>
                             <Column footer=""></Column>
                             <Column footer=""></Column>
@@ -96,7 +95,11 @@
                             <template #empty>
                                 Empty...
                             </template>
-                            <Column field="total_volume" header="Total Volume"></Column>
+                            <Column field="total_volume" header="Total Volume">
+                                <template #body="{ data }">
+                                   <LinkParagraph :data="data.total_volume" @pushing="onClickToVolume"></LinkParagraph>
+                                </template>
+                            </Column>
                             <Column field="rate" header="Rate"></Column>
                             <Column field="total_volume_fee" header="Subtotal"></Column>
                         </DataTable>
@@ -141,6 +144,7 @@
     import StringFunction from '../../components/utils/StringFunction';
     import DialogTransferType from './components/DialogTransferType.vue';
     import { mapGetters } from 'vuex';
+    import LinkParagraph from '../../components/LinkParagraph.vue';
 
     export default{
         created() {
@@ -205,9 +209,12 @@
                     this.myType=event.data?.transfer_type_name;
                     this.myStatusType=true
                 }
+            },
+            onClickToVolume(){
+                return this.$router.push({name: "volumeList", query: this.$route.query})
             }
         },
-        components: { RetryField, DialogTransferType },
+        components: { RetryField, DialogTransferType, LinkParagraph },
 
         watch:{
             mySelected(newValue){

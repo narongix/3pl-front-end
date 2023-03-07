@@ -37,5 +37,35 @@ export default{
         });
 
         return res.data;
+    },
+
+    async getVolumeTotal({month, year, offset, limit, userId}){
+        const res = await ApiConfig.getMethods({
+            api: "bill_detail/volume_trx",
+            params:{
+                user_id: userId,
+                month:month,
+                year:year,
+                offset:offset,
+                limit:limit
+            }
+        });
+
+        return res.data;
+    },
+
+    async getVolumeByProductId({month, year, offset, limit, productId}){
+        const res = await ApiConfig.getMethods({
+            api: "bill_detail/volume_trx/product",
+            params:{
+                month: month,
+                year: year,
+                offset: offset,
+                limit: limit,
+                product_id: productId
+            }
+        });
+
+        return res.data;
     }
 }
