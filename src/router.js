@@ -92,12 +92,12 @@ const routes = [
             {
                 path:"/billing/detail/volume",
                 name: "volumeList",
-                component: ()=>import("./pages/billing/BillingVolumeList.vue"),
+                component: ()=>import("./pages/billing/VolumeList.vue"),
             },
             {
                 path:"/billing/detail/volume/productDetail",
                 name: "volumeProductDetail",
-                component: ()=>import("./pages/billing/BillingVolumeProduct.vue"),
+                component: ()=>import("./pages/billing/VolumeProductID.vue"),
             }
         ]
     },

@@ -4,10 +4,9 @@
             <div class="card">
                 <h5>Billing Summary</h5>
                 <p></p>
-                <MyDataTable v-slot="mySlot" :initializeList="tempData" :row="row">
-
+                <MyDataTable v-slot="mySlot" :initializeList="tempData" :row="row" :total="total">
                     <DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" 
-                    dataKey="id" :rowHover="true" responsiveLayout="scroll" 
+                    :dataKey="mySlot.tmpId" :rowHover="true" responsiveLayout="scroll" 
                     @page="onPage($event, mySlot.update)" :rowsPerPageOptions="[10, 20, 30]"
                     v-model:rows="row"
                     >
@@ -22,7 +21,7 @@
                         </Column>
                         <Column field="month" header="Month"></Column>
                         <Column field="year" header="Year"></Column>
-                        <Column field="total" header="Total"></Column>
+                        <Column field="bill_total" header="Total"></Column>
                         <Column field="bill_status_id" header="Status"></Column>
                         <Column field="created_at" header="CreatedAt">
                             <template #body="{ data }">
@@ -58,6 +57,7 @@
                 row: 10,
                 toLoadRetry: null,
                 tempData: [],
+                total: 0,
             }
         },
         computed:{
@@ -88,7 +88,8 @@
                     offset: 0
                 })
 
-                this.tempData = myData;
+                this.total = myData.rows_total;
+                this.tempData = myData.rows;
             },
 
             onPage(event, updateList) {
@@ -100,12 +101,12 @@
 
                     const offset= event.first;
                     const limit = event.rows;
-                    updateList({offset: offset, row:limit, tempList: billings})
+                    updateList({offset: offset, row:limit, tempList: billings.rows})
                 }
             },
 
             formatDate(time){
-                return TimeConvert.formatDateFromScheduleDate(time)
+                return TimeConvert.formatUTCToDate(time)
             }
         }
     }

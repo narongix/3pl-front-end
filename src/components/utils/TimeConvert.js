@@ -7,7 +7,7 @@ export default {
         return num.toString().padStart(2, '0')
     },
 
-    formatDateFromScheduleDate(date){
+    formatUTCToDate(date){
         if(date){
             const time = moment(date).format("DD/MM/YYYY hh:mm a")
             return time

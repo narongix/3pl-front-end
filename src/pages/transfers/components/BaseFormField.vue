@@ -495,7 +495,7 @@
             initializeData(){
                 this.transferData={
                     id: this.data?.id,
-                    scheduledDate: TimeConvert.formatDateFromScheduleDate(this.data?.created_at),
+                    scheduledDate: TimeConvert.formatUTCToDate(this.data?.created_at),
                     recipient: this.data?.recipient ?? null,
                     transfer_type_id: this.data?.transfer_type_id,
                     transferProducts: this.data?.transfer_products? [...this.data.transfer_products] : [],

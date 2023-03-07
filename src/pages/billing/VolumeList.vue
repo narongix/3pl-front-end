@@ -4,7 +4,7 @@
             <div class="card">
                 <h5>Volumes</h5>
                 <p></p>
-                <MyDataTable v-slot="mySlot" :initializeList="tempData">
+                <MyDataTable v-slot="mySlot" :initializeList="tempData" :total="length">
                     <DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
                     :rowHover="true" responsiveLayout="scroll" @page="$event=> onPage($event, mySlot.update)" :rowsPerPageOptions="[10,20,30]"
                     v-model:rows="row" >
@@ -19,15 +19,15 @@
                     </DataTable>
                 </MyDataTable>
             </div>
-            <HiddenRetryField :toLoad="toLoadRetry" :message="messages" :retryToast="retryToast"></HiddenRetryField>
+            <RetryField :toLoad="toLoadRetry" :message="messages" :retryToast="retryToast"></RetryField>
         </div>
     </div>
 </template>
 
 <script>
     import LinkParagraph from '../../components/LinkParagraph.vue';
-import MyDataTable from '../../components/MyDataTable.vue';
-    import HiddenRetryField from '../../components/prompt_field/HiddenRetryField.vue';
+    import MyDataTable from '../../components/MyDataTable.vue';
+    import RetryField from '../../components/prompt_field/RetryField.vue';
 
     export default{
         created(){
@@ -37,14 +37,15 @@ import MyDataTable from '../../components/MyDataTable.vue';
             return {
                 toLoadRetry: null,
                 tempData: [], 
-                row: 10
+                row: 10,
+                length:0,
             }
         },
 
         components:{
-            HiddenRetryField,
             MyDataTable,
-            LinkParagraph
+            LinkParagraph,
+            RetryField
         },
 
         computed:{
@@ -74,7 +75,9 @@ import MyDataTable from '../../components/MyDataTable.vue';
                     month: this.$route.query.month,
                     year: this.$route.query.year
                 });
-                this.tempData = volumeList;
+                this.length = volumeList.rows_total;
+
+                this.tempData = volumeList.rows;
             },
 
             async onPage(event, updateList){
@@ -89,7 +92,7 @@ import MyDataTable from '../../components/MyDataTable.vue';
                     const offset = event.first;
                     const limit = event.rows;
 
-                    updateList({offset: offset, row: limit, tempList: data});
+                    updateList({offset: offset, row: limit, tempList: data.rows});
                 } 
             },
 

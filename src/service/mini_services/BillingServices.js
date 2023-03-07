@@ -26,13 +26,15 @@ export default{
         return res.data
     },
 
-    async getTransferTrx({month, year, transferType}){
+    async getTransferTrx({month, year, transferType, offset, limit}){
         const res = await ApiConfig.getMethods({
             api: "bill_detail/transfers_trx",
             params:{
                 month: month,
                 year: year,
-                transfer_type: transferType
+                transfer_type: transferType,
+                offset: offset,
+                limit: limit
             }
         });
 
@@ -54,16 +56,10 @@ export default{
         return res.data;
     },
 
-    async getVolumeByProductId({month, year, offset, limit, productId}){
+    async getVolumeByProductId(params){
         const res = await ApiConfig.getMethods({
             api: "bill_detail/volume_trx/product",
-            params:{
-                month: month,
-                year: year,
-                offset: offset,
-                limit: limit,
-                product_id: productId
-            }
+            params:params
         });
 
         return res.data;
