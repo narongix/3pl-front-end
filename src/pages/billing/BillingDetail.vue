@@ -5,7 +5,7 @@
                 <h5>Billing Summary</h5>
                 <p></p>
                 <div class="grid">
-                    <div class="col-12 sm:col-5 md:col-3 lg:col-3 xl:col-2">
+                    <div class="col-12 sm:col-5 md:col-4 lg:col-4 xl:col-3">
                         <table class="tableClass">
                             <tr>
                                 <th>Year</th>
@@ -17,7 +17,7 @@
                             </tr>
                             <tr>
                                 <th>Client</th>
-                                <td>{{ data?.billsummary?.client ?? "" }}</td>
+                                <td>{{ getFullName ?? "" }}</td>
                             </tr>
                             <tr>
                                 <th>Total Amount</th>
@@ -25,7 +25,7 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="col-0 sm:col-0 md:col-4 lg:col-5 xl:col-7"></div>
+                    <div class="col-0 sm:col-0 md:col-3 lg:col-3 xl:col-6"></div>
                     
                     <div class="col-12 sm:col-7 md:col-5 lg:col-4 xl:col-3">
                         <table class="tableClass extra">
@@ -66,7 +66,7 @@
 
                     <Column field="transfer_type_name" header="Transfer Type">
                         <template #body="{ data }">
-                            <p>{{ capitalizeWord(data.transfer_type_name) }}</p>
+                            <u>{{ capitalizeWord(data.transfer_type_name) }}</u>
                         </template>
                     </Column>
                     <Column field="qty" header="QTY"></Column>
@@ -124,7 +124,7 @@
         width: 100%;
     }
     .tableClass td {
-        text-align: center;
+        text-align: left;
     }
     .tableClass th{
         text-align: left;
@@ -140,6 +140,7 @@
     import TimeConvert from '../../components/utils/TimeConvert';
     import StringFunction from '../../components/utils/StringFunction';
     import DialogTransferType from './components/DialogTransferType.vue';
+    import { mapGetters } from 'vuex';
 
     export default{
         created() {
@@ -154,7 +155,6 @@
                 mySelected: null,
                 myStatusType: null,
                 myType: null,
-
             };
         },
         computed:{
@@ -171,7 +171,10 @@
                     summary: "Error!",
                     detail: "Failed Loading Billing Detail!"
                 }
-            }
+            },
+            ...mapGetters({
+                getFullName: "auth/getFullName"
+            })
         },
         methods:{
             async initData(){
