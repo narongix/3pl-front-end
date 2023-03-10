@@ -11,7 +11,7 @@
         },
         computed:{
             getDate(){
-               return TimeConvert.formatDateFromScheduleDate(new Date(this.data.created_at))
+               return TimeConvert.formatUTCToDate(new Date(this.data.created_at))
             }
         }
     }

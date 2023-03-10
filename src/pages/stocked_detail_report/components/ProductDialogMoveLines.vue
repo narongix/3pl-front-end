@@ -127,7 +127,7 @@
     },
     methods: {
         convert(data) {
-            return TimeConvert.formatDateFromScheduleDate(data);
+            return TimeConvert.formatUTCToDate(data);
         },
         async initData() {
             this.toLoadRetry = async ()=>{

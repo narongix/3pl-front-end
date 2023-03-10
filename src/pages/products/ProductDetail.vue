@@ -357,7 +357,7 @@ export default {
             }
         },
         convert(time){
-            return TimeConvert.formatDateFromScheduleDate(time)
+            return TimeConvert.formatUTCToDate(time)
         }
     },
     computed: {

@@ -121,7 +121,7 @@
             },
 
             convertUTCToTimeFormat(time){
-                return TimeConvert.formatDateFromScheduleDate(time);
+                return TimeConvert.formatUTCToDate(time);
             }
         },
         watch:{

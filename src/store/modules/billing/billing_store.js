@@ -36,16 +36,16 @@ export default{
         }
     },
     actions:{
-        async onFetchBilling({ commit, state }, {limit, offset}){
+        async onFetchBilling({ commit }, {limit, offset}){
             const data = await ApiService.onFetchBillingList({
                 userId: store.getters['auth/getUserId'],
                 offset: offset, 
                 limit:limit
             });
 
-            commit("updateBillingState", data)
+            commit("updateBillingState", data.rows)
 
-            return state.billingList
+            return data
         },
 
         async onFetchDetailBilling({ state }, {month, year}){
@@ -89,14 +89,16 @@ export default{
             return data;
         },
 
-        async onFetchVolumeWithProductId({state}, {offset, limit, month, year}){
-            const data = await ApiService.getVolumeByProductId({
-                offst: offset,
-                limit: limit,
+        async onFetchVolumeWithProductId({state}, {offset, limit, month, year, productId}){
+            const params = {
                 month: month,
-                year: year
-            });
-            
+                year: year,
+                offset: offset,
+                limit: limit,
+                product_id: productId
+            }
+
+            const data = await ApiService.getVolumeByProductId(params);
             state.billingList;
 
             return data

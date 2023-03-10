@@ -66,7 +66,7 @@
 
                     <Column field="transfer_type_name" header="Transfer Type">
                         <template #body="{ data }">
-                            <u>{{ capitalizeWord(data.transfer_type_name) }}</u>
+                            <u style="color:blue">{{ capitalizeWord(data.transfer_type_name) }}</u>
                         </template>
                     </Column>
                     <Column field="qty" header="QTY"></Column>
@@ -195,7 +195,7 @@
             },
 
             formatDateTime(time){
-                return TimeConvert.formatDateFromScheduleDate(time);
+                return TimeConvert.formatUTCToDate(time);
             },
 
             capitalizeWord(word){

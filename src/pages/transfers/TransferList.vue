@@ -266,7 +266,7 @@
       },
       
       formatDate(value) {
-        return myTime.formatDateFromScheduleDate(value)
+        return myTime.formatUTCToDate(value)
       },
 
       goToCreateTransfer() {

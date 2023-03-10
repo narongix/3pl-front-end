@@ -1,5 +1,5 @@
 <template>
-    <slot :value="myList" :update="updateList">
+    <slot :value="myList" :update="updateList" :tmpId="tmp">
     </slot>
 </template>
 
@@ -7,23 +7,32 @@
     export default{
         props:{
             initializeList: Array,
-            row: Number
+            row: Number,
+            total: Number,
+            id: String,
         },
         data(){
             return {
                 myList: [],
             }
         },
+        computed:{
+            tmp(){
+                return "tempId"
+            }
+        },
         methods:{
-            initList(values){
-                for(let i=0; i<values.length; i++){
-                    this.myList.push({id: i})
+            initList(){
+                for(let i=0; i<this.total; i++){
+                    const tmp = {}
+                    tmp[this.id ?? this.tmp] = i
+                    this.myList.push(tmp)
                 }
 
                 this.updateList({
                     offset: 0,
                     row: this.row ?? 10,
-                    tempList: values
+                    tempList: this.initializeList
                 })
             },
 
@@ -33,16 +42,19 @@
                     if(!(tempList?.[index])){
                         break;
                     }
+
+                    const myId = this.myList[i]?.[this.id ?? this.tmp];
                     
-                    this.myList[i]=tempList[index];
+                    this.myList[i] = tempList[index];
+                    this.myList[i][this.id ?? this.tmp] = myId;
                     index++;
                 }
             }
         },
         watch:{
             initializeList:{
-                handler: function(newValue){
-                    this.initList(newValue);
+                handler(){
+                    this.initList();
                 }
             }
         }
