@@ -4,6 +4,7 @@
             <div class="card">
                 <h5>Billing Summary</h5>
                 <p></p>
+                
                 <MyDataTable v-slot="mySlot" :initializeList="tempData" :row="row" :total="total">
                     <DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" 
                     :dataKey="mySlot.tmpId" :rowHover="true" responsiveLayout="scroll" 
@@ -85,18 +86,17 @@
             async initData(){
                 const myData = await this.$store.dispatch("billing/onFetchBilling", {
                     limit: this.row,
-                    offset: 0
-                })
-
+                    offset: 0,
+                });
                 this.total = myData.rows_total;
-                this.tempData = myData.rows;
+                this.tempData = myData.rows;                
             },
 
             onPage(event, updateList) {
                 this.toLoadRetry = async () => {
                     const billings = await this.$store.dispatch("billing/onFetchBilling", {
                         currentOffset: event.first,
-                        limit: this.row
+                        limit: this.row,
                     })
 
                     const offset= event.first;

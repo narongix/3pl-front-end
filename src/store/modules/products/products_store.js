@@ -166,7 +166,7 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ commit, state }, { offset, productName, limit, searchKey}) {
+        async onFetchProducts({ commit }, { offset, productName, limit, searchKey}) {
             const params = {
                 offset: offset,
                 limit: limit,
@@ -177,7 +177,7 @@ export default {
             const products = await ApiService.getProducts(params)
             commit("updateProductState", products)
 
-            return state.products
+            return products
         },
         async getProdCategories(context) {
             try {

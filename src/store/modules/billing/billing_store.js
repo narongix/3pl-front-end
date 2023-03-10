@@ -36,11 +36,12 @@ export default{
         }
     },
     actions:{
-        async onFetchBilling({ commit }, {limit, offset}){
+        async onFetchBilling({ commit }, { limit, offset, searchFilter}){
             const data = await ApiService.onFetchBillingList({
                 userId: store.getters['auth/getUserId'],
                 offset: offset, 
-                limit:limit
+                limit:limit,
+                search_key: searchFilter
             });
 
             commit("updateBillingState", data.rows)
@@ -75,14 +76,16 @@ export default{
             return data;
         },
 
-        async onFetchVolume({ state }, {offset, limit, month, year}){
-            const data = await ApiService.getVolumeTotal({
+        async onFetchVolume({ state }, {offset, limit, month, year, searchFilter}){
+            const params = {
                 offset: offset,
                 limit: limit,
                 month: month,
                 year: year,
-                userId: store.getters['auth/getUserId']
-            });
+                user_id: store.getters['auth/getUserId'],
+                search_key: searchFilter
+            };
+            const data = await ApiService.getVolumeTotal(params);
 
             state.billingList;
 

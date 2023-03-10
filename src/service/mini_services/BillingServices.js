@@ -41,16 +41,10 @@ export default{
         return res.data;
     },
 
-    async getVolumeTotal({month, year, offset, limit, userId}){
+    async getVolumeTotal(params){
         const res = await ApiConfig.getMethods({
             api: "bill_detail/volume_trx",
-            params:{
-                user_id: userId,
-                month:month,
-                year:year,
-                offset:offset,
-                limit:limit
-            }
+            params: params
         });
 
         return res.data;

@@ -5,6 +5,7 @@
                 <h5>Products</h5>
                 <Button label="Create" class="p-button-success mr-2" @click="goToNewProduct" />
                 <p></p>
+                
                 <DataTable 
                     :value="dataList" 
                     :paginator="true" 
