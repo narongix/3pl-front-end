@@ -71,7 +71,7 @@ export default{
     },
 
     actions:{
-        async getTransfers({ commit, state }, {currentOffset, limit, params}){
+        async getTransfers({ commit }, {currentOffset, limit, params}){
             const data = await ApiService.getTransfers({
                 offset: currentOffset,
                 limit: limit, 
@@ -79,7 +79,7 @@ export default{
             })
 
             commit("updateTransferState", data)
-            return state.transfers
+            return data
         },
         
         async getTransferDetail({ commit }, { transferId }){

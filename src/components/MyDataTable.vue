@@ -1,5 +1,5 @@
 <template>
-    <slot :value="myList" :update="updateList" :tmpId="tmp">
+    <slot :value="myList" :update="updateList" :tmpId="tmp" :updateReplaceAll="updateAndReplaceAll">
     </slot>
 </template>
 
@@ -23,6 +23,8 @@
         },
         methods:{
             initList(){
+                this.myList.length=0;
+
                 for(let i=0; i<this.total; i++){
                     const tmp = {}
                     tmp[this.id ?? this.tmp] = i
@@ -48,6 +50,14 @@
                     this.myList[i] = tempList[index];
                     this.myList[i][this.id ?? this.tmp] = myId;
                     index++;
+                }
+            },
+
+            updateAndReplaceAll(tempList){
+                this.myList.length=0;
+                for(let i=0; i<tempList.length; i++){
+                    this.myList[i] = tempList[i];
+                    this.myList[i][this.id ?? this.tmp] = i;
                 }
             }
         },
