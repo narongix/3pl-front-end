@@ -29,8 +29,8 @@
         data(){
             return{
                 baseData:{
-                    titleForm: "Add new Transfer",
-                    buttonSubmit: "Add Transfer detail"
+                    titleForm: "Add New Transfer",
+                    buttonSubmit: "Add Product"
                 },
                 disabledField:{
                     scheduleDate:false,
