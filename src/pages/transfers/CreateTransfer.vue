@@ -4,7 +4,7 @@
     @onClickSubmit="onFormSubmit"
     :FieldNotActive="FieldNotActive"
     :disabledField="disabledField"
-    :data="{}"
+    :data="{}" :popup="myPopUp"
     >
         <template #myTop>
             <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -30,7 +30,7 @@
             return{
                 baseData:{
                     titleForm: "Add New Transfer",
-                    buttonSubmit: "Add Product"
+                    buttonSubmit: "Add Transfer Detail"
                 },
                 disabledField:{
                     scheduleDate:false,
@@ -66,7 +66,14 @@
         computed:{
             ...mapGetters({
                 products: "products/getProductState"
-            })
+            }),
+
+            myPopUp(){
+                return {
+                    header: "Product Quantity",
+                    productDemandDisplay: "Quantity"
+                }
+            }
         },
         
         methods:{
