@@ -25,9 +25,9 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="col-0 sm:col-0 md:col-3 lg:col-3 xl:col-6"></div>
+                    <div class="col-0 sm:col-0 md:col-2 lg:col-2 xl:col-5"></div>
                     
-                    <div class="col-12 sm:col-7 md:col-5 lg:col-4 xl:col-3">
+                    <div class="col-12 sm:col-7 md:col-6 lg:col-5 xl:col-4">
                         <table class="tableClass extra">
                             <tr>
                                 <th>Reference</th>
