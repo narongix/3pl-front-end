@@ -42,7 +42,6 @@
                             </template>
                         </v-select>
                     </div>
-                    <div class="field col-12 md:col-12"></div><!-- empty space -->
                     <div class="field col-12 md:col-3">
                         <label for="qty-available">On Hands</label>
                         <InputText id="qty-available" type="text" v-model="product.onhands.newVal" :disabled=true />
@@ -55,6 +54,14 @@
                         <label for="outgoing-qty">Outgoing</label>
                         <InputText id="outgoing-qty" type="text" v-model="product.outgoing.newVal" :disabled=true />
                     </div>
+                    <div class="field col-12 md:col-12"></div><!-- empty space -->
+                </div>
+            </div>
+            <div class="card">
+                <h5>Specification</h5>
+                <hr>
+                <p></p>
+                <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-3">
                         <label for="forecasted-qty">Forecasted</label>
                         <InputText id="forecasted-qty" type="text" v-model="product.forecasted.newVal" :disabled=true />
