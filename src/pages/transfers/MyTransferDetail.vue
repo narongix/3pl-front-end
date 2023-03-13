@@ -4,11 +4,10 @@
 	@onClickSubmit="onFormSubmit"
 	:data="oldData"
 	:FieldNotActive="fieldNotActive"
-	:disabledField="disabledField"
+	:disabledField="disabledField" :popup="myPopUp"
 	>
-		
 		<template #myTop="">
-			<RetryField :toLoad="toLoad" :message="message"></RetryField>
+			<RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
 		</template>
 
 		<template #myButton="mySlot">
@@ -54,7 +53,7 @@
                     titleForm: "Transfer Detail",
                     titleField1: "Transfer Name",
                     titleField2: "Operation Type",
-					buttonSubmit:"Add Transfer Detail"
+					buttonSubmit:"Add Product"
                 },
 				fieldNotActive: true,
 				oldData: null,
@@ -64,21 +63,33 @@
 				isCancelStatus: false,
 
 				toLoad:null,
-				message:{
-					failed: "Error Loading Data. Try again?",
-					yesButton: "Yes",
-					noButton: "No"
-				},
-				errorToast:{
-					severity: "error",
-					summary: "Error!",
-					detail: "Failed Editing Transfer"
-				}
+
 			}
 		},
 		computed:{
 			getDataState(){
 				return  this.$store.getters["transfers/findTransferDetail"](this.$route.params.id)
+			},
+
+			myPopUp(){
+                return {
+                    header: "Product Quantity",
+                    productDemandDisplay: "Quantity"
+                }
+            },
+			message(){
+				return {
+					failed: "Error Loading Data. Try again?",
+					yesButton: "Yes",
+					noButton: "No"
+				};
+			},
+			errorToast(){
+				return {
+					severity: "error",
+					summary: "Error!",
+					detail: "Failed Editing Transfer"	
+				};
 			}
 		},
 		methods:{

@@ -129,7 +129,7 @@
         </div>
     </div>
 
-    <Dialog v-model:visible="promptCreateField" :style="{width: '450px'}" header="Select New Product" :modal=true>
+    <Dialog v-model:visible="promptCreateField" :style="{width: '450px'}" :header="popup.header ?? 'Select New Product'" :modal=true>
         <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-12 sm:col-12">
                 <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
@@ -147,7 +147,7 @@
             </div>
 
             <div class="field col-12 md:col-12 sm:col-12">
-                <label for="demand" :class="{'p-error': validationField2.demand.value!=null}">Product Quantity</label>
+                <label for="demand" :class="{'p-error': validationField2.demand.value!=null}">{{ popup.productDemandDisplay ?? "Product Quantity" }}</label>
                 <InputText :disabled="FieldNotActive" id="demand" type="text" v-model="demand" :class="{'p-invalid':validationField2.demand.value}"></InputText>
                 <small id="demand-help" class="p-error" v-if="validationField2.demand.value!=null">{{ validationField2.demand.value }}</small>
             </div>
@@ -214,7 +214,11 @@
             FieldNotActive: Boolean,
             data: Object,
             disabledField: Object,
-            offset: Number
+            offset: Number,
+            popup: {
+                header: String,
+                productDemandDisplay: String
+            }
         },
         
         emits:["onClickSubmit"],
