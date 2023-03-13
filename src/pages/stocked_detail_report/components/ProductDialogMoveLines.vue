@@ -10,11 +10,6 @@
                 <template #empty>
                     No product history found.
                 </template>
-                <Column field="product_id" header="Product Id" style="min-width:12rem" :sortable="true">
-                    <template #filter="{filterModel, filterCallBack}">
-                        <inputText v-model="filterModel.value" @input="filterCallBack()"></inputText>
-                    </template>
-                </Column>
                 <Column field="created_at" header="Created at" :sortable="true" sort :showFilterMatchModes="false">
                     <template #filter>
                         <CalendarTime @getValueMode="storeCreatedAtMode" @getValue="storeCreatedAtValue"></CalendarTime>
@@ -23,7 +18,7 @@
                         {{ convert(data.created_at) }}
                     </template>
                 </Column>
-                <Column field="movement_name" header="Movement Name" style="min-width:12rem" :sortable="true">
+                <Column field="movement_name" header="Movement" style="min-width:12rem" :sortable="true">
                     <template #filter="{filterModel, filterCallBack}">
                         <inputText v-model="filterModel.value" @input="filterCallBack()"></inputText>
                     </template>
@@ -75,7 +70,6 @@
             outOfFetch: 3,
 
             filters: {
-                product_id: {operator: FilterOperator.OR, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
                 created_at: {value: null, matchMode: "datesIn"},
                 movement_name: {operator: FilterOperator.OR, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
                 qty: {operator: FilterOperator.OR, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
@@ -173,8 +167,6 @@
     },
     watch: {
         productId(newValue) {
-            // TODO: Intergrate product movesline
-            // with stock detail product
             if (newValue) {
                 this.initData();
             }

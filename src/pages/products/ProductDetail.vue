@@ -86,14 +86,13 @@
                     <template #empty>
                         No product history found.
                     </template>
-                    <Column field="product_id" header="Product Id" style="min-width:12rem"></Column>
                     <Column field="created_at" header="Created at">
                         <template #body="{ data }">
                             {{ convert(data.created_at) }}
                         </template>
                     </Column>
                     <Column field="movement_name" header="Movement Name" style="min-width:12rem"></Column>
-                    <Column field="qty" header="Quatity" style="min-width:12rem"></Column>
+                    <Column field="qty" header="Quantity" style="min-width:12rem"></Column>
                     <Column field="serial" header="Serial/Lot Number" style="min-width:12rem"></Column>
                     <Column field="odoo_reference" header="Odoo Reference" style="min-width:12rem"></Column>
                 </DataTable>

@@ -76,7 +76,6 @@
                         <p>No StockDetail Report found. Please select dates to fetch.</p>
                     </template>
                     <Column selectionMode="single"></Column>
-                    <Column field="product_id" header="Product Id" exportHeader="Product Id" exportFooter="Product Id" :sortable="true" style="min-width:15rem"></Column>
                     <Column field="product_name" header="Product Name" exportHeader="Product Name" 
                     exportFooter="Product Name" :sortable="true" style="min-width:15rem" 
                     :showFilterMatchModes="false">
