@@ -22,8 +22,7 @@
                     <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
-                            <product-item :data="data"
-                                :class="{ shake: activateOrNot(data.product_name) }"></product-item>
+                            <LinkParagraph :data="data.barcode" @pushing="navigateToDetail(data.product_id)" :myClass="{ shake: activateOrNot(data.product_name) }"></LinkParagraph>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
@@ -124,17 +123,17 @@
     </template>
 </template>
 <script>
-import ProductItem from '../../components/ui/products/ProductItem.vue';
 import router from '../../router';
 import RetryField from "../../components/prompt_field/RetryField.vue"
 import { FilterMatchMode } from "primevue/api";
 import { mapGetters } from 'vuex';
+import LinkParagraph from '../../components/LinkParagraph.vue';
 
 export default {
     components: {
-        ProductItem,
-        RetryField
-    },
+    RetryField,
+    LinkParagraph
+},
     data() {
         return {
             rows: 10,        
@@ -254,6 +253,9 @@ export default {
             if(index>=0){
                 this.dataList.splice(index, 1)
             }
+        },
+        navigateToDetail(id){
+            this.$router.push({name: "productDetail", params: {id: id}});
         }
     },
 }
