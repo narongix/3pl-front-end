@@ -43,7 +43,7 @@
     </template>
 </template>
 <script>
-import CategoriesItem from './components/products/CategoriesItem.vue';
+import CategoriesItem from './components/CategoriesItem.vue';
 import router from '../../router';
 import RetryField from "../../components/prompt_field/RetryField.vue"
 
