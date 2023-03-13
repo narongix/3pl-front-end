@@ -108,13 +108,13 @@
                             <Column field="rate" header="Rate"></Column>
                             <Column field="total_volume_fee" header="Subtotal"></Column>
                             <ColumnGroup type="footer">
-                        <Row>
-                            <Column footer=""></Column>
-                            <Column footer=""></Column>
-                            <Column footer="Total"></Column>
-                            <Column :footer="data?.volume_trx_summary?.total_volume_fee ?? 0"></Column>
-                        </Row>
-                    </ColumnGroup>
+                                <Row>
+                                    <Column footer=""></Column>
+                                    <Column footer=""></Column>
+                                    <Column footer="Total"></Column>
+                                    <Column :footer="data?.volume_trx_summary?.total_volume_fee ?? 0"></Column>
+                                </Row>
+                            </ColumnGroup>
                         </DataTable>
                     </div>
                 </div>

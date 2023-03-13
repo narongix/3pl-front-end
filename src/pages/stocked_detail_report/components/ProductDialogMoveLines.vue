@@ -1,7 +1,7 @@
 <template>
     <div>
-        <Dialog header="Product Moves Lines History" v-model:visible="myState">
-            <DataTable :value="getProductMoves" :paginator="true" v-model:rows="row"
+        <Dialog header="Product Moves Lines History" v-model:visible="myState" maximizable modal :style="{ width: '75vw' }">
+            <DataTable :value="getProductMoves" scrollable :paginator="true" v-model:rows="row"
                 :rowHover="true" filterDisplay="menu" responsiveLayout="scroll"
                 :rowsPerPageOptions="[10,20,30]" sortField="created_at" :sortOrder="-1" 
                 class="p-datatable-sm" dataKey="id" v-model:filters="filters" @page="onPage($event)" 

@@ -17,7 +17,13 @@
                         v-model="toDate" @date-select="onSelectDate"
                         :dateFormat="getCalendarFormat" :hideOnDateTimeSelect="false" placeholder="Select End of Date"></Calendar>
                     </div>
-                    <div class="md:col-4"></div>
+                    <div class="field col-12 md:col-4">
+                        <label>Product Filters</label>
+                        <Dropdown :options="ProductListFilter" v-model="productFilter" @change="onSelectDate"
+                        class="p-column-filter" placeholder="Search by status" optionLabel="title" optionValue="code"
+                        >
+                        </Dropdown>
+                    </div>
                 </div>
 
                 <DataTable :value="dataList" ref="dt" class="p-datatable-sm" dataKey="product_id"
@@ -25,8 +31,20 @@
                     :rowsPerPageOptions="[10, 20, 30]" v-model:selection="mySelected" :paginator="true"
                     @page="onPage($event)" selectionMode="single" :metaKeySelection="false">
                     <template #header>
-                        <div style="text-align: left">
-                            <Button icon="pi pi-external-link" label="Export" @click="exportStock($event)" />
+                        <div class="p-fluid formgrid grid">
+                            <div class="field col-12 md:col-2">
+                                <Button icon="pi pi-external-link" label="Export" @click="exportStock($event)" />
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <Button label="Previous Month" @click="goBackByOneMonth"></Button>
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <Button label="Next Month" @click="goForwardByOneMonth"></Button>
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <Button label="This Month" @click="goToThisMonth"></Button>
+                            </div>
                         </div>
                         <p></p>
                         <div class="p-fluid formgrid grid">
@@ -100,15 +118,18 @@
     #vs1__listbox{
         display: none !important;
     }
+    .p-multiselect-header{
+        display: none !important;
+    }
 </style>
 
 <script>
     import { mapGetters } from 'vuex';
     import HiddenRetryField from '../../components/prompt_field/HiddenRetryField.vue';
     import RetryField from '../../components/prompt_field/RetryField.vue';
-    import TimeConvert from '../../components/utils/TimeConvert';
     import MultiSelectPagination from './components/MultiSelectPagination.vue';
     import ProductDialogMoveLines from './components/ProductDialogMoveLines.vue';
+    import TimeConvert from '../../components/utils/TimeConvert';
 
     export default{
         unmounted(){
@@ -130,10 +151,6 @@
         },
         data(){
             return {
-                // filters:{
-                //     barcode: {value: null, matchMode: FilterMatchMode.STARTS_WITH},
-                //     product_name: {operator: FilterOperator.AND, constraints:[{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
-                // },
                 myFilterOffset: 10,
                 myFilters:{
                     myBarcode: [],
@@ -186,23 +203,33 @@
                     summary: "Loading Failed!",
                     detail: "Error Loading Stocked Detail Report",
                     life: 3000
-                }
+                },
+
+                productFilter: 0,
+                productMaxLength: 0,
             }
         },
         computed:{
             ...mapGetters({
                 getStockedList: "stockedDetailReport/getStockedList",
                 getProducts: "products/getProductState",
-                getProductMaxLength: "products/getProductLength"
+                // getProductMaxLength: "products/getProductLength"
             }),
 
             getCalendarFormat(){
-                return TimeConvert.getCalendarFormat()
+                return TimeConvert.getCalendarFormat();
             },
 
             getProductCurrentLength(){
-                return this.getProducts.length
+                return this.getProducts.length;
             },
+
+            ProductListFilter(){
+                return [
+                    {title: "Active products", code: 1}, 
+                    {title: "All Products", code: 0}
+                ];
+            }
         },
         methods:{
             async whenSearchProduct(filterValue){
@@ -229,7 +256,8 @@
                         limit: this.row,
                         offset: event.first,
                         barcodes:this.myFilters.myBarcode,
-                        sku: this.myFilters.myProductSku
+                        sku: this.myFilters.myProductSku,
+                        activeProduct: this.productFilter
                     })
                  
                     const offset= event.first
@@ -239,28 +267,36 @@
             },
             
             async onSelectDate(){
+                console.log(this.productFilter)
+
                 if(this.validate()){
                     this.toLoadRetry = async()=>{
                         const stockList = await this.$store.dispatch("stockedDetailReport/onfetchedAndReplaceStockedList", {
                             from_date: this.fromDate,
                             to_date: this.toDate,
-                            limit: this.row,
+                            limit: 100,
                             offset:0,
                             barcodes:this.myFilters.myBarcode,
-                            sku: this.myFilters.myProductSku
+                            sku: this.myFilters.myProductSku,
+                            activeProduct: this.productFilter
                         })
 
-                        await this.$store.dispatch("products/getProductLength")
+                        this.productMaxLength = await this.$store.dispatch("stockedDetailReport/onFetchStockReportTotal", {
+                            activeProduct: this.productFilter,
+                            sku: this.myFilters.myProductSku,
+                            barcodes:this.myFilters.myBarcode,
+                            from_date: this.fromDate,
+                            to_date: this.toDate,
+                        });
                         
-                        this.initingOrigList()
-
+                        this.initingOrigList();
                         this.updateList({
                             offset: 0,
                             row: this.row,
                             tempList: stockList
-                        })
+                        });
                     }
-                    this.offset = this.row*2
+                    this.offset = this.row*2;
                 }
             },
 
@@ -268,6 +304,7 @@
                 const isValidate = this.toDate && this.fromDate && TimeConvert.convertToMs(this.toDate) >= TimeConvert.convertToMs(this.fromDate)
                 return isValidate
             },
+
             exportStock() {
                 this.$refs.dt.exportCSV();
             },
@@ -282,7 +319,8 @@
                             offset:0,
                             listFilter: value,
                             barcodes:this.myFilters.myBarcode,
-                            sku: this.myFilters.myProductSku
+                            sku: this.myFilters.myProductSku,
+                            activeProduct: this.productFilter?.code
                         })
                         if(this.myFilters.myBarcode.length==0 && this.myFilters.myProductSku.length==0){
                             this.initingOrigList()
@@ -301,20 +339,71 @@
             },
 
             initingOrigList(){
-                for(let i=0; i<this.getProductMaxLength; i++){
-                    this.dataList.push({product_id: i})
+                this.dataList.length=0;
+                for(let i=0; i<this.productMaxLength; i++){
+                    this.dataList.push({product_id: i.toString()})
                 }
             },
 
             updateList({offset, row, tempList}){
-                let index=0
+                let index=0;
                 for(let i=offset; i<row+offset; i++){
-                if(!(tempList?.[index])){
-                    break
-                }
+                    if(!(tempList?.[index])){
+                        break;
+                    }
                     this.dataList[i]={temp_id: this.dataList?.[i]?.temp_id,...tempList[index]}
+                    console.log(`this.dataList[${i}] ${this.dataList[i]} = tempList[${index}] ${tempList[index]}`);
                     index++
                 }
+            },
+
+            goBackByOneMonth(){
+                const currentDate = this.fromDate || new Date();
+                currentDate.setMonth(currentDate.getMonth()-1)
+                const lastDay = TimeConvert.getLastDayOfMonth(currentDate.getMonth(), this.fromDate?.getYear());
+
+                this.setDate({
+                    month: currentDate.getMonth(),
+                    firstDay: 1,
+                    lastDay: lastDay,
+                    year: currentDate.getFullYear()
+                });
+            },
+            
+            goForwardByOneMonth(){
+                // The reason we separate it into 2 variables are to calculate whether 
+                // we should set it to the current month or the next month
+                const currentDay = new Date();
+                const year = this.fromDate?.getFullYear() || currentDay.getFullYear();
+                // +1 to get the next month so we can calculate the last day of the next month
+                // Null safety doesn't cover NAN, || does
+                const userMonth = this.fromDate?.getMonth()+1 || currentDay.getMonth();
+                const lastDay = TimeConvert.getLastDayOfMonth(userMonth, year);
+
+                this.setDate({
+                    month: userMonth,
+                    firstDay: 1,
+                    lastDay: lastDay,
+                    year: year
+                });
+            },
+            
+            goToThisMonth(){
+                const currentDay = new Date();
+                const lastDay = TimeConvert.getLastDayOfMonth(currentDay.getMonth(), currentDay.getFullYear());
+
+                this.setDate({
+                    month: currentDay.getMonth(),
+                    firstDay: 1,
+                    lastDay: lastDay,
+                    year: currentDay.getFullYear()
+                });
+            },
+
+            setDate({month, firstDay, lastDay, year}){
+                this.fromDate = new Date(year, month, firstDay);
+                this.toDate = new Date(year, month, lastDay);
+                this.onSelectDate();
             },
         },
         watch:{
