@@ -50,7 +50,7 @@ export default{
         return res.data;
     },
 
-    async getVolumeByProductId(params){
+    async getVolumeByDate(params){
         const res = await ApiConfig.getMethods({
             api: "bill_detail/volume_trx/product",
             params:params

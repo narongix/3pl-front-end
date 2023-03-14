@@ -92,16 +92,14 @@ export default{
             return data;
         },
 
-        async onFetchVolumeWithProductId({state}, {offset, limit, month, year, productId}){
+        async onFetchVolumeWithDate({state}, {offset, limit, date}){
             const params = {
-                month: month,
-                year: year,
                 offset: offset,
                 limit: limit,
-                product_id: productId
+                date: date
             }
 
-            const data = await ApiService.getVolumeByProductId(params);
+            const data = await ApiService.getVolumeByDate(params);
             state.billingList;
 
             return data
