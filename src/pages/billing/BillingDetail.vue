@@ -96,11 +96,17 @@
                             <template #empty>
                                 Empty...
                             </template>
-                            <Column field="total_volume" header="Total Volume">
+                            <!-- <Column field="total_volume" header="Total Volume">
                                 <template #body="{ data }">
                                    <LinkParagraph :data="data.total_volume" @pushing="onClickToVolume"></LinkParagraph>
                                 </template>
+                            </Column> -->
+                            <Column field="created_at" header="Created At" style="min-width: 13rem;">
+                                <template #body="{ data }">
+                                    {{ formatDateTime(data.created_at) }}
+                                </template>
                             </Column>
+                            <Column field="total_volume" header="Total Volume"></Column>
                             <Column field="rate" header="Rate"></Column>
                             <Column field="total_volume_fee" header="Subtotal"></Column>
                         </DataTable>
@@ -145,7 +151,6 @@
     import StringFunction from '../../components/utils/StringFunction';
     import DialogTransferType from './components/DialogTransferType.vue';
     import { mapGetters } from 'vuex';
-    import LinkParagraph from '../../components/LinkParagraph.vue';
 
     export default{
         created() {
@@ -188,7 +193,8 @@
                     year: this.$route.query.year,
                 });
                 this.dataList = this.data.transfer_trx_summary.lines;
-                this.volumeSummary.push(this.data.volume_trx_summary);
+
+                this.volumeSummary = this.data.volume_trx_summary;
             },
 
             convertIdToStatus(id){
@@ -215,7 +221,7 @@
                 return this.$router.push({name: "volumeList", query: this.$route.query})
             }
         },
-        components: { RetryField, DialogTransferType, LinkParagraph },
+        components: { RetryField, DialogTransferType },
 
         watch:{
             mySelected(newValue){
