@@ -71,6 +71,7 @@
                     </Column>
                     <Column field="qty" header="QTY"></Column>
                     <Column field="volume" header="Volume"></Column>
+                    <Column field="charged_volume" header="Charge Volume"></Column>
                     <Column field="rate" header="Rate"></Column>
                     <Column field="base_fee" header="Sub Total"></Column>
                     
