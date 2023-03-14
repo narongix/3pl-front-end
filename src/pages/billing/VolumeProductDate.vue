@@ -1,5 +1,34 @@
 <template>
-    <div class="grid">
+    <Dialog header="Volumes" v-model:visible="myStatus" :modal="true">
+        <div class="card">
+            <p></p>
+            <MyDataTable v-slot="mySlot" :initializeList="myArray" :total="length">
+                <DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
+                :rowHover="true" responsiveLayout="scroll" @page="$event=> onPage($event, mySlot.update)" :rowsPerPageOptions="[10,20,30]"
+                v-model:rows="row" >
+                    <template #empty>
+                        <p>Empty...</p>
+                    </template>
+                    
+                    <Column field="created_at" header="Created At" style="min-width:12rem">
+                        <template #body="{ data }">
+                            {{ convertUTCToTime(data.created_at) }}
+                        </template>
+                    </Column>
+                    <Column field="product_name" header="Product Name" style="min-width:15rem"></Column>
+                    <Column field="dimensions" header="Dimension" style="min-width:12rem"></Column>
+                    <Column field="volume_per_unit" header="Volume Per Unit" style="min-width:12rem"></Column>
+                    <Column field="qty" header="Qty" style="min-width:5rem"></Column>
+                    <Column field="total_volume" header="Total Volume" style="min-width:8rem"></Column>
+                    <Column field="rate" header="Rate" style="min-width:4rem"></Column>
+                    <Column field="volume_fee" header="Volume Fee" style="min-width:8rem"></Column>
+                </DataTable>
+            </MyDataTable>
+        </div>
+        <RetryField :toLoad="toLoadRetry" :message="messages" :retryToast="retryToast"></RetryField>
+    </Dialog>
+
+    <!-- <div class="grid">
         <div class="col-12">
             <div class="card">
                 <h5>Volumes</h5>
@@ -30,7 +59,7 @@
             </div>
         </div>
         <RetryField :toLoad="toLoadRetry" :message="messages" :retryToast="retryToast"></RetryField>
-    </div>
+    </div> -->
 </template>
 
 <script>
@@ -39,9 +68,13 @@
     import TimeConvert from '../../components/utils/TimeConvert';
 
     export default{
-        created(){
-            this.toLoadRetry = this.initData;
+        props:{
+            date: String,
+            state: Boolean
         },
+        
+        emits:["update:state"],
+
         data(){
             return {
                 toLoadRetry: null,
@@ -72,16 +105,24 @@
                     life: 1000
                 }
             },
+
+            myStatus:{
+                get(){
+                    return this.state;
+                },
+
+                set(newValue){
+                    this.$emit("update:state", newValue);
+                }
+            }
         },
 
         methods:{
             async initData(){
-                const volumeListProduct = await this.$store.dispatch("billing/onFetchVolumeWithProductId",{
+                const volumeListProduct = await this.$store.dispatch("billing/onFetchVolumeWithDate",{
                     offset: 0,
                     limit: this.row,
-                    month: this.$route.query.month,
-                    year: this.$route.query.year,
-                    productId: this.$route.query.product_id
+                    date: this.date
                 });
                 this.length= volumeListProduct.rows_total;
                 this.myArray = volumeListProduct.rows;
@@ -92,12 +133,10 @@
                     const offset = event.first;
                     const limitForList = event.rows;
 
-                    const data = await this.$store.dispatch("billing/onFetchVolumeWithProductId",{
+                    const data = await this.$store.dispatch("billing/onFetchVolumeWithDate",{
                         offset: offset,
                         limit: this.row,
-                        month: this.$route.query.month,
-                        year: this.$route.query.year,
-                        productId: this.$route.query.product_id
+                        date: this.date
                     });
                     
                     updateList({offset: offset, row: limitForList, tempList: data.rows});
@@ -106,6 +145,11 @@
 
             convertUTCToTime(time){
                 return TimeConvert.formatUTCToDate(time);
+            }
+        },
+        watch:{
+            state(){
+                this.toLoadRetry = this.initData;
             }
         }
     }

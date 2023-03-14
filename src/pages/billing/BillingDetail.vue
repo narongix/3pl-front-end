@@ -82,6 +82,7 @@
                             <Column footer=""></Column>
                             <Column footer="Total"></Column>
                             <Column :footer="data?.transfer_trx_summary?.transfer_fee_total ?? 0"></Column>
+                            <Column footer=""></Column>
                         </Row>
                     </ColumnGroup>
                 </DataTable>
@@ -103,7 +104,7 @@
                             </Column> -->
                             <Column field="created_at" header="Created At" style="min-width: 13rem;">
                                 <template #body="{ data }">
-                                    {{ formatDateTime(data.created_at) }}
+                                    <LinkParagraph :data="formatDateTime(data.created_at)" @pushing="onClickToVolume(data.created_at)"></LinkParagraph>
                                 </template>
                             </Column>
                             <Column field="total_volume" header="Total Volume"></Column>
@@ -112,10 +113,11 @@
                         </DataTable>
                     </div>
                 </div>
-
             </div>
         </div>
+
         <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingTransfer"></RetryField>
+        <VolumeProductDate v-model:state="myVolumeDetailState" :date="myDate"></VolumeProductDate>
         <DialogTransferType :type="myType" v-model:status="myStatusType" @onExitDialog="onExitDialog"></DialogTransferType>
     </div>
 </template>
@@ -151,6 +153,8 @@
     import StringFunction from '../../components/utils/StringFunction';
     import DialogTransferType from './components/DialogTransferType.vue';
     import { mapGetters } from 'vuex';
+    import VolumeProductDate from './VolumeProductDate.vue';
+    import LinkParagraph from '../../components/LinkParagraph.vue';
 
     export default{
         created() {
@@ -165,6 +169,9 @@
                 mySelected: null,
                 myStatusType: null,
                 myType: null,
+
+                myVolumeDetailState: false,
+                myDate: null,
             };
         },
         computed:{
@@ -194,7 +201,7 @@
                 });
                 this.dataList = this.data.transfer_trx_summary.lines;
 
-                this.volumeSummary = this.data.volume_trx_summary;
+                this.volumeSummary = this.data.volume_trx_summary.volume_transactions;
             },
 
             convertIdToStatus(id){
@@ -208,20 +215,23 @@
             capitalizeWord(word){
                 return StringFunction.capitalize(word)
             },
+            
             onExitDialog(){
                 this.mySelected=null;
             },
+
             onRowTap(event){
                 if(event.data){
                     this.myType=event.data?.transfer_type_name;
                     this.myStatusType=true
                 }
             },
-            onClickToVolume(){
-                return this.$router.push({name: "volumeList", query: this.$route.query})
+            onClickToVolume(date){
+                this.myDate = TimeConvert.formatDateToStockFormat(date);
+                this.myVolumeDetailState = true;
             }
         },
-        components: { RetryField, DialogTransferType },
+        components: { RetryField, DialogTransferType, VolumeProductDate, LinkParagraph },
 
         watch:{
             mySelected(newValue){

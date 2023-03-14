@@ -98,7 +98,7 @@ const routes = [
             {
                 path:"/billing/detail/volume/productDetail",
                 name: "volumeProductDetail",
-                component: ()=>import("./pages/billing/VolumeProductID.vue"),
+                component: ()=>import("./pages/billing/VolumeProductDate.vue"),
             }
         ]
     },
