@@ -1,9 +1,9 @@
 <template>
-    <Dialog header="Volumes" v-model:visible="myStatus" :modal="true">
+    <Dialog header="Volumes" v-model:visible="myStatus" maximizable modal :style="{ width: '75vw' }">
         <div class="card">
             <p></p>
             <MyDataTable v-slot="mySlot" :initializeList="myArray" :total="length">
-                <DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
+                <DataTable scrollable scrollHeight="flex" :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
                 :rowHover="true" responsiveLayout="scroll" @page="$event=> onPage($event, mySlot.update)" :rowsPerPageOptions="[10,20,30]"
                 v-model:rows="row" >
                     <template #empty>
