@@ -25,9 +25,9 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="col-0 sm:col-0 md:col-2 lg:col-2 xl:col-5"></div>
+                    <div class="col-0 sm:col-0 md:col-2 lg:col-3 xl:col-5"></div>
                     
-                    <div class="col-12 sm:col-7 md:col-6 lg:col-5 xl:col-4">
+                    <div class="col-12 sm:col-7 md:col-6 lg:col-4 xl:col-4">
                         <table class="tableClass extra">
                             <tr>
                                 <th>Reference</th>
@@ -52,12 +52,12 @@
                 <div class="wastedSpace"></div>
                 <h5>Billing Details</h5>
                 <p></p>
-                <DataTable :value="dataList" responsiveLayout="scroll" class="p-datatable-sm"
+                <DataTable scrollable :value="dataList" responsiveLayout="scroll" class="p-datatable-sm"
                 selectionMode="single" :metaKeySelection="false"
                 v-model:selection="mySelected"
                 >
                     <template #header>
-                        <h6>Number of Transfers Performed During the Period</h6>
+                        <h6>Number of Transfers Performed During The Period</h6>
                     </template>
 
                     <template #empty>
@@ -80,9 +80,9 @@
                             <Column footer=""></Column>
                             <Column footer=""></Column>
                             <Column footer=""></Column>
+                            <Column footer=""></Column>
                             <Column footer="Total"></Column>
                             <Column :footer="data?.transfer_trx_summary?.transfer_fee_total ?? 0"></Column>
-                            <Column footer=""></Column>
                         </Row>
                     </ColumnGroup>
                 </DataTable>
@@ -92,24 +92,29 @@
                 <p></p>
 
                 <div class="grid">
-                    <div class="col-12 md:col-6 lg:col-6 xl:col-6">
-                        <DataTable :value="volumeSummary" responsiveLayout="scroll" class="p-datatable-sm">
+                    <div class="col-12 md:col-8">
+                        <DataTable scrollable :value="volumeSummary" responsiveLayout="scroll" class="p-datatable-sm">
                             <template #empty>
                                 Empty...
                             </template>
-                            <!-- <Column field="total_volume" header="Total Volume">
-                                <template #body="{ data }">
-                                   <LinkParagraph :data="data.total_volume" @pushing="onClickToVolume"></LinkParagraph>
-                                </template>
-                            </Column> -->
-                            <Column field="created_at" header="Created At" style="min-width: 13rem;">
+                            <Column field="created_at" header="Created At" style="min-width: 3rem;">
                                 <template #body="{ data }">
                                     <LinkParagraph :data="formatDateTime(data.created_at)" @pushing="onClickToVolume(data.created_at)"></LinkParagraph>
                                 </template>
                             </Column>
-                            <Column field="total_volume" header="Total Volume"></Column>
+
+                            
+                            <Column field="total_volume" header="Total Volume" style="min-width: 3rem;"></Column>
                             <Column field="rate" header="Rate"></Column>
                             <Column field="total_volume_fee" header="Subtotal"></Column>
+                            <ColumnGroup type="footer">
+                        <Row>
+                            <Column footer=""></Column>
+                            <Column footer=""></Column>
+                            <Column footer="Total"></Column>
+                            <Column :footer="data?.volume_trx_summary?.total_volume_fee ?? 0"></Column>
+                        </Row>
+                    </ColumnGroup>
                         </DataTable>
                     </div>
                 </div>
