@@ -30,5 +30,17 @@ export default {
 
     getCalendarFormat(){
         return timeFormatForCalendar
+    },
+
+    getLastDayOfMonth(month, year){
+        const currentDay = new Date();
+        if(month){
+            const lastDay = new Date(year ?? currentDay.getFullYear(), month+1, 0);  
+            return lastDay.getDate();
+        }
+        
+        const lastDay = new Date(currentDay.getFullYear(), currentDay.getMonth()+1, 0);
+        
+        return lastDay.getDate();
     }
 }

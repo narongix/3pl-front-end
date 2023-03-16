@@ -3,7 +3,7 @@ import ApiConfig from "../ApiConfig"
 export default {
     async getProductLength(){
         const res = await ApiConfig.getMethods({
-            api:"/product/total"
+            api:"/product/total",
         })
         return res.data
     },

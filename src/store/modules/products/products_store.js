@@ -1,4 +1,5 @@
 import ApiService from "../../../service/ApiService.js";
+
 export default {
     namespaced: true,
     state() {
@@ -99,8 +100,8 @@ export default {
     },
     actions: {
         async getProductLength({ commit }){
-            const maxProductLength = await ApiService.getProductLength()
-            commit("setProductLength", maxProductLength.total_products)
+            const maxProductLength = await ApiService.getProductLength();
+            commit("setProductLength", maxProductLength.total_products);
         },
         async getDetailProductOnStockDetail({commit}, {productId, limit, offset, barcode}){
             const params = {

@@ -27,7 +27,7 @@
 
                 for(let i=0; i<this.total; i++){
                     const tmp = {}
-                    tmp[this.id ?? this.tmp] = i
+                    tmp[this.id ?? this.tmp] = i.toString()
                     this.myList.push(tmp)
                 }
 

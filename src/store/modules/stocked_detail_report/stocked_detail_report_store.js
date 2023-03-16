@@ -1,6 +1,7 @@
 import ApiService from "../../../service/ApiService";
 import store from "../../index";
 import TimeConvert from "../../../components/utils/TimeConvert";
+import { convertListToObject } from "../../../components/utils/MyList";
 
 export default{
     namespaced: true,
@@ -36,64 +37,84 @@ export default{
         }
     },
     actions:{
-        async onfetchAndUpdateStockedList({commit, dispatch}, {from_date, to_date, limit, offset, barcodes, sku}){
-            const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
-            const newToDate = TimeConvert.formatDateToStockFormat(to_date)
+        async onFetchStockReportTotal({ state }, {from_date, to_date, barcodes, sku, activeProduct}){
+            const newFromDate = TimeConvert.formatDateToStockFormat(from_date);
+            const newToDate = TimeConvert.formatDateToStockFormat(to_date);
 
-            const newProductIds = dispatch("convertListToObject", {myList: sku, name: "skus"}) ?? null
-            const newBarCodes = dispatch("convertListToObject", {myList: barcodes, name: "barcodes"}) ?? null
+            const newProductIds = convertListToObject({myList: sku, name: "skus"}) ?? null;
+            const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
+ 
+            const params ={
+                owner_id: store.getters["auth/user"]?.odoo_id,
+                from_date: newFromDate,
+                to_date: newToDate,
+                active_product: activeProduct,
+                ...newProductIds,
+                ...newBarCodes
+            }
 
-            const data = await ApiService.getStockedDetailReport({
-                params:{
-                    owner_id: store.getters["auth/user"]?.odoo_id,
-                    from_date: newFromDate,
-                    to_date: newToDate,
-                    limit: limit ?? 10,
-                    offset: offset ?? 0,
-                    ...newProductIds,
-                    ...newBarCodes
-                }
-            })
+            const data = await ApiService.onFetchStockReportTotal({params});
 
-            commit("onUpdateStockedList", data)
-            return data
+            state.stockedList;
+
+            return data.count;
         },
 
-        async onfetchedAndReplaceStockedList({ commit, dispatch }, {from_date, to_date, limit, offset, barcodes, sku}){
+        async onfetchAndUpdateStockedList({ commit }, {from_date, to_date, limit, offset, barcodes, sku, activeProduct}){
+            const newFromDate = TimeConvert.formatDateToStockFormat(from_date);
+            const newToDate = TimeConvert.formatDateToStockFormat(to_date);
+
+            const newProductIds = convertListToObject({myList: sku, name: "skus"}) ?? null;
+            const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
+
+            const params= {
+                owner_id: store.getters["auth/user"]?.odoo_id,
+                from_date: newFromDate,
+                to_date: newToDate,
+                limit: limit ?? 10,
+                offset: offset ?? 0,
+                active_product: activeProduct,
+                ...newProductIds,
+                ...newBarCodes
+            };
+
+            const data = await ApiService.getStockedDetailReport({
+                params: params
+            });
+
+            commit("onUpdateStockedList", data);
+            return data;
+        },
+
+        async onfetchedAndReplaceStockedList({ commit }, {from_date, to_date, limit, offset, barcodes, sku, activeProduct}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
             const newToDate = TimeConvert.formatDateToStockFormat(to_date)
 
-            const newProductIds = await dispatch("convertListToObject", {myList: sku, name: "skus"}) ?? null
-            const newBarCodes = await dispatch("convertListToObject", {myList: barcodes, name: "barcodes"}) ?? null
-
+            const newProductIds = convertListToObject({myList: sku, name: "skus"}) ?? null;
+            const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
+            console.log("acitve?rpdi: " + activeProduct)
+            
+            const param = {
+                owner_id: store.getters["auth/user"]?.odoo_id,
+                from_date: newFromDate,
+                to_date: newToDate,
+                limit: limit ?? 10,
+                offset: offset ?? 0,
+                active_product: activeProduct,
+                ...newBarCodes,
+                ...newProductIds
+            };
             const data = await ApiService.getStockedDetailReport({
-                params:{
-                    owner_id: store.getters["auth/user"]?.odoo_id,
-                    from_date: newFromDate,
-                    to_date: newToDate,
-                    limit: limit ?? 10,
-                    offset: offset ?? 0,
-                    ...newBarCodes,
-                    ...newProductIds
-                }
-            })
+                params: param
+            });
             // Don't user update because of the fact that old data can be in different 
             // date
-            commit("onReplacedStockedList", data)
-            return data
+            commit("onReplacedStockedList", data);
+            return data;
         },
 
         clearSockDetailReport({ commit }){
             commit("onClearState")
         },
-
-        convertListToObject(_, {myList, name}){
-            const myObject = {}
-            for(let i=0; i<myList?.length ?? 0; i++){
-                const newName = `${name}[${i}]`
-                myObject[newName] = myList[i]
-            }
-            return myObject
-        }
     },
 }
