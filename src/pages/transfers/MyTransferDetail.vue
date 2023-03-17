@@ -53,7 +53,7 @@
                     titleForm: "Transfer Detail",
                     titleField1: "Transfer Name",
                     titleField2: "Operation Type",
-					buttonSubmit:"Add Product"
+					buttonSubmit:"Add Transfer Detail"
                 },
 				fieldNotActive: true,
 				oldData: null,
