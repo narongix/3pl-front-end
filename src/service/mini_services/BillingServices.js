@@ -1,41 +1,27 @@
 import ApiConfig from "../ApiConfig";
 
 export default{
-    async onFetchBillingList({offset, limit, userId}){
+    async onFetchBillingList(params){
         const res = await ApiConfig.getMethods({
             api: '/bill',
-            params:{
-                offset: offset,
-                limit: limit,
-                user_id: userId
-            }
+            params:params
         });
 
         return res.data ?? [];
     },
 
-    async onFetchDetailBilling({userId, month, year}){
+    async onFetchDetailBilling(params){
         const res = await ApiConfig.getMethods({
             api: "bill_detail",
-            params:{
-                user_id: userId,
-                month: month,
-                year: year,
-            }
+            params:params
         });
         return res.data
     },
 
-    async getTransferTrx({month, year, transferType, offset, limit}){
+    async getTransferTrx(params){
         const res = await ApiConfig.getMethods({
             api: "bill_detail/transfers_trx",
-            params:{
-                month: month,
-                year: year,
-                transfer_type: transferType,
-                offset: offset,
-                limit: limit
-            }
+            params:params,
         });
 
         return res.data;

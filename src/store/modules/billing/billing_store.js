@@ -37,12 +37,14 @@ export default{
     },
     actions:{
         async onFetchBilling({ commit }, { limit, offset, searchFilter}){
-            const data = await ApiService.onFetchBillingList({
-                userId: store.getters['auth/getUserId'],
+            const params = {
+                user_id: store.getters['auth/getUserId'],
                 offset: offset, 
                 limit:limit,
                 search_key: searchFilter
-            });
+            };
+
+            const data = await ApiService.onFetchBillingList(params);
 
             commit("updateBillingState", data.rows)
 
@@ -50,11 +52,13 @@ export default{
         },
 
         async onFetchDetailBilling({ state }, {month, year}){
-            const data = await ApiService.onFetchDetailBilling({
-                userId: store.getters['auth/getUserId'],
+            const params = {
+                user_id: store.getters['auth/getUserId'],
                 month: month,
                 year: year,
-            });
+            };
+
+            const data = await ApiService.onFetchDetailBilling(params);
 
             // Keep this here or else, error. 
             // the web will throw an error
@@ -65,13 +69,16 @@ export default{
         },
 
         async onFetchTransferTrx({ state }, {offset, limit, month, year, transferType}){
-            const data = await ApiService.getTransferTrx({
+            const params = {
                 offset: offset,
                 limit: limit,
                 month: month,
                 year: year,
-                transferType: transferType
-            });
+                user_id: store.getters['auth/getUserId'],
+                transfer_type: transferType
+            };
+
+            const data = await ApiService.getTransferTrx(params);
             state.billingList;
             return data;
         },
@@ -96,7 +103,8 @@ export default{
             const params = {
                 offset: offset,
                 limit: limit,
-                date: date
+                date: date,
+                user_id: store.getters['auth/getUserId'],
             }
 
             const data = await ApiService.getVolumeByDate(params);
