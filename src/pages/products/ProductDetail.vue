@@ -68,15 +68,15 @@
                     </div>
                     <!-- TODO1: disabled product details field -->
                     <div class="field col-12 md:col-3">
-                        <label for="width">Width</label>
+                        <label for="width">Width(cm)</label>
                         <InputText id="width" type="text" v-model="product.width.newVal" :disabled=true />
                     </div>
                     <div class="field col-12 md:col-3">
-                        <label for="length">Length</label>
+                        <label for="length">Length(cm)</label>
                         <InputText id="length" type="text" v-model="product.length.newVal" :disabled=true />
                     </div>
                     <div class="field col-12 md:col-3">
-                        <label for="height">Height</label>
+                        <label for="height">Height(cm)</label>
                         <InputText id="height" type="text" v-model="product.height.newVal" :disabled=true />
                     </div>
                     <div class="field col-12 md:col-3">
