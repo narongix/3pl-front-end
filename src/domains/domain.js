@@ -27,5 +27,10 @@ const billStatus = {
     3: "Closed"
 }
 
-export { transferStatus, transferType, transferId, billStatus }
+const roleGroupId = {
+    Admin: 1,
+    User: 2
+}
+
+export { transferStatus, transferType, transferId, billStatus, roleGroupId };
 

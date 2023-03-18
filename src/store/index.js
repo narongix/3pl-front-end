@@ -6,6 +6,7 @@ import recipientModule from './modules/recipient/recipient_store.js';
 import transferTypeModule from './modules/transfer_type/transfer_type_store.js';
 import stockedDetailReportModule from './modules/stocked_detail_report/stocked_detail_report_store.js';
 import billing_store from './modules/billing/billing_store.js';
+import user_store from './modules/user/user_store.js';
 
 const store = createStore({
     modules:{
@@ -16,6 +17,7 @@ const store = createStore({
         transferType: transferTypeModule,
         stockedDetailReport: stockedDetailReportModule,
         billing: billing_store,
+        user: user_store
     },
     actions:{
         clearAllStates({ commit }){

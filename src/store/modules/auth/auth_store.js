@@ -1,5 +1,6 @@
 import ApiService from '../../../service/ApiService.js';
 import LocalStorageKeys from "../../../domains/LocalStorageKeys.js";
+import { roleGroupId } from '../../../domains/domain.js';
 
 export default {
     namespaced: true,
@@ -33,17 +34,17 @@ export default {
             return state.user?.email ?? ""
         },
 
-        getToken(state){
-            const token = state.oneTimeAccessToken ?? localStorage.getItem(LocalStorageKeys.accessTokenkey)
+        getToken(state, getters){
+            const token = state.oneTimeAccessToken ?? getters.user.access_token;
             return token
         },
 
-        getUserId(state){
-            if (!state.user) {
-                state.user = Object.assign(state.user ?? {}, JSON.parse(localStorage.getItem(LocalStorageKeys.userKey)))
-            }
-            
-            return state.user.id;  
+        getUserId(state, getters){
+            return getters.user.id;  
+        },
+
+        getUserRole(state, getters){
+            return getters.user?.role?.role_id ?? roleGroupId.User;
         }
     },
     mutations: {
@@ -67,7 +68,6 @@ export default {
 
             localStorage.removeItem(LocalStorageKeys.userKey)
             localStorage.removeItem(LocalStorageKeys.loggedInIndicatorKey)
-            localStorage.removeItem(LocalStorageKeys.accessTokenkey)
         },
 
         async login(context, payload) {

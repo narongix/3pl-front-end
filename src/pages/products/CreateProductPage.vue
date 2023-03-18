@@ -33,10 +33,10 @@
                                             </p>
                                         </div>
                                     </template>
-                                    <!-- <template v-else style="opacity: 0.5">Start typing to search for product categories.</template> -->
                                 </template>
                             </v-select>
                         </div>
+                        <slot name="body"></slot>
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@ export default {
             };
             this.toLoad = async () => {
                 const newProduct = await this.$store.dispatch('products/addProduct', actionPayload);
-                await this.$router.push({ path: '/products', query: { id: newProduct.product_id, name: newProduct.product_name } });
+                await this.$router.push({ name: "productList", query: { id: newProduct.product_id, name: newProduct.product_name } });
                 this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
             }
         },

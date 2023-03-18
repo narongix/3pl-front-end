@@ -105,6 +105,7 @@ import BlockViewer from './BlockViewer';
 import vSelect from "vue-select";
 
 import { FilterService, FilterMatchMode } from "primevue/api"
+import LocalStoragekeys from './domains/LocalStorageKeys';
 
 
 router.beforeEach(function(to, from, next) {
@@ -148,6 +149,10 @@ app.use(PrimeVue, { ripple: true, inputStyle: 'outlined',
     ]
  }
 });
+
+localStorage.removeItem(LocalStoragekeys.accessTokenkey);
+
+
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(router);

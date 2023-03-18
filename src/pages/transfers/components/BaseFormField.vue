@@ -168,8 +168,7 @@
                 :validation="validationField1.recipient.value"
                 :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
                 :maxLength="getRecipientLength"
-                :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
-                :showOption="option=>option.full_name ?? option.full_name"
+                :showOption="option=>option.full_name"
                 :showValue="showValueRecipient" :offset="offset ?? 0"
                 >
 
@@ -198,7 +197,7 @@
     import { mapGetters } from 'vuex'
 
     import StringFunction from '../../../components/utils/StringFunction'
-    import DropDownPagination from './DropDownPagination.vue';
+    import DropDownPagination from '../../../components/DropDownPagination.vue';
     import PromptField from '../../../components/prompt_field/PromptField.vue';
 
     import TimeConvert from "@/components/utils/TimeConvert";

@@ -2,6 +2,24 @@ import { createRouter, createWebHashHistory, START_LOCATION } from 'vue-router';
 import App from './App.vue';
 import store from "@/store";
 
+// import { roleGroupId } from './domains/domain';
+
+// const adminRoutes = [
+//     {
+//         path: "/products/new_admin/",
+//         name: "createProduct",
+//         component: () => import("./pages/products/admin/AdminCreateProduct.vue"),
+//         meta: {requireAuth: true, role: roleGroupId.Admin},
+//         beforeEnter: (to, from, next)=>{
+//             console.log("REEEEE");
+//             const permissionRole = store.getters["auth/getUserRole"];
+//             if(permissionRole == roleGroupId.Admin){
+//                 return true;
+//             }
+//             next();
+//         }
+//     }
+// ];
 
 const routes = [
     {
@@ -47,6 +65,7 @@ const routes = [
             },
             {
                 path: '/products',
+                name: "productList",
                 component: ()=>import('./pages/products/ProductList.vue'),
     
             },
@@ -57,6 +76,7 @@ const routes = [
             },
             {
                 path: '/products/new/',
+                name: "createProduct",
                 component: ()=>import('./pages/products/CreateProductPage.vue')
             },
             {
@@ -99,7 +119,7 @@ const routes = [
                 path:"/billing/detail/volume/productDetail",
                 name: "volumeProductDetail",
                 component: ()=>import("./pages/billing/VolumeProductDate.vue"),
-            }
+            },
         ]
     },
     {

@@ -107,11 +107,9 @@
             if (this.checked) {
               localStorage.setItem(localStorageKeys.loggedInIndicatorKey, JSON.stringify(true))
               localStorage.setItem(localStorageKeys.userKey, JSON.stringify(loginData.user))
-              localStorage.setItem(localStorageKeys.accessTokenkey, loginData.access_token)
             }
             else{
               localStorage.removeItem(localStorageKeys.loggedInIndicatorKey, JSON.stringify(false))
-              localStorage.removeItem(localStorageKeys.accessTokenkey)
               localStorage.removeItem(localStorageKeys.userKey)
             }
 

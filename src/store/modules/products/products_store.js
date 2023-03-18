@@ -103,6 +103,7 @@ export default {
             const maxProductLength = await ApiService.getProductLength();
             commit("setProductLength", maxProductLength.total_products);
         },
+
         async getDetailProductOnStockDetail({commit}, {productId, limit, offset, barcode}){
             const params = {
                 product_id: productId ?? null,
