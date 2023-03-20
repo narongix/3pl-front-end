@@ -1,6 +1,6 @@
 <template>
     <div>
-        <CreateProductPage>
+        <CreateProductPage @onSubmit="onSubmit" @onInit="onInit">
             <template #body>
                 <div class="field col-12 md:col-12">
                     <label for="userId">Select User</label>
@@ -13,7 +13,6 @@
                 </div>
             </template>
         </CreateProductPage>
-        <RetryField :toLoad="toLoadRetry" :message="messages" :errorToast="errorToast"></RetryField>
     </div>
 </template>
 
@@ -21,19 +20,12 @@
     import CreateProductPage from '../CreateProductPage.vue';
     import DropDownPagination from '../../../components/DropDownPagination.vue';
     import { mapGetters } from 'vuex';
-    import RetryField from '../../../components/prompt_field/RetryField.vue';
     import MyToast from "../../../components/utils/MyToast";
 
     export default{
-        created(){
-            this.RetryField = this.initData;
-        },
-
         data() {
             return {
-                toLoadRetry: null,
                 userSelecter: null,
-
                 offset: 0,
 
                 validationField:{
@@ -84,20 +76,18 @@
                 return value ?? "Empty";
             },
             
-            initData(){
+            onInit(){
                 this.$store.dispatch("user/fetchUser", {
                     offset: 0,
                     limit: this.myLimit
                 });
             },
 
-            getUsers(offset){
-                this.toLoadRetry = async ()=>{
-                    await this.$store.dispatch("user/fetchUser", {
-                        offset: offset,
-                        limit: this.myLimit
-                    });
-                };
+            async getUsers(offset){
+                await this.$store.dispatch("user/fetchUser", {
+                    offset: offset,
+                    limit: this.myLimit
+                });
             },
 
             async findUsers(filterValue){
@@ -107,11 +97,13 @@
                 });
             },
 
-            Submit(){
-
+            async onSubmit(newlyCreatedProduct){
+                const newProduct = await this.$store.dispatch('products/addProduct', {newlyCreatedProduct: newlyCreatedProduct, userId: this.userSelecter});
+                // TODO: Refactor this to push to admin product list instead
+                await this.$router.push({ name: "productList", query: { id: newProduct.product_id, name: newProduct.product_name } });
             }
         },
 
-        components: { CreateProductPage, DropDownPagination, RetryField }
+        components: { CreateProductPage, DropDownPagination }
     }
 </script>

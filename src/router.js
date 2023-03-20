@@ -2,24 +2,23 @@ import { createRouter, createWebHashHistory, START_LOCATION } from 'vue-router';
 import App from './App.vue';
 import store from "@/store";
 
-// import { roleGroupId } from './domains/domain';
+import { roleGroupId } from './domains/domain';
 
-// const adminRoutes = [
-//     {
-//         path: "/products/new_admin/",
-//         name: "createProduct",
-//         component: () => import("./pages/products/admin/AdminCreateProduct.vue"),
-//         meta: {requireAuth: true, role: roleGroupId.Admin},
-//         beforeEnter: (to, from, next)=>{
-//             console.log("REEEEE");
-//             const permissionRole = store.getters["auth/getUserRole"];
-//             if(permissionRole == roleGroupId.Admin){
-//                 return true;
-//             }
-//             next();
-//         }
-//     }
-// ];
+const adminRoutes = [
+    {
+        path: "/products/new_admin/",
+        name: "createProduct",
+        component: () => import("./pages/products/admin/AdminCreateProduct.vue"),
+        meta: {requireAuth: true, role: roleGroupId.Admin},
+        beforeEnter: (to, from, next)=>{
+            const permissionRole = store.getters["auth/getUserRole"];
+            if(permissionRole == to.meta.role){
+                return true;
+            }
+            next();
+        }
+    }
+];
 
 const routes = [
     {
@@ -74,11 +73,11 @@ const routes = [
                 name: 'productDetail',
                 component: ()=>import('./pages/products/ProductDetail.vue')
             },
-            {
-                path: '/products/new/',
-                name: "createProduct",
-                component: ()=>import('./pages/products/CreateProductPage.vue')
-            },
+            // {
+            //     path: '/products/new/',
+            //     name: "createProduct",
+            //     component: ()=>import('./pages/products/CreateProductPage.vue')
+            // },
             {
                 path: '/product-categories',
                 name: "productCategoriesList",
