@@ -7,15 +7,14 @@ import { roleGroupId } from './domains/domain';
 const adminRoutes = [
     {
         path: "/products/new_admin/",
-        name: "createProduct",
+        name: "createProductAdmin",
         component: () => import("./pages/products/admin/AdminCreateProduct.vue"),
         meta: {requireAuth: true, role: roleGroupId.Admin},
-        beforeEnter: (to, from, next)=>{
-            const permissionRole = store.getters["auth/getUserRole"];
-            if(permissionRole == to.meta.role){
+        beforeEnter: ()=>{
+            if(store.getters["auth/getUserRole"] == roleGroupId.Admin){
                 return true;
             }
-            next();
+            return {name: "productList"};
         }
     }
 ];
@@ -66,18 +65,18 @@ const routes = [
                 path: '/products',
                 name: "productList",
                 component: ()=>import('./pages/products/ProductList.vue'),
-    
+                meta:{role: roleGroupId.User}
             },
             {
                 path: '/products/product_detail/:id',
                 name: 'productDetail',
                 component: ()=>import('./pages/products/ProductDetail.vue')
             },
-            // {
-            //     path: '/products/new/',
-            //     name: "createProduct",
-            //     component: ()=>import('./pages/products/CreateProductPage.vue')
-            // },
+            {
+                path: '/products/new/',
+                name: "createProduct",
+                component: ()=>import('./pages/products/CreateProductPage.vue'),
+            },
             {
                 path: '/product-categories',
                 name: "productCategoriesList",
@@ -119,6 +118,8 @@ const routes = [
                 name: "volumeProductDetail",
                 component: ()=>import("./pages/billing/VolumeProductDate.vue"),
             },
+
+            ...adminRoutes
         ]
     },
     {
@@ -149,29 +150,33 @@ const router = createRouter({
 });
 
 router.beforeEach((to,from)=>{
-    const token = store.getters["auth/getToken"]
-    const user = store.getters["auth/user"]
-    const isloggedIn = (store.getters["auth/isLoggedIn"]) ?? false
+    const token = store.getters["auth/getToken"];
+    const user = store.getters["auth/user"];
+    const isLoggedIn = user?.id != null && token != null; 
 
-    // if user doesn't have token and the page the user redirect to isn't login
-    const noDataToken = !token && to.name !== "login"
+    // For now this login isn't complete, sometime might give out error,
+    // Closing this for now and will use it in the future
+    // // if user doesn't have token and the page the user redirect to isn't login
+    // const noDataToken = !token && to.name !== "login"
 
-    // if user doesn't have data and the page the user redirect to isn't login
-    const noDataUser = !user && to.name !== "login"
+    // // if user doesn't have data and the page the user redirect to isn't login
+    // const noDataUser = !user && to.name !== "login"
 
-    if(isloggedIn && to.name=='login'){
+    if(isLoggedIn && to.name=='login'){
         return {name: from.name ?? 'dashboard'}
     }   
 
-    if(noDataToken || noDataUser || !isloggedIn && to.name!='login'){
+    if(!isLoggedIn && to.name!='login'){
         return {name:"login"}
     }
 
     // If page is refresh and theres no token or no data, and it's not at login page
     // Or if the page is refresh and get unauthenticated
-    if(from == START_LOCATION && (noDataToken || noDataUser) && to.name!='login'){
+    if(from == START_LOCATION && !isLoggedIn && to.name!='login'){
         return {name: "login"}
     }
+
+
 })
 
 router.afterEach((to, from)=>{

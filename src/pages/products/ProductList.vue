@@ -128,6 +128,7 @@ import RetryField from "../../components/prompt_field/RetryField.vue"
 import { FilterMatchMode } from "primevue/api";
 import { mapGetters } from 'vuex';
 import LinkParagraph from '../../components/LinkParagraph.vue';
+import { roleGroupId } from '../../domains/domain';
 
 export default {
     components: {
@@ -192,7 +193,13 @@ export default {
             }, 1500)
         },
         goToNewProduct() {
-            router.push('/products/new/');
+            const userId = this.$store.getters["auth/getUserRole"];
+            if(userId == roleGroupId.Admin){
+                router.push({name: "createProductAdmin"});
+            }else{
+                router.push({name: "createProduct"});
+            }
+            
         },
         confirmDeleteProduct(product) {
             this.product = product;

@@ -49,18 +49,21 @@
         <p>{{ message?.prompt ?? "Are you sure you want to create this?" }} <strong>{{ selectedCreated }}</strong>?</p>
     </PromptField>
 </template>
+
 <script>
 import RetryField from '../../../components/prompt_field/RetryField.vue'
 import PromptField from "../../../components/prompt_field/PromptField.vue"
 
 export default {
     props:{
+        additionalValidation: Function,
+        onInit: Function
     },
-    emits:["onSubmit"],
     components: {
         RetryField,
         PromptField
     },
+    emits:["onSubmit"],
     data() {
         return {
             validationField:{
@@ -105,7 +108,10 @@ export default {
     },
     created() {
         this.loadProdCategories();
-        this.toLoad = this.initData
+        this.toLoad = async () => {
+            await this.initData();
+            await this.onInit?.();
+        }
     },
     computed: {
         prodCategories() {
@@ -144,10 +150,8 @@ export default {
                 categoryId: this.prodCategory?.id ?? null
             };
 
-            this.toLoad = async () => {
-                await this.emits("onSubmit", actionPayload);
-            
-                this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+            this.toLoad = () => {
+                this.$emit("onSubmit", actionPayload);
             }
         },
         validateForm() {
@@ -163,8 +167,11 @@ export default {
                 const error = this.validationField[i].value!=null
                 myList.push(error)
             }
+
+            const index2 = this.additionalValidation?.() ?? -1; 
+
             const index = myList.findIndex((e)=>e)
-            if(index>=0){
+            if(index>=0 || index2>=0){
                 this.formIsValid=false
             }
         },

@@ -12,6 +12,14 @@ export default {
     getters:{
         getUser(state){
             return state.userList;
+        },
+
+        getUserLength(state){
+            return state.userList?.length ?? 0;
+        },
+
+        getUserLimit(){
+            return 10
         }
     },
     
@@ -21,25 +29,27 @@ export default {
                 // Using odoo_id might me more efficient
                 const index = state.userList.findIndex((e)=>e.id == element.id);
                 if(index<0){
-                    this.userList.push(element);
+                    state.userList.push(element);
                 }
                 else{
-                    this.userList[index] = element;
+                    state.userList[index] = element;
                 }
             });
         },
     },
 
     actions:{
-        fetchUser({ commit }, {offset, limit, userName}){
+        async fetchUser({ commit }, {offset, limit, userName}){
             const params ={
                 offset: offset,
                 limit: limit,
                 user_name: userName
             };
-            const data = ApiService.fetchUser(params);
+            const data = await ApiService.fetchUser(params);
 
             commit("updateUserState", data);
+            
+            return data;
         }
     }
 }

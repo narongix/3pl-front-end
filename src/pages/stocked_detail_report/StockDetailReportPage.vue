@@ -267,8 +267,6 @@
             },
             
             async onSelectDate(){
-                console.log(this.productFilter)
-
                 if(this.validate()){
                     this.toLoadRetry = async()=>{
                         const stockList = await this.$store.dispatch("stockedDetailReport/onfetchedAndReplaceStockedList", {
@@ -352,7 +350,6 @@
                         break;
                     }
                     this.dataList[i]={temp_id: this.dataList?.[i]?.temp_id,...tempList[index]}
-                    console.log(`this.dataList[${i}] ${this.dataList[i]} = tempList[${index}] ${tempList[index]}`);
                     index++
                 }
             },

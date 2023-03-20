@@ -1,26 +1,27 @@
 <template>
     <div>
-        <CreateProductPage @onSubmit="onSubmit" @onInit="onInit">
+        <CreateProductTemplate @onSubmit="onSubmit" :onInit="onInit" :additionalValidation="onValidate">
             <template #body>
                 <div class="field col-12 md:col-12">
                     <label for="userId">Select User</label>
-                    <DropDownPagination v-model="userSelecter" :options="getUsers" id="user" placeholder="Please select a user"
+                    <DropDownPagination v-model="userSelecter" :options="myUsersList" id="user" placeholder="Please select a user"
                     :validation="validationField.userSelecter.value" :whenLoad="getUsers" :limit="myLimit"
-                    :whenSearch="findUsers" :maxLength="userMaxLength" :showValue="showValueUser" :offset="offset ?? 0">
-                    :disabled="true"
+                    :whenSearch="findUsers" :maxLength="userMaxLength" :offset="offset ?? 0"
+                    :disabled="false" optionLabel="full_name" optionValue="id" :showOption="option=>option.full_name"
+                    >
                     </DropDownPagination>
                     <small>{{ validationField.userSelecter.value }}</small>
                 </div>
             </template>
-        </CreateProductPage>
+        </CreateProductTemplate>
     </div>
 </template>
 
 <script>
-    import CreateProductPage from '../CreateProductPage.vue';
     import DropDownPagination from '../../../components/DropDownPagination.vue';
     import { mapGetters } from 'vuex';
     import MyToast from "../../../components/utils/MyToast";
+    import CreateProductTemplate from '../components/CreateProductTemplate.vue';
 
     export default{
         data() {
@@ -31,11 +32,11 @@
                 validationField:{
                     userSelecter:{
                         value: null,
-                        myFunction: ()=>{
+                        validate: ()=>{
                             if(this.userSelecter){
-                                return this.validationField1.value = null;
+                                return this.validationField.userSelecter.value = null;
                             }
-                            this.validationField1.value = "User cannot be empty";
+                            this.validationField.userSelecter.value = "User cannot be empty";
                         }
                     }
                 }
@@ -44,7 +45,7 @@
 
         computed:{
             ...mapGetters({
-                getUsers: "user/getUser"
+                myUsersList: "user/getUser"
             }),
 
             messages(){ 
@@ -56,7 +57,7 @@
             },
 
             userMaxLength(){
-                return this.getUsers.length;
+                return this.myUsersList.length;
             },
 
             errorToast(){
@@ -72,12 +73,8 @@
         },
 
         methods:{
-            showValueUser(value){
-                return value ?? "Empty";
-            },
-            
-            onInit(){
-                this.$store.dispatch("user/fetchUser", {
+            async onInit(){
+                await this.$store.dispatch("user/fetchUser", {
                     offset: 0,
                     limit: this.myLimit
                 });
@@ -100,10 +97,21 @@
             async onSubmit(newlyCreatedProduct){
                 const newProduct = await this.$store.dispatch('products/addProduct', {newlyCreatedProduct: newlyCreatedProduct, userId: this.userSelecter});
                 // TODO: Refactor this to push to admin product list instead
+                this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
                 await this.$router.push({ name: "productList", query: { id: newProduct.product_id, name: newProduct.product_name } });
+            },
+
+            async onValidate(){
+                const myList = [];
+                for(const i in this.validationField){
+                    this.validationField[i].validate();
+                    myList.push(this.validationField[i].value);
+                }
+                const index = myList.findIndex((e)=>e);
+                return index;
             }
         },
 
-        components: { CreateProductPage, DropDownPagination }
+        components: { DropDownPagination, CreateProductTemplate }
     }
 </script>

@@ -47,8 +47,6 @@
 
 <script>
   import {mapState} from "vuex";
-  import localStorageKeys from "../../domains/LocalStorageKeys.js";
-
 
   export default {
     data() {
@@ -99,25 +97,18 @@
     methods: {
       async submitForm() {
         const validated = this.validate()
-
         if (validated) {
           try{
-            const loginData = await this.$store.dispatch('auth/login', this.form)
-            // If uncheck
-            if (this.checked) {
-              localStorage.setItem(localStorageKeys.loggedInIndicatorKey, JSON.stringify(true))
-              localStorage.setItem(localStorageKeys.userKey, JSON.stringify(loginData.user))
-            }
-            else{
-              localStorage.removeItem(localStorageKeys.loggedInIndicatorKey, JSON.stringify(false))
-              localStorage.removeItem(localStorageKeys.userKey)
-            }
-
+            await this.$store.dispatch('auth/login', {payload: this.form, storeData: this.checked})
             this.$router.replace({name:"dashboard"})
           }catch(e){
+            console.log(e);
             this.validation.password.value = e.errorMessage
             this.stopShowed=true
-            this.validation.email.value="rise"
+            // Since we're not displaying the email msg,
+            // We still have to do insert values since our validation
+            // require value to show error
+            this.validation.email.value="tmp"
           }
         }
       },
