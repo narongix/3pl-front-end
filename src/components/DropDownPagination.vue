@@ -44,7 +44,7 @@
     props: {
       modelValue: null,
       disabled: Boolean,
-      validation: Boolean,
+      validation: null,
       optionLabel: String,
       placeholderSearch: String,
       optionValue: String,

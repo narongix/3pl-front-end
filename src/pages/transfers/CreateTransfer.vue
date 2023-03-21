@@ -20,6 +20,7 @@
     import BaseFieldForm from './components/BaseFormField.vue'
     import { mapGetters } from 'vuex'
     import RetryField from '../../components/prompt_field/RetryField.vue'
+    import { roleGroupId } from '../../domains/domain';
 
     export default{
         async created(){
@@ -78,7 +79,8 @@
         computed:{
             ...mapGetters({
                 products: "products/getProductState",
-                myuserId: "auth/getUserId"
+                myuserId: "auth/getUserId",
+                userRole: "auth/getUserRole"
             }),
 
             myPopUp(){
@@ -91,6 +93,12 @@
         
         methods:{
             async initData(){
+                if(this.userRole == roleGroupId.Admin){
+					await this.$store.dispatch("user/fetchUser", {
+						offset: 0,
+						limit: 10,
+					});
+				}
                 await this.$store.dispatch("transferType/getTransferType")
                 await this.$store.dispatch("recipient/getRecipients", {
                     offset: 0,

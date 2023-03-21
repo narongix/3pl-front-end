@@ -169,12 +169,13 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ commit }, { offset, productName, limit, searchKey}) {
+        async onFetchProducts({ commit }, { offset, productName, limit, searchKey, userId}) {
             const params = {
                 offset: offset,
                 limit: limit,
                 product_name: productName,
-                search_key: searchKey
+                search_key: searchKey,
+                user_id: userId
             }
             
             const products = await ApiService.getProducts(params)
