@@ -63,12 +63,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="field col-12 md:col-3 sm:col-12">
-                            <label for="status">Status</label>
-                            <InputText :disabled="true" id="status" 
-                            type="text" v-model="myTransferStatus"></InputText>
-                        </div>
-
                         <div class="field col-12 md:col-4">
                             <label for="InternalReference" :class="{'p-error': validationField1.reference.value}">Internal Reference</label>
                             <InputText :disabled="FieldNotActive || disabledField['reference']" id="InternalReference" 
@@ -88,6 +82,12 @@
                             >
                             </DropDownPagination>
                             <small id="adminuserId-help" class="p-error" v-if="validationField1.userId.value">{{ validationField1.userId.value }}</small>
+                        </div>
+
+                        <div class="field col-12 md:col-3 sm:col-12">
+                            <label for="status">Status</label>
+                            <InputText :disabled="true" id="status" 
+                            type="text" v-model="myTransferStatus"></InputText>
                         </div>
                     </div>
                 </div>
@@ -177,7 +177,7 @@
     <Dialog v-model:visible="promptFindRecipient" header="Choose from template" :style="{width: '350px'}">
         <div class="grid">
             <div class="col-12 md:col-12 sm:col-12">
-                <DropDownPagination v-model="myContact" :options="getRecipientsState" optionLabel="full_name" optionValue="full_name"
+                <DropDownPagination v-model="myContact" :options="getRecipientByUser" optionLabel="full_name" optionValue="full_name"
                 :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
                 :validation="validationField1.recipient.value"
                 :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
@@ -457,6 +457,7 @@
                 transfer_type: "transferType/getTansferType",
                 
                 user: "auth/user",
+                userId: "auth/getUserId",
                 
                 getUsers: "user/getUser",
                 getUserLength: "user/getUserLength",
@@ -470,8 +471,15 @@
 
 
             getProductByUser(){
-                const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? e.user_id));
+                const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? this.userId));
                 return newProduct;
+            },
+
+            getRecipientByUser(){
+                // TODO: Fix Dialog Select Recipient. Everytime Recipient Dialog is loaded, it would refresh the entire widget
+                const newRecipient = this.getRecipientsState.filter((e)=>e.user_id == (this.userSelector ?? this.userId))
+
+                return newRecipient;
             },
 
             getProductLength(){
@@ -736,7 +744,8 @@
 
             async onloadRecipientV2(offset){
                 const recipients = await this.$store.dispatch("recipient/getRecipients",{
-                    offset: offset
+                    offset: offset,
+                    userId: this.userSelector ?? this.userId
                 })
                 return recipients.length
             },
@@ -772,7 +781,8 @@
             async findRecipient(filterValue){
                 await this.$store.dispatch("recipient/getRecipients", {
                     offset: 0,
-                    searchString: filterValue
+                    searchString: filterValue,
+                    user_id: this.userSelector ?? this.userId
                 })
             },
 
@@ -837,6 +847,27 @@
                     this.showRecipientField = true
                 }
             },
+
+            promptFindRecipient:{
+                immediate:true,
+                handler(newValue){
+                    if(newValue){
+                        // Doing this to ensure that whenever 
+                        // a new user in admin is loaded, 
+                        // it wouldn't take a contact of the old selected user
+                        this.myContact=null
+
+                        try{
+                            // TODO: Fix this, everytime the dialog is tap, 
+                            // it shoudl have loaded this,
+                            // Temp Fix
+                            this.onloadRecipientV2(0);
+                        }catch(e){
+                            console.log(e);
+                        }
+                    }
+                }
+            },  
         }
     }
 </script>
