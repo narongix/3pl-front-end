@@ -78,7 +78,7 @@
 
                         <div v-if="adminOrUser() && !vanishField['userSelector']" class="field col-12 md:col-3">
                             <label for="adminUserId" :class="{'p-error': validationField1.userId.value}">User</label>
-                            <DropDownPagination v-model="myUserId" :options="getUsers" optionLabel="full_name" optionValue="id"
+                            <DropDownPagination v-model="userSelector" :options="getUsers" optionLabel="full_name" optionValue="id"
                             :disabled="FieldNotActive || disabledField['userSelector']" id="id" placeholder="Please select a user" 
                             :validation="validationField1.userId.value!=null"
                             :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
@@ -147,7 +147,7 @@
         <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-12 sm:col-12">
                 <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
-                <DropDownPagination v-model="product_id" :options="getProducts" optionLabel="search_key" optionValue="product_id"
+                <DropDownPagination v-model="product_id" :options="getProductByUser" optionLabel="search_key" optionValue="product_id"
                 :disabled="FieldNotActive" id="product_id" placeholder="Please select a product" 
                 :validation="validationField2.product_id.value"
                 :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
@@ -313,7 +313,7 @@
                                 return this.validationField1.userId.value = null
                             }
 
-                            if(this.myUserId){
+                            if(this.userSelector){
                                 return this.validationField1.userId.value = null
                             }
                             
@@ -413,7 +413,7 @@
                 },
 
                 tempProductList:[],
-                myUserId: null,
+                userSelector: null,
                 tempReceipientList:[],
 
                 productLoading: false,
@@ -463,13 +463,19 @@
                 
                 getUserLimit: "user/getUserLimit",
                 getUserRole: "auth/getUserRole",
+                // Limit offset
                 getProductLimit: "products/limit",
                 getRecipientLimit: "recipient/getLimit",
-                
             }),
 
+
+            getProductByUser(){
+                const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? e.user_id));
+                return newProduct;
+            },
+
             getProductLength(){
-                return this.getProducts.length
+                return this.getProductByUser?.length ?? 0
             },
 
             getRecipientLength(){
@@ -663,7 +669,7 @@
                 if(index<0){
                     // TODO: Implement Proper Time conversion to API
                     // this.transferData.scheduledDate = this.transferData.scheduledDate.toUTCString()
-                    this.$emit('onClickSubmit', this.transferData, this.addedTransferProducts, this.updatedTransferProducts,  this.deletedTransferProducts, this.myUserId)
+                    this.$emit('onClickSubmit', this.transferData, this.addedTransferProducts, this.updatedTransferProducts,  this.deletedTransferProducts, this.userSelector)
                 }
                 e.preventDefault();
             },
@@ -722,6 +728,7 @@
             async onLoadProductV2(offset){
                 const products = await this.$store.dispatch("products/onFetchProducts", {
                     offset: offset,
+                    userId: this.userSelector,
                 })
 
                 return products.length
@@ -757,7 +764,8 @@
                     // TODO: Find a better solution to get a large amount of products
                     // Possibly, implement pagination on search result
                     limit: 30,
-                    searchKey: filterValue
+                    searchKey: filterValue,
+                    userId: this.userSelector
                 })
             },
 
