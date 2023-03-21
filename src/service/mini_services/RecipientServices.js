@@ -1,14 +1,10 @@
 import ApiConfig from "../ApiConfig.js"
 
 export default{
-    async getRecipients(offset, limit, filter){
+    async getRecipients(params){
         const res = await ApiConfig.getMethods({
             api: "/user_contacts?",
-            params:{
-                offset: offset,
-                limit:limit,
-                search_string:filter
-            }
+            params:params
         })
         return res.data
     },

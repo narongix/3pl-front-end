@@ -152,7 +152,8 @@
 			async loadData(){
 				await this.$store.dispatch("transferType/getTransferType")
 				await this.$store.dispatch("recipient/getRecipients",{
-					offset: 0
+					offset: 0,
+					userId: this.myUserId
 				})
 
 				await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
