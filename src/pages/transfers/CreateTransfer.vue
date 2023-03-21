@@ -4,7 +4,7 @@
     @onClickSubmit="onFormSubmit"
     :FieldNotActive="FieldNotActive"
     :disabledField="disabledField"
-    :data="{}" :popup="myPopUp"
+    :data="{}" :popup="myPopUp" :vanishField="vanishField"
     >
         <template #myTop>
             <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -32,6 +32,7 @@
                     titleForm: "Add New Transfer",
                     buttonSubmit: "Add Product"
                 },
+
                 disabledField:{
                     scheduleDate:false,
                     recipient: false,
@@ -41,6 +42,17 @@
 					destination: false,
                     reference: false
                 },
+                
+                vanishField: {
+					scheduleDate: false,
+					recipient: false,
+					source: false,
+					transfer_type_id: false,
+					destination: false,
+					reference: false,
+					userSelector: false,
+				},
+
                 FieldNotActive: false,
 
                 toLoad:null,
@@ -65,7 +77,8 @@
 
         computed:{
             ...mapGetters({
-                products: "products/getProductState"
+                products: "products/getProductState",
+                myuserId: "auth/getUserId"
             }),
 
             myPopUp(){
@@ -85,7 +98,7 @@
                 await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
             },
 
-            async onFormSubmit(transfer){
+            async onFormSubmit(transfer, addedTransfer, updatedTransfer, deletedTransfer, userId){
                 // TODO: Implement bold text on Transfer List
                 // When created new data 
                 this.message.failed="Error Creating Data, Retry?"
@@ -95,10 +108,10 @@
                             "product_id":e.product_id,
                             "demand": e.demand,
                         }
-                    })
+                    });
 
-                    const newTransfer = await this.$store.dispatch("transfers/createTransfers", {tempTransfer: transfer})  
-                    await this.$router.replace({name:"TransferDetail", params:{id: newTransfer.id}})
+                    const newTransfer = await this.$store.dispatch("transfers/createTransfers", {tempTransfer: transfer, userId: userId ?? this.myuserId}); 
+                    await this.$router.replace({name:"TransferDetail", params:{id: newTransfer.id}});
                     this.$toast.add({severity:'success', summary: 'Success', detail:'Transfer Created Successfully', life: 3000});
                 }
             },

@@ -103,6 +103,7 @@ export default {
             const maxProductLength = await ApiService.getProductLength();
             commit("setProductLength", maxProductLength.total_products);
         },
+
         async getDetailProductOnStockDetail({commit}, {productId, limit, offset, barcode}){
             const params = {
                 product_id: productId ?? null,
@@ -122,12 +123,13 @@ export default {
             const response = await ApiService.getDetailOnProduct(data);
             commit("updateProductState", [response])
         },
-        async addProduct(context, payload) {
+        async addProduct(context, {newlyCreatedProduct, userId}) {
             try {
                 const data = {
-                    'product_name': payload.name,
-                    'sku': payload.sku,
-                    product_category_id: payload.categoryId
+                    'product_name': newlyCreatedProduct.name,
+                    'sku': newlyCreatedProduct.sku,
+                    product_category_id: newlyCreatedProduct.categoryId,
+                    user_id: userId
                 }
                 const newProduct = await ApiService.addOnProduct(data)
                 context.commit('onAddProduct', [newProduct]);

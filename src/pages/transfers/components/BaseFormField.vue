@@ -69,11 +69,25 @@
                             type="text" v-model="myTransferStatus"></InputText>
                         </div>
 
-                        <div class="field col-12 md:col-3 sm:col-12">
+                        <div class="field col-12 md:col-4">
                             <label for="InternalReference" :class="{'p-error': validationField1.reference.value}">Internal Reference</label>
                             <InputText :disabled="FieldNotActive || disabledField['reference']" id="InternalReference" 
                             type="text" v-model.trim="transferData.reference" :class="{'p-invalid': validationField1.reference.value}"></InputText>
                             <small id="InternalReference-help" class="p-error" v-if="validationField1.reference.value">{{ validationField1.reference.value }}</small>
+                        </div>
+
+                        <div v-if="adminOrUser() && !vanishField['userSelector']" class="field col-12 md:col-3">
+                            <label for="adminUserId" :class="{'p-error': validationField1.userId.value}">User</label>
+                            <DropDownPagination v-model="myUserId" :options="getUsers" optionLabel="full_name" optionValue="id"
+                            :disabled="FieldNotActive || disabledField['userSelector']" id="id" placeholder="Please select a user" 
+                            :validation="validationField1.userId.value!=null"
+                            :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
+                            :maxLength="getUserLength"
+                            :errorToastLoading="errorToastLoadingUsers" :messageLoad="messageLoadUser"
+                            :showOption="option => option.full_name"
+                            >
+                            </DropDownPagination>
+                            <small id="adminuserId-help" class="p-error" v-if="validationField1.userId.value">{{ validationField1.userId.value }}</small>
                         </div>
                     </div>
                 </div>
@@ -168,8 +182,7 @@
                 :validation="validationField1.recipient.value"
                 :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
                 :maxLength="getRecipientLength"
-                :errorToastLoading="errorToastLoadingRecipient" :messageLoad="messageLoadRecipient"
-                :showOption="option=>option.full_name ?? option.full_name"
+                :showOption="option=>option.full_name"
                 :showValue="showValueRecipient" :offset="offset ?? 0"
                 >
 
@@ -198,7 +211,7 @@
     import { mapGetters } from 'vuex'
 
     import StringFunction from '../../../components/utils/StringFunction'
-    import DropDownPagination from './DropDownPagination.vue';
+    import DropDownPagination from '../../../components/DropDownPagination.vue';
     import PromptField from '../../../components/prompt_field/PromptField.vue';
 
     import TimeConvert from "@/components/utils/TimeConvert";
@@ -207,6 +220,8 @@
     import { transferStatus } from '../../../domains/domain';
     import RecipientField from './RecipientField.vue';
     import RetryField from '../../../components/prompt_field/RetryField.vue';
+    import { roleGroupId } from '../../../domains/domain';
+
 
     export default{
         props:{
@@ -218,7 +233,8 @@
             popup: {
                 header: String,
                 productDemandDisplay: String
-            }
+            },
+            vanishField: Object,
         },
         
         emits:["onClickSubmit"],
@@ -290,6 +306,21 @@
                 },
 
                 validationField1:{
+                    userId:{
+                        value: null,
+                        myFunction:()=>{
+                            if(this.getUserRole == roleGroupId.User){
+                                return this.validationField1.userId.value = null
+                            }
+
+                            if(this.myUserId){
+                                return this.validationField1.userId.value = null
+                            }
+                            
+                            this.validationField1.userId.value = "User field cannot be blank"
+                            return this.validationField1.userId.value
+                        }
+                    },
                     transferProducts:{
                         value: null,
                         myFunction: ()=>{                            
@@ -381,17 +412,8 @@
                     }
                 },
 
-                offsetProduct: 0,
-                limitProduct: 20,
-                // To keep track of pages when loading in the dropdown
-                // It will load even if we scroll up
-                trackPaginationProduct: 0,
                 tempProductList:[],
-
-
-                offsetReceipient:0,
-                limitReceipient:20,
-                trackPaginationRecipient: 0,
+                myUserId: null,
                 tempReceipientList:[],
 
                 productLoading: false,
@@ -433,9 +455,17 @@
                 getProducts: "products/getProductState",
                 getRecipientsState: "recipient/getRecipientsState",
                 transfer_type: "transferType/getTansferType",
+                
                 user: "auth/user",
+                
+                getUsers: "user/getUser",
+                getUserLength: "user/getUserLength",
+                
+                getUserLimit: "user/getUserLimit",
+                getUserRole: "auth/getUserRole",
                 getProductLimit: "products/limit",
-                getRecipientLimit: "recipient/getLimit"
+                getRecipientLimit: "recipient/getLimit",
+                
             }),
 
             getProductLength(){
@@ -456,6 +486,21 @@
 
             getFormatCalendar(){
                 return TimeConvert.getCalendarFormat()
+            },
+
+            messageLoadUser(){
+                return {
+                    failed: "Error loading Users, retry?",
+                    yesButton: "Yes",
+                    noButton: "No",
+                };
+            },
+            errorToastLoadingUsers(){
+                return{
+                    severity:"error",
+                    summary: "Error!",
+                    detail: "Failed Loading Users!"    
+                };
             }
         },
 
@@ -608,12 +653,17 @@
                 }
             },
 
+            adminOrUser(){
+                return this.getUserRole == roleGroupId.Admin
+            },
+
+
             validateAndSubmit(e){
-                const index = this.onValidateField1()
+                const index = this.onValidateField1();
                 if(index<0){
                     // TODO: Implement Proper Time conversion to API
                     // this.transferData.scheduledDate = this.transferData.scheduledDate.toUTCString()
-                    this.$emit('onClickSubmit', this.transferData, this.addedTransferProducts, this.updatedTransferProducts,  this.deletedTransferProducts)
+                    this.$emit('onClickSubmit', this.transferData, this.addedTransferProducts, this.updatedTransferProducts,  this.deletedTransferProducts, this.myUserId)
                 }
                 e.preventDefault();
             },
@@ -684,6 +734,15 @@
                 return recipients.length
             },
 
+            async onLoadUser(offset){
+                const users = await this.$store.dispatch("user/fetchUser", {
+                    offset: offset,
+                    limit: this.rows,
+                });
+
+                return users.length;
+            },
+
             stopLoadingProduct(){
                 this.productLoading=false
             },
@@ -708,6 +767,14 @@
                     searchString: filterValue
                 })
             },
+
+            async findUser(filterValue){
+                await this.$store.dispatch("user/fetchUser", {
+                    offset: 0,
+                    userName: filterValue,
+                    limit: this.rows
+                });
+            },
             
             changeRecipientState(){
                 this.promptFindRecipient = !this.promptFindRecipient
@@ -716,7 +783,7 @@
             onConfirmSelectRecipientState(){
                 this.transferData.recipient = this.myContact
                 this.changeRecipientState()
-            }
+            },
         },
         
         watch:{

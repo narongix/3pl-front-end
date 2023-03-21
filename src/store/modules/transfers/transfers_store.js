@@ -89,13 +89,14 @@ export default{
             return newTransfer
         },
 
-        async createTransfers({commit}, { tempTransfer }){
+        async createTransfers({commit}, { tempTransfer, userId }){
             const reformatTransfer = {
                 scheduled_time: tempTransfer.scheduledDate,
                 transfer_type_id: tempTransfer.transfer_type_id,
                 transferProducts: tempTransfer.transferProducts,
                 recipient: tempTransfer.recipient,
-                reference: tempTransfer.reference
+                reference: tempTransfer.reference,
+                user_id: userId
             }
 
             const newTransfer = await ApiService.createTransfer(reformatTransfer)
@@ -104,7 +105,7 @@ export default{
             return newTransfer
         },
 
-        async updateTransfer({ commit }, { recipient, reference, id, transfer_status_id, created, updated, deleted }){
+        async updateTransfer({ commit }, { recipient, reference, id, transfer_status_id, created, updated, deleted, userId }){
             const newTransfer = {
                 recipient: recipient,
                 reference: reference,
@@ -112,6 +113,7 @@ export default{
                 addedTransferProducts: created,
                 deletedTransferProducts: deleted,
                 updatedTransferProducts: updated,
+                user_id: userId
             }
             const newTransferV2 = await ApiService.updateTransfer(newTransfer, id)
             
