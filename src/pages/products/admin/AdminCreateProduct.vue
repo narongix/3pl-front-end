@@ -1,6 +1,6 @@
 <template>
     <div>
-        <CreateProductTemplate @onSubmit="onSubmit" :onInit="onInit" :additionalValidation="onValidate">
+        <CreateProductTemplate @onSubmit="onSubmit" :onInit="onInit" :additionalValidation="onValidate" :productCategoryOption="prodCategories">
             <template #body>
                 <div class="field col-12 md:col-12">
                     <label for="userId">Select User</label>
@@ -45,8 +45,15 @@
 
         computed:{
             ...mapGetters({
+                userId: "auth/getUserId",
+                getUserRole: "auth/getUserRole",
                 myUsersList: "user/getUser"
             }),
+
+            prodCategories() {
+                const prod = this.$store.getters['products/prodCategories'].filter((e)=>e.user_id == (this.userSelecter ?? e.user_id));
+                return prod;
+            },
 
             messages(){ 
                 return {
@@ -109,6 +116,24 @@
                 }
                 const index = myList.findIndex((e)=>e);
                 return index;
+            }
+        },
+
+        watch:{
+            userSelecter:{
+                immediate:true,
+                async handler(newVal){
+                    if(newVal){
+                        try{
+                        await this.$store.dispatch("products/getProdCategories", {
+                            offset: 0,
+                            userId: newVal
+                        })
+                        }catch(e){
+                            console.log(e);
+                        }
+                    }
+                }
             }
         },
 

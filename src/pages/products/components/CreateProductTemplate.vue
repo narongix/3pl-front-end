@@ -24,7 +24,7 @@
 
                         <div class="field col-12 md:col-12">
                             <label for="category-name">Product Category</label>
-                            <v-select id="category-name" :options="prodCategories" label="category_name"
+                            <v-select id="category-name" :options="productCategoryOption" label="category_name"
                                 v-model="prodCategory">
                                 <template v-slot:no-options="{ search, searching }">
                                     <template v-if="searching">
@@ -53,11 +53,20 @@
 <script>
 import RetryField from '../../../components/prompt_field/RetryField.vue'
 import PromptField from "../../../components/prompt_field/PromptField.vue"
+import { mapGetters } from 'vuex';
 
 export default {
+    created() {
+        this.loadProdCategories();
+        this.toLoad = async () => {
+            await this.initData();
+            await this.onInit?.();
+        }
+    },
     props:{
         additionalValidation: Function,
-        onInit: Function
+        onInit: Function,
+        productCategoryOption: Array,
     },
     components: {
         RetryField,
@@ -106,17 +115,10 @@ export default {
             }
         };
     },
-    created() {
-        this.loadProdCategories();
-        this.toLoad = async () => {
-            await this.initData();
-            await this.onInit?.();
-        }
-    },
-    computed: {
-        prodCategories() {
-            return this.$store.getters['products/prodCategories'];
-        },
+    computed:{
+        ...mapGetters({
+            userId: "auth/getUserId",
+        })
     },
     methods: {
         async newCategory(name) {
@@ -177,7 +179,9 @@ export default {
         },
         async loadProdCategories() {
             try {
-                await this.$store.dispatch('products/getProdCategories', {});
+                await this.$store.dispatch('products/getProdCategories', {
+                    userId: this.userId
+                });
             } catch (e) {
                 console.log(e);
             }
