@@ -236,7 +236,7 @@
                 const products = await this.$store.dispatch("products/onFetchProducts",{
                     offset: 0,
                     limit: 30,
-                    productName: filterValue
+                    searchKey: filterValue
                 })
                 return products.length
             },
