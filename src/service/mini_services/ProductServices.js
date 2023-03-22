@@ -50,13 +50,10 @@ export default {
         return res.data
     },
 
-    async getProdCategories(offset, limit) {
+    async getProdCategories(params) {
         const res = await ApiConfig.getMethods({
             api: '/category',
-            params: {
-                limit: limit,
-                offset: offset
-            }
+            params: params
         })
 
         return res.data

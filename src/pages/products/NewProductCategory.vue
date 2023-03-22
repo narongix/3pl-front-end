@@ -52,6 +52,11 @@ export default {
             }
         }
     },
+    computed:{
+        getUserId(){
+            return this.$store.getters["auth/getUserId"];
+        }
+    },
     methods: {
         async submitForm() {
             // when created failed internet 
@@ -82,11 +87,13 @@ export default {
             await this.$store.dispatch("products/onFetchProducts", {
                 offset: 0
             })
-            await this.$store.dispatch("products/getProdCategories")
+            await this.$store.dispatch("products/getProdCategories", {
+                userId: this.getUserId
+            });
         }
     },
     created() {
-        this.toLoad = this.initData
+        this.toLoad = this.initData;
     }
 }
 </script>

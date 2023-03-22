@@ -183,10 +183,14 @@ export default {
 
             return products
         },
-        async getProdCategories(context) {
+        async getProdCategories({ commit }, {userId}) {
             try {
-                const categories = await ApiService.getProdCategories()
-                context.commit('updateProductCategoryState', categories);
+                const params = {
+                    user_id: userId
+                }
+
+                const categories = await ApiService.getProdCategories(params);
+                commit('updateProductCategoryState', categories);
             }
             catch (e) {
                 const error = new Error(e || 'Cannot retrieve categories!');
