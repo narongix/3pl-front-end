@@ -66,10 +66,17 @@ export default{
     },
 
     actions:{
-        async getRecipients({ commit, getters }, {offset, searchString}){
-            const filterValue = searchString? searchString : "" 
+        async getRecipients({ commit, getters }, {offset, searchString, userId}){
+            const filterValue = searchString ?? ""; 
 
-            const data = await ApiService.getRecipients(offset, getters["getLimit"], filterValue)
+            const params = {
+                offset: offset,
+                limit: getters["getLimit"], 
+                search_string: filterValue,
+                user_id: userId
+            }
+
+            const data = await ApiService.getRecipients(params)
             commit("updateRecipientState", data)
             return data
         },

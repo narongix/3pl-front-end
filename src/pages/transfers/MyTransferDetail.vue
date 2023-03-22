@@ -5,6 +5,7 @@
 	:data="oldData"
 	:FieldNotActive="fieldNotActive"
 	:disabledField="disabledField" :popup="myPopUp"
+	:vanishField="vanishField"
 	>
 		<template #myTop="">
 			<RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -30,6 +31,7 @@
 	import BaseFieldForm from './components/BaseFormField.vue';
 	import RetryField from '../../components/prompt_field/RetryField.vue';
 	import { transferId } from '../../domains/domain';
+	import { mapGetters } from 'vuex';
 
 	export default{
 		async created(){
@@ -48,6 +50,16 @@
 					transfer_type_id: true,
 					destination: true,
 					reference: false,
+					userSelector: true
+				},
+				vanishField: {
+					scheduleDate: false,
+					recipient: false,
+					source: false,
+					transfer_type_id: false,
+					destination: false,
+					reference: false,
+					userSelector: true,
 				},
                 baseData:{
                     titleForm: "Transfer Detail",
@@ -67,6 +79,11 @@
 			}
 		},
 		computed:{
+			...mapGetters({
+				userRole: "auth/getUserRole",
+				myUserId: "auth/getUserId"
+			}),
+
 			getDataState(){
 				return  this.$store.getters["transfers/findTransferDetail"](this.$route.params.id)
 			},
@@ -135,7 +152,8 @@
 			async loadData(){
 				await this.$store.dispatch("transferType/getTransferType")
 				await this.$store.dispatch("recipient/getRecipients",{
-					offset: 0
+					offset: 0,
+					userId: this.myUserId
 				})
 
 				await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
@@ -168,9 +186,11 @@
 						id : transfer.id,
 						created, 
 						updated, 
-						deleted})
-					this.changeEditState()
-					this.$toast.add({severity:"success",summary:"Success", detail:"Transfer Edited Successfully", life:3000})
+						deleted,
+					});
+
+					this.changeEditState();
+					this.$toast.add({severity:"success",summary:"Success", detail: "Transfer Edited Successfully", life:3000});
 				}
 			},
 

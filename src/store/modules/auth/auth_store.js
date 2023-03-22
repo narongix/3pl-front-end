@@ -1,5 +1,6 @@
 import ApiService from '../../../service/ApiService.js';
 import LocalStorageKeys from "../../../domains/LocalStorageKeys.js";
+import { roleGroupId } from '../../../domains/domain.js';
 
 export default {
     namespaced: true,
@@ -13,20 +14,20 @@ export default {
     getters: {
         user(state) {
             if (!state.user) {
-                state.user = Object.assign(state.user ?? {}, JSON.parse(localStorage.getItem(LocalStorageKeys.userKey)))
+                state.user = JSON.parse(localStorage.getItem(LocalStorageKeys.userKey));
             }
+            
             return state.user;  
         },
 
-        isLoggedIn(state) {
-            const myValue = JSON.parse(localStorage.getItem(LocalStorageKeys.loggedInIndicatorKey))
-            state.isLoggedIn =  myValue ?? false
-        
-            return state.isLoggedIn;
+        isLoggedIn(state, getters) {
+            // TODO: Refactor this, getters.user.id is just a temp solution
+            state.isLoggedIn =  getters.user?.id != null;
+            return state.isLoggedIn;    
         },
 
-        getFullName(state) {
-            return (state.user?.first_name ?? "") + " " + (state.user?.last_name ?? "")
+        getFullName(state, getters) {
+            return (getters.user?.first_name ?? "") + " " + (getters.user?.last_name ?? "")
         },
 
         getEmail(state) {
@@ -34,16 +35,17 @@ export default {
         },
 
         getToken(state){
-            const token = state.oneTimeAccessToken ?? localStorage.getItem(LocalStorageKeys.accessTokenkey)
+            const token = state.oneTimeAccessToken ?? localStorage.getItem(LocalStorageKeys.accessTokenkey);
             return token
         },
 
-        getUserId(state){
-            if (!state.user) {
-                state.user = Object.assign(state.user ?? {}, JSON.parse(localStorage.getItem(LocalStorageKeys.userKey)))
-            }
-            
-            return state.user.id;  
+        getUserId(state, getters){
+            return getters.user.id;  
+        },
+
+        getUserRole(state, getters){
+            const role = getters.user?.role?.role_id ?? roleGroupId.User;
+            return role;
         }
     },
     mutations: {
@@ -54,26 +56,32 @@ export default {
 
         setLoggedInState(state, myState){
             state.isLoggedIn = myState
-            localStorage.setItem(LocalStorageKeys.loggedInIndicatorKey, JSON.stringify(myState))
         }
     },
     actions: {
         async logout(context) {
-            await ApiService.logout()
+            await ApiService.logout();
 
-            context.state.user = null
-            context.state.oneTimeAccessToken = null
-            context.state.isLoggedIn = false
+            context.state.user = null;
+            context.state.oneTimeAccessToken = null;
+            context.state.isLoggedIn = false;
 
-            localStorage.removeItem(LocalStorageKeys.userKey)
-            localStorage.removeItem(LocalStorageKeys.loggedInIndicatorKey)
-            localStorage.removeItem(LocalStorageKeys.accessTokenkey)
+            localStorage.removeItem(LocalStorageKeys.userKey);
+            localStorage.removeItem(LocalStorageKeys.accessTokenkey);
         },
 
-        async login(context, payload) {
+        async login(context, {payload, storeData}) {
             const loginData = await ApiService.login(payload)
             context.state.oneTimeAccessToken = loginData.access_token
 
+            if (storeData) {
+                localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(loginData.user))
+                localStorage.setItem(LocalStorageKeys.accessTokenkey, loginData.access_token)
+              }
+              else{
+                localStorage.removeItem(LocalStorageKeys.accessTokenkey)
+                localStorage.removeItem(LocalStorageKeys.userKey)
+              }
             context.commit('setUser', {
                 user: loginData.user,
                 isLoggedIn: true

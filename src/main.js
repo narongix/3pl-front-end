@@ -106,7 +106,6 @@ import vSelect from "vue-select";
 
 import { FilterService, FilterMatchMode } from "primevue/api"
 
-
 router.beforeEach(function(to, from, next) {
     window.scrollTo(0, 0);
     next();
@@ -148,6 +147,7 @@ app.use(PrimeVue, { ripple: true, inputStyle: 'outlined',
     ]
  }
 });
+
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(router);

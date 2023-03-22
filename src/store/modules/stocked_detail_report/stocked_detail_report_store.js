@@ -92,7 +92,6 @@ export default{
 
             const newProductIds = convertListToObject({myList: sku, name: "skus"}) ?? null;
             const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
-            console.log("acitve?rpdi: " + activeProduct)
             
             const param = {
                 owner_id: store.getters["auth/user"]?.odoo_id,
