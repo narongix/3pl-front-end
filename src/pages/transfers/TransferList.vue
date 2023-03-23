@@ -8,11 +8,21 @@
           <p></p>
 
           <!-- NOTE: Possible to implement sort and load api through @sort -->
-          <DataTable :value="dataList" :paginator="true" class="p-datatable-sm" dataKey="id"
+          <DataTable :value="dataList" :paginator="true" class="p-datatable-sm" dataKey="tmpId"
             :rowHover="true" filterDisplay="menu" :loading="isLoading" responsiveLayout="scroll"
-            v-model:selection="mySelected" v-model:filters="filters" @page="onPage($event)" v-model:rows="row"
+            v-model:selection="mySelected" v-model:filters="filters" @page="onPage($event)" v-model:rows="rows"
             :rowsPerPageOptions="[10,20,30]" :totalRecords="getTotalRecords" removableSort
             >
+
+              <template v-if="isAdmin" #header>
+                <div class="formgrid grid">
+                  <div class="col-12">
+                    <label>User</label>
+                    <UserDropDownPagination v-model:userSelector="userSelector">
+                    </UserDropDownPagination>  
+                  </div>
+                </div>
+              </template>
 
               <template #empty>
                 <p :onload="findData(MyCountDown.startCountdown)">No Transfer found.</p>
@@ -99,8 +109,6 @@
               </Column>
             </DataTable>
           
-
-          
           <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingTransfer"></RetryField>
           <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="onDecline"
                       :message="message"/>
@@ -137,20 +145,23 @@
   import CalendarTime from "@/pages/transfers/components/CalendarTime.vue";
   import CountDown from "../../components/CountDown.vue"
   import TransferTypeField from "./components/TransferTypeField.vue"
-
+  import UserDropDownPagination from "../../components/UserDropDownPagination.vue"
+  import { roleGroupId } from "../../domains/domain"
+  
   export default {
     created() {
       this.toLoadRetry = this.initData
     },
     components: {
-      CalendarTime,
-      TransferItem,
-      RetryField,
-      PromptField,
-      TransferStatusField,
-      CountDown,
-      TransferTypeField,
-    },
+    CalendarTime,
+    TransferItem,
+    RetryField,
+    PromptField,
+    TransferStatusField,
+    CountDown,
+    TransferTypeField,
+    UserDropDownPagination
+},
     data() {
       return {
         loading1: false,
@@ -160,7 +171,7 @@
 
         dataList: [],
 
-        row: 10,
+        rows: 10,
 
         filters: {
           id: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -197,6 +208,9 @@
           summary: "Error!",
           detail: "Failed Loading Transfer!"
         },
+
+        userSelector: null,
+        myPageTracker:0,
       }
     },
     computed: {
@@ -204,7 +218,9 @@
         myTransfers: "transfers/getTransfers",
         hasTransfers: "transfers/hasTransfers",
         LoginStatus: "isLoggedIn",
-        getTotalRecords: "transfers/getTotalRecords"
+        getTotalRecords: "transfers/getTotalRecords",
+
+        getUserRole: "auth/getUserRole"
       }),
 
       convertToList() {
@@ -227,6 +243,9 @@
       isLoading() {
         return this.loading1 && !this.$store.state.transfers.transfers
       },
+      isAdmin(){
+        return this.getUserRole == roleGroupId.Admin;
+      }
     },
     methods: {
       onInputStatusId(id, filterCallback){
@@ -298,10 +317,11 @@
       },
 
       onPage(event) {
+        this.myPageTracker = event.page;
         this.toLoadRetry = async () => {
             const transfers = await this.$store.dispatch("transfers/getTransfers", {
               currentOffset: event.first,
-              limit: this.row
+              limit: this.rows
             })
             const offset= event.first
             const limit = event.rows
@@ -310,23 +330,38 @@
       },
 
       async initData() {
-        this.message.failed = "Loading failed, retry?"
-        const transfer = await this.$store.dispatch("transfers/getTransfers", {
-          limit: this.row * 2,
-          offset: 0
-        })
-
-        await this.$store.dispatch("transfers/getTotalRecords")
-        
-        for(let i=0; i<this.getTotalRecords; i++){
-          this.dataList.push({id: i, temp_id: i})
+        if(this.getUserRole == roleGroupId.Admin){
+          await this.$store.dispatch("user/fetchUser", {
+              offset: 0,
+              limit: 10,
+          });
         }
+
+        this.searchTransfer();
+      },
+
+      async searchTransfer(onPage){
+        this.message.failed = "Loading failed, retry?"
+        const products = await this.$store.dispatch("transfers/getTransfers", {
+            offset: this.onPage*this.rows,
+            limit: this.rows,
+            userId: this.userSelector
+        });
+
+        await this.$store.dispatch("transfers/getTotalRecords",{
+            userId: this.userSelector
+        });
+
+        this.initList();
+        this.updateList({offset: onPage? onPage*this.rows : 0, row: this.rows, tempList: products});
         
-        this.updateList({
-          offset: 0, 
-          row: this.row, 
-          tempList: transfer
-        })
+      },
+
+      initList(){
+        this.dataList.length=0;
+        for(let i=0; i<this.getTotalRecords; i++){
+          this.dataList.push({tmpId: i});
+        }
       },
 
       noRetry() {
@@ -365,13 +400,14 @@
       },
 
       updateList({offset, row, tempList}){
-        let index=0
+        let index=0;
         for(let i=offset; i<row+offset; i++){
           if(!(tempList?.[index])){
             break
           }
-            this.dataList[i]=tempList[index]
-            index++
+            const myId = this.dataList[i].tmpId;
+            this.dataList[i]={tmpId: myId, ...tempList[index]};
+            index++;
         }
       },
     },
@@ -387,7 +423,21 @@
         if (this.mySelected <= 0) {
           this.promptDeleted = false
         }
-      }
+      },
+
+      userSelector:{
+            immediate:true,
+            handler(newValue){
+                if(newValue){
+                    this.toLoadRetry = async () => {
+                      await this.searchTransfer(this.myPageTracker);
+                    }
+                }
+                this.toLoadRetry = async() => {
+                  await this.searchTransfer(this.myPageTracker);
+                };
+            }
+        }
     }
   }
 </script>
