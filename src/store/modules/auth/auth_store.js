@@ -50,13 +50,13 @@ export default {
     },
     mutations: {
         setUser(state, payload) {
-            state.user = payload.user;
-            state.isLoggedIn = payload.isLoggedIn;
-            state.oneTimeAccessToken = payload.oneTimeAccessToken;
+            state.user = payload?.user;
+            state.isLoggedIn = payload?.isLoggedIn;
+            state.oneTimeAccessToken = payload?.oneTimeAccessToken;
 
-            if(payload.user){
-                localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(payload.user))
-                localStorage.setItem(LocalStorageKeys.accessTokenkey, payload.access_token)
+            if(payload?.user){
+                localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(payload?.user))
+                localStorage.setItem(LocalStorageKeys.accessTokenkey, payload?.access_token)
             }else{
                 localStorage.removeItem(LocalStorageKeys.userKey);
                 localStorage.removeItem(LocalStorageKeys.accessTokenkey);
@@ -68,8 +68,10 @@ export default {
         }
     },
     actions: {
-        async logout() {
+        async logout({ commit }) {
             await ApiService.logout();
+            commit("setUser");
+            commit("setLoggedInState", false);
         },
 
         async login({ commit }, {payload, storeData}) {
@@ -88,7 +90,8 @@ export default {
 
         // Incase there is token expire
         forcedLogOut({ commit }){
-          commit("setLoggedInState", {storeData: false})
+            commit("setUser");
+            commit("setLoggedInState", false);
         }
     }
 }

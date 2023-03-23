@@ -11,7 +11,7 @@
                     :paginator="true" 
                     class="p-datatable-sm" 
                     :rows="rows" 
-                    dataKey="product_id"
+                    dataKey="tmpId"
                     :rowHover="true" 
                     filterDisplay="menu" 
                     responsiveLayout="scroll"
@@ -19,19 +19,11 @@
                     v-model:filters="filters" 
                     @page="onPage"
                 >
-                    <template #header>
-                        <div v-if="isAdmin" class="formgrid grid">
+                    <template v-if="isAdmin" #header>
+                        <div class="formgrid grid">
                             <div class="col-12">
                                 <label for="id">User</label>
-
-                                <DropDownPagination v-model="userSelector" :options="getUsers" optionLabel="full_name" optionValue="id"
-                                :disabled="false" id="id" inputId="id" placeholder="Please select a user" 
-                                :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
-                                :maxLength="getUserLength" :showClear="true"
-                                :errorToastLoading="errorToastLoadingUsers" :messageLoad="messageLoadUser"
-                                :showOption="option => option.full_name"
-                                >
-                                </DropDownPagination>
+                                <UserDropDownPagination v-model:userSelector="userSelector"></UserDropDownPagination>
                             </div>
                         </div>
                     </template>
@@ -135,7 +127,7 @@
         </div>
     </div>
     <template>
-        <RetryField :toLoad="toLoadProduct" :message="message" :errorToast="errorToastDeletingProduct"></RetryField>
+        <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingProduct"></RetryField>
     </template>
 </template>
 <script>
@@ -149,7 +141,7 @@ import DropDownPagination from '../../components/DropDownPagination.vue';
 
 export default {
     async created() {
-        this.toLoadProduct = this.initData
+        this.toLoadRetry = this.initData
     },
     components: {
         RetryField,
@@ -177,7 +169,7 @@ export default {
                 { label: "Contains", value: FilterMatchMode.CONTAINS },
                 { label: "Equals", value: FilterMatchMode.EQUALS },
             ],
-            toLoadProduct: null,
+            toLoadRetry: null,
             message: {
                 failed: "Error Loading Data. Try again?",
                 yesButton: "Yes",
@@ -197,12 +189,7 @@ export default {
         ...mapGetters({
             getProductLength: "products/getProductLength",
             getUserId: "auth/getUserId",
-            getUserRole: "auth/getUserRole",
-
-            
-            getUsers: "user/getUser",
-            getUserLength: "user/getUserLength",
-            getUserLimit: "user/getUserLimit",
+            getUserRole: "auth/getUserRole"
         }),
 
         products() {
@@ -211,22 +198,6 @@ export default {
 
         isAdmin(){
             return this.getUserRole == roleGroupId.Admin;
-        },
-
-        messageLoadUser(){
-            return {
-                failed: "Error loading Users, retry?",
-                yesButton: "Yes",
-                noButton: "No",
-            };
-        },
-
-        errorToastLoadingUsers(){
-            return{
-                severity:"error",
-                summary: "Error!",
-                detail: "Failed Loading Users!"    
-            };
         },
     },
     
@@ -249,7 +220,7 @@ export default {
             this.deleteProductDialog = true;
         },
         async deleteProduct() {
-            this.toLoadProduct = async () => {
+            this.toLoadRetry = async () => {
                 this.deleteProductDialog = false;
                 const actionPayload = {
                     id: this.product.product_id,
@@ -263,7 +234,7 @@ export default {
         },
 
         async initData() {
-            if(this.getUserRole == roleGroupId.Admin){
+            if(this.isAdmin){
                 await this.$store.dispatch("user/fetchUser", {
                     offset: 0,
                     limit: 10,
@@ -289,7 +260,7 @@ export default {
 
         async onPage(event) {
             this.myPageTracker = event.page;
-            this.toLoadProduct = async ()=>{
+            this.toLoadRetry = async ()=>{
                 const products = await this.$store.dispatch("products/onFetchProducts", {
                     offset: event.first,
                     limit: this.rows,
@@ -304,7 +275,7 @@ export default {
         initList(){
             this.dataList.length=0;
             for(let i=0; i<this.getProductLength; i++){
-                this.dataList.push({product_id: i});
+                this.dataList.push({tmpId: i});
             }
         },
 
@@ -314,7 +285,8 @@ export default {
                 if(!(tempList?.[index])){
                     break
                 }
-                this.dataList[i]=tempList[index]
+                const myId = this.dataList[i].tmpId;
+                this.dataList[i]={tmpId: myId, ...tempList[index]};
                 index++
             }
         },
@@ -329,26 +301,6 @@ export default {
         navigateToDetail(id){
             this.$router.push({name: "productDetail", params: {id: id}});
         },
-
-
-
-
-        async findUser(filterValue) {
-            await this.$store.dispatch("user/fetchUser", {
-                offset: 0,
-                userName: filterValue,
-                limit: this.rows
-            });
-        },
-
-        async onLoadUser(offset){
-            const users = await this.$store.dispatch("user/fetchUser", {
-                offset: offset,
-                limit: this.rows,
-            });
-
-            return users.length;
-        },     
     },
 
     watch:{
@@ -356,9 +308,13 @@ export default {
             immediate:true,
             handler(newValue){
                 if(newValue){
-                    this.SearchProduct(this.myPageTracker);
+                    this.toLoadRetry = async () => {
+                        await this.SearchProduct(this.myPageTracker);
+                    }
                 }
-                this.SearchProduct(this.myPageTracker);
+                this.toLoadRetry = async()=>{
+                    await this.SearchProduct(this.myPageTracker);
+                }
             }
         }
     }
