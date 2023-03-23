@@ -25,7 +25,6 @@
 import AppTopBar from './AppTopbar.vue';
 import AppMenu from './AppMenu.vue';
 import AppConfig from './AppConfig.vue';
-import { roleGroupId } from './domains/domain';
 import { mapGetters } from 'vuex';
 
 // import AppFooter from './AppFooter.vue';
