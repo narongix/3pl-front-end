@@ -99,8 +99,11 @@ export default {
 
     },
     actions: {
-        async getProductLength({ commit }){
-            const maxProductLength = await ApiService.getProductLength();
+        async getProductLength({ commit }, myParams){
+            const params = {
+                user_id: myParams?.userId
+            };
+            const maxProductLength = await ApiService.getProductLength(params);
             commit("setProductLength", maxProductLength.total_products);
         },
 
@@ -175,7 +178,7 @@ export default {
                 limit: limit,
                 product_name: productName,
                 search_key: searchKey,
-                user_id: userId
+                user_id: userId 
             }
             
             const products = await ApiService.getProducts(params)

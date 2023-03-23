@@ -25,6 +25,9 @@
 import AppTopBar from './AppTopbar.vue';
 import AppMenu from './AppMenu.vue';
 import AppConfig from './AppConfig.vue';
+import { roleGroupId } from './domains/domain';
+import { mapGetters } from 'vuex';
+
 // import AppFooter from './AppFooter.vue';
 
 export default {
@@ -61,9 +64,9 @@ export default {
                     label: 'Billing',
                     items:[
                         {label: 'Billing statement', icon: 'pi pi-fw pi-products', to: '/billing'}
+
                     ]
                 },
-                this.isLogin
             ]
         }
     },
@@ -143,6 +146,9 @@ export default {
         }
     },
     computed: {
+        ...mapGetters({
+            getUserRole: "auth/getUserRole",    
+        }),
         containerClass() {
             return ['layout-wrapper', {
                 'layout-overlay': this.layoutMode === 'overlay',
@@ -153,23 +159,6 @@ export default {
 				'p-input-filled': this.$primevue.config.inputStyle === 'filled',
 				'p-ripple-disabled': this.$primevue.config.ripple === false
             }];
-        },
-        isLogin(){
-            const loggedIn = this.$state.getters["isLoggedIn"]
-            const page ={
-					label: 'Pages', icon: 'pi pi-fw pi-clone',
-					items: [
-						// {label: 'Crud', icon: 'pi pi-fw pi-user-edit', to: '/crud'},
-						// {label: 'Timeline', icon: 'pi pi-fw pi-calendar', to: '/timeline'},
-                            {label: 'Login', icon: 'pi pi-fw pi-sign-in', to: '/login'}
-                        // {label: 'Error', icon: 'pi pi-fw pi-times-circle', to: '/error'},
-                        // {label: 'Not Found', icon: 'pi pi-fw pi-exclamation-circle', to: '/notfound'},
-                        // {label: 'Access Denied', icon: 'pi pi-fw pi-lock', to: '/access'},
-						// {label: 'Empty', icon: 'pi pi-fw pi-circle-off', to: '/empty'},
-					]
-				}
-
-            return loggedIn? null : page
         },
         logo() {
             return (this.$appState.darkTheme) ? "images/logo-white.svg" : "images/logo.svg";

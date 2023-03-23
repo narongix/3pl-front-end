@@ -11,7 +11,7 @@ async function authException(exception){
 
         // If Unauthenticated
         if(data.status == 401){
-            store.dispatch('auth/setLoggedInMode', false)
+            store.dispatch('auth/forcedLogOut')
             await router.replace({name: "login"})
             return
         }

@@ -16,7 +16,13 @@ const adminRoutes = [
             }
             return {name: "productList"};
         }
-    }
+    },
+    // {
+    //     path: "products_admin/",
+    //     name: "productListAdmin",
+    //     component: ()=>import('./pages/products/admin/AdminProductList.vue'),
+    //     meta:{role: roleGroupId.Admin}
+    // }
 ];
 
 const routes = [
