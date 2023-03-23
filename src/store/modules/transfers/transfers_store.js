@@ -71,12 +71,13 @@ export default{
     },
 
     actions:{
-        async getTransfers({ commit }, {currentOffset, limit, params}){
-            const data = await ApiService.getTransfers({
+        async getTransfers({ commit }, {currentOffset, limit, userId}){
+            const params = {
                 offset: currentOffset,
                 limit: limit, 
-                ...params
-            })
+                user_id: userId,
+            };
+            const data = await ApiService.getTransfers(params)
 
             commit("updateTransferState", data)
             return data
@@ -135,8 +136,11 @@ export default{
             commit("deleteTransferState", transfers)
         },
 
-        async getTotalRecords({commit}){
-            const data = await ApiService.getTransferTotalRecords();
+        async getTotalRecords({commit}, { userId }){
+            const params = {
+                user_id: userId
+            };
+            const data = await ApiService.getTransferTotalRecords(params);
             commit("updateTotalTransfer", data.total_transfers)
         }
     },

@@ -52,7 +52,7 @@ export default {
         setUser(state, payload) {
             state.user = payload?.user;
             state.isLoggedIn = payload?.isLoggedIn;
-            state.oneTimeAccessToken = payload?.oneTimeAccessToken;
+            state.oneTimeAccessToken = payload?.access_token;
 
             if(payload?.user){
                 localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(payload?.user))
@@ -80,7 +80,7 @@ export default {
             commit('setUser', {
                 user: loginData.user,
                 isLoggedIn: true,
-                oneTimeAccessToken: loginData.access_token,
+                access_token: loginData.access_token,
                 // Whether the user only one a one time access
                 storeData: storeData
             });

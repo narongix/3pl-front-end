@@ -137,7 +137,7 @@ import { FilterMatchMode } from "primevue/api";
 import { mapGetters } from 'vuex';
 import LinkParagraph from '../../components/LinkParagraph.vue';
 import { roleGroupId } from '../../domains/domain';
-import DropDownPagination from '../../components/DropDownPagination.vue';
+import UserDropDownPagination from '../../components/UserDropDownPagination.vue';
 
 export default {
     async created() {
@@ -146,7 +146,7 @@ export default {
     components: {
         RetryField,
         LinkParagraph,
-        DropDownPagination
+        UserDropDownPagination
     },
     data() {
         return {
@@ -240,12 +240,12 @@ export default {
                     limit: 10,
                 });
             }
-            this.SearchProduct();
+            await this.SearchProduct();
         },
 
-        async SearchProduct(onPage){
+        async SearchProduct(pageNumber){
             const products = await this.$store.dispatch("products/onFetchProducts", {
-                offset: this.onPage*this.rows,
+                offset: (pageNumber || 0) * this.rows,
                 limit: this.rows,
                 userId: this.userSelector
             });
@@ -255,7 +255,7 @@ export default {
             });
     
             this.initList();
-            this.updateList({offset: onPage? onPage*this.rows : 0, row: this.rows, tempList: products});
+            this.updateList({offset: pageNumber? pageNumber*this.rows : 0, row: this.rows, tempList: products});
         },
 
         async onPage(event) {
@@ -312,7 +312,7 @@ export default {
                         await this.SearchProduct(this.myPageTracker);
                     }
                 }
-                this.toLoadRetry = async()=>{
+                this.toLoadRetry = async() => {
                     await this.SearchProduct(this.myPageTracker);
                 }
             }

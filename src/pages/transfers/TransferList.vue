@@ -321,7 +321,8 @@
         this.toLoadRetry = async () => {
             const transfers = await this.$store.dispatch("transfers/getTransfers", {
               currentOffset: event.first,
-              limit: this.rows
+              limit: this.rows,
+              userId: this.userSelector
             })
             const offset= event.first
             const limit = event.rows
@@ -340,20 +341,21 @@
         this.searchTransfer();
       },
 
-      async searchTransfer(onPage){
+      async searchTransfer(pageNumber){
         this.message.failed = "Loading failed, retry?"
-        const products = await this.$store.dispatch("transfers/getTransfers", {
-            offset: this.onPage*this.rows,
-            limit: this.rows,
-            userId: this.userSelector
-        });
 
         await this.$store.dispatch("transfers/getTotalRecords",{
             userId: this.userSelector
         });
 
         this.initList();
-        this.updateList({offset: onPage? onPage*this.rows : 0, row: this.rows, tempList: products});
+
+        const products = await this.$store.dispatch("transfers/getTransfers", {
+            currentOffset: (pageNumber || 0) * this.rows,
+            limit: this.rows ?? 0,
+            userId: this.userSelector
+        });
+        this.updateList({offset: pageNumber? pageNumber*this.rows : 0, row: this.rows, tempList: products});
         
       },
 
@@ -405,9 +407,9 @@
           if(!(tempList?.[index])){
             break
           }
-            const myId = this.dataList[i].tmpId;
-            this.dataList[i]={tmpId: myId, ...tempList[index]};
-            index++;
+          const myId = this.dataList[i].tmpId;
+          this.dataList[i]={tmpId: myId, ...tempList[index]};
+          index++;
         }
       },
     },
