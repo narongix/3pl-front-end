@@ -57,7 +57,6 @@ export default {
             loading1: true,
             deleteProductDialog: false,
             temp: null,
-            disabled: false,
             toLoadCategory: null,
             message: {
                 failed: "Error Loading Data. Try again?",
@@ -81,7 +80,6 @@ export default {
     },
     created() {
         this.loadProductCategories();
-        this.warnDisabled();
         this.toLoadCategory = this.initData
     },
     methods: {
@@ -89,9 +87,11 @@ export default {
             return id == this.$route.query.id ?? false
         },
         async loadProductCategories(refresh = false) {
+            const userId = this.$store.getters["auth/getUserId"];
             try {
                 await this.$store.dispatch('products/getProdCategories', {
                     forceRefresh: refresh,
+                    userId: userId
                 });
             } catch (error) {
                 this.error = error.message || 'Something went wrong!';
@@ -105,12 +105,6 @@ export default {
             this.temp = category;
 
             this.deleteProductDialog = true;
-        },
-        warnDisabled() {
-            this.disabled = true;
-            setTimeout(() => {
-                this.disabled = false;
-            }, 1500)
         },
         async deleteProductCategory() {
             this.toLoadCategory = async () => {
@@ -126,10 +120,13 @@ export default {
             }
         },
         async initData() {
+            const userId = this.$store.getters["auth/getUserId"];
             await this.$store.dispatch("products/onFetchProducts", {
                 offset: 0
             })
-            await this.$store.dispatch("products/getProdCategories")
+            await this.$store.dispatch("products/getProdCategories",{
+                userId: userId
+            })
         }
     },
 

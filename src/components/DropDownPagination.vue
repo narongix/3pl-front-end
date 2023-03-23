@@ -4,11 +4,12 @@
               :disabled="disabled"
               :id="id"
               :class="{'p-invalid': validation}"
-              :placeholderSearch="placeholderSearch"
+              :placeholder="placeholder"
               :filter="true"
-              :selectOnFocus="true"
+              :selectOnFocus="selectOnFocus ?? true"
               @filter="onFilter($event)" @blur="stopLoading"
               :virtualScrollerOptions="{lazy:true, onLazyLoad: onload, showLoader:true, loading: loading, itemSize:38}"
+              :inputId="inputId" :showClear="showClear"
     >
       <template #value="slotProps">
         <p v-if="showValue">{{ showValue?.(slotProps.value) }}</p>
@@ -28,7 +29,7 @@
           <Skeleton :width="options.even ? '60%' : '50%'"/>
         </div>
       </template>
-    </Dropdown>
+    </Dropdown>  
   </CountDown>
 </template>
 
@@ -42,11 +43,12 @@
       CountDown
     },
     props: {
+      inputId: String,
       modelValue: null,
       disabled: Boolean,
       validation: null,
       optionLabel: String,
-      placeholderSearch: String,
+      placeholder: String,
       optionValue: String,
       id: String,
       options: Array,
@@ -57,6 +59,8 @@
       maxLength: Number,
       showOption: Function,
       showValue: Function,
+      showClear: Boolean,
+      selectOnFocus: Boolean
     },
     data() {
       return {

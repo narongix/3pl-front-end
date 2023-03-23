@@ -19,6 +19,22 @@
                     v-model:filters="filters" 
                     @page="onPage"
                 >
+                    <template #header>
+                        <div v-if="isAdmin" class="formgrid grid">
+                            <div class="col-12">
+                                <label for="id">User</label>
+
+                                <DropDownPagination v-model="userSelector" :options="getUsers" optionLabel="full_name" optionValue="id"
+                                :disabled="false" id="id" inputId="id" placeholder="Please select a user" 
+                                :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
+                                :maxLength="getUserLength" :showClear="true"
+                                :errorToastLoading="errorToastLoadingUsers" :messageLoad="messageLoadUser"
+                                :showOption="option => option.full_name"
+                                >
+                                </DropDownPagination>
+                            </div>
+                        </div>
+                    </template>
                     <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
@@ -129,12 +145,17 @@ import { FilterMatchMode } from "primevue/api";
 import { mapGetters } from 'vuex';
 import LinkParagraph from '../../components/LinkParagraph.vue';
 import { roleGroupId } from '../../domains/domain';
+import DropDownPagination from '../../components/DropDownPagination.vue';
 
 export default {
+    async created() {
+        this.toLoadProduct = this.initData
+    },
     components: {
-    RetryField,
-    LinkParagraph
-},
+        RetryField,
+        LinkParagraph,
+        DropDownPagination
+    },
     data() {
         return {
             rows: 10,        
@@ -166,32 +187,54 @@ export default {
                 severity: "error",
                 summary: "Error!",
                 detail: "Failed Deleting Product!"
-            }
+            },
+
+            userSelector: null,
+            myPageTracker: 0,
         }
     },
     computed: {
         ...mapGetters({
-            getProductLength: "products/getProductLength"
+            getProductLength: "products/getProductLength",
+            getUserId: "auth/getUserId",
+            getUserRole: "auth/getUserRole",
+
+            
+            getUsers: "user/getUser",
+            getUserLength: "user/getUserLength",
+            getUserLimit: "user/getUserLimit",
         }),
 
         products() {
             return this.$store.getters['products/getProductState'];
-        }
+        },
+
+        isAdmin(){
+            return this.getUserRole == roleGroupId.Admin;
+        },
+
+        messageLoadUser(){
+            return {
+                failed: "Error loading Users, retry?",
+                yesButton: "Yes",
+                noButton: "No",
+            };
+        },
+
+        errorToastLoadingUsers(){
+            return{
+                severity:"error",
+                summary: "Error!",
+                detail: "Failed Loading Users!"    
+            };
+        },
     },
-    async created() {
-        this.toLoadProduct = this.initData
-        this.warnDisabled();
-    },
+    
     methods: {
         activateOrNot(product_name) {
             return product_name == this.$route.query.name ?? false
         },
-        warnDisabled() {
-            this.disabled = true;
-            setTimeout(() => {
-                this.disabled = false;
-            }, 1500)
-        },
+
         goToNewProduct() {
             const userId = this.$store.getters["auth/getUserRole"];
             if(userId == roleGroupId.Admin){
@@ -220,27 +263,48 @@ export default {
         },
 
         async initData() {
-            const products = await this.$store.dispatch("products/onFetchProducts", {
-                offset: 0,
-                limit: this.rows
-            })
-            
-            await this.$store.dispatch("products/getProductLength")
-        
-            for(let i=0; i<this.getProductLength; i++){
-                this.dataList.push({product_id: i})
+            if(this.getUserRole == roleGroupId.Admin){
+                await this.$store.dispatch("user/fetchUser", {
+                    offset: 0,
+                    limit: 10,
+                });
             }
-            this.updateList({offset:0, row: this.rows, tempList: products})
+            this.SearchProduct();
         },
+
+        async SearchProduct(onPage){
+            const products = await this.$store.dispatch("products/onFetchProducts", {
+                offset: this.onPage*this.rows,
+                limit: this.rows,
+                userId: this.userSelector
+            });
+
+            await this.$store.dispatch("products/getProductLength",{
+                userId: this.userSelector
+            });
+    
+            this.initList();
+            this.updateList({offset: onPage? onPage*this.rows : 0, row: this.rows, tempList: products});
+        },
+
         async onPage(event) {
+            this.myPageTracker = event.page;
             this.toLoadProduct = async ()=>{
                 const products = await this.$store.dispatch("products/onFetchProducts", {
                     offset: event.first,
-                    limit: this.rows
+                    limit: this.rows,
+                    userId: this.userSelector
                 })
                 const offset = event.first
                 const limit = event.rows
                 this.updateList({offset: offset, row:limit, tempList: products})
+            }
+        },
+
+        initList(){
+            this.dataList.length=0;
+            for(let i=0; i<this.getProductLength; i++){
+                this.dataList.push({product_id: i});
             }
         },
 
@@ -261,10 +325,43 @@ export default {
                 this.dataList.splice(index, 1)
             }
         },
+
         navigateToDetail(id){
             this.$router.push({name: "productDetail", params: {id: id}});
-        }
+        },
+
+
+
+
+        async findUser(filterValue) {
+            await this.$store.dispatch("user/fetchUser", {
+                offset: 0,
+                userName: filterValue,
+                limit: this.rows
+            });
+        },
+
+        async onLoadUser(offset){
+            const users = await this.$store.dispatch("user/fetchUser", {
+                offset: offset,
+                limit: this.rows,
+            });
+
+            return users.length;
+        },     
     },
+
+    watch:{
+        userSelector:{
+            immediate:true,
+            handler(newValue){
+                if(newValue){
+                    this.SearchProduct(this.myPageTracker);
+                }
+                this.SearchProduct(this.myPageTracker);
+            }
+        }
+    }
 }
 </script>
 

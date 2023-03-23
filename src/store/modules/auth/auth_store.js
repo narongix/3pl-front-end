@@ -52,6 +52,15 @@ export default {
         setUser(state, payload) {
             state.user = payload.user;
             state.isLoggedIn = payload.isLoggedIn;
+            state.oneTimeAccessToken = payload.oneTimeAccessToken;
+
+            if(payload.user){
+                localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(payload.user))
+                localStorage.setItem(LocalStorageKeys.accessTokenkey, payload.access_token)
+            }else{
+                localStorage.removeItem(LocalStorageKeys.userKey);
+                localStorage.removeItem(LocalStorageKeys.accessTokenkey);
+            }
         },
 
         setLoggedInState(state, myState){
@@ -59,40 +68,27 @@ export default {
         }
     },
     actions: {
-        async logout(context) {
+        async logout() {
             await ApiService.logout();
-
-            context.state.user = null;
-            context.state.oneTimeAccessToken = null;
-            context.state.isLoggedIn = false;
-
-            localStorage.removeItem(LocalStorageKeys.userKey);
-            localStorage.removeItem(LocalStorageKeys.accessTokenkey);
         },
 
-        async login(context, {payload, storeData}) {
+        async login({ commit }, {payload, storeData}) {
             const loginData = await ApiService.login(payload)
-            context.state.oneTimeAccessToken = loginData.access_token
 
-            if (storeData) {
-                localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(loginData.user))
-                localStorage.setItem(LocalStorageKeys.accessTokenkey, loginData.access_token)
-              }
-              else{
-                localStorage.removeItem(LocalStorageKeys.accessTokenkey)
-                localStorage.removeItem(LocalStorageKeys.userKey)
-              }
-            context.commit('setUser', {
+            commit('setUser', {
                 user: loginData.user,
-                isLoggedIn: true
+                isLoggedIn: true,
+                oneTimeAccessToken: loginData.access_token,
+                // Whether the user only one a one time access
+                storeData: storeData
             });
 
             return loginData
         },
 
         // Incase there is token expire
-        setLoggedInMode({ commit }, state){
-          commit("setLoggedInState", state)
+        forcedLogOut({ commit }){
+          commit("setLoggedInState", {storeData: false})
         }
     }
 }
