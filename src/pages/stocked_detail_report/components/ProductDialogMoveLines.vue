@@ -57,6 +57,7 @@
     props: {
         modelValue: Boolean,
         productId: String,
+        userId: String
     },
     emits: ["update:modelValue"],
     data() {
@@ -128,7 +129,8 @@
                 await this.$store.dispatch("products/getDetailProductOnStockDetail", { 
                     productId: this.productId, 
                     limit:this.row*2, 
-                    offset: this.offset
+                    offset: this.offset,
+                    userId: this.userId
                 });
                
                 this.offset =  this.row*2
@@ -140,7 +142,8 @@
                 const data = await this.$store.dispatch("products/getDetailProductOnStockDetail", {
                     productId: this.productId,
                     limit: this.row,
-                    offset: this.offset
+                    offset: this.offset,
+                    userId: this.userId
                 })
 
                 if(data.product_moves.length==0){

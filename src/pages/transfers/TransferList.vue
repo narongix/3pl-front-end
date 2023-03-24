@@ -18,7 +18,7 @@
                 <div class="formgrid grid">
                   <div class="col-12">
                     <label>User</label>
-                    <UserDropDownPagination v-model:userSelector="userSelector">
+                    <UserDropDownPagination v-model:userSelector="userSelector" :rows="rows">
                     </UserDropDownPagination>  
                   </div>
                 </div>

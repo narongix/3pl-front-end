@@ -26,6 +26,7 @@ import AppTopBar from './AppTopbar.vue';
 import AppMenu from './AppMenu.vue';
 import AppConfig from './AppConfig.vue';
 import { mapGetters } from 'vuex';
+import { roleGroupId } from './domains/domain';
 
 // import AppFooter from './AppFooter.vue';
 
@@ -49,7 +50,7 @@ export default {
                     items: [
                         {label: 'Transfers', icon: 'pi pi-fw pi-transfer', to: '/transfers'},
                         // { label: 'Inventory Adjustments', icon: 'pi pi-fw pi-inven-adjust', to: '/inventory-adjustment'}
-                        {label: "Stock Detail Report", icon: 'pi pi-fw pi-file-word',  to: "/stockDetailreport"}
+                        {label: "Stock Detail Report", icon: 'pi pi-fw pi-file-word',  to: this.stockDetailPage()}
                     ]
                 },
                 {
@@ -76,6 +77,14 @@ export default {
         }
     },
     methods: {
+        stockDetailPage(){
+            const userRole = this.$store.getters["auth/getUserRole"];
+            if(userRole == roleGroupId.Admin){
+                return '/stockDetailreport_admin';
+            }else{
+                return '/stockDetailreport';
+            }
+        },
         onWrapperClick() {
             if (!this.menuClick) {
                 this.overlayMenuActive = false;

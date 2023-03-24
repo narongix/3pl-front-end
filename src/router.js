@@ -17,6 +17,18 @@ const adminRoutes = [
             return {name: "productList"};
         }
     },
+    {
+        path: "/stockDetailreport_admin",
+        name: "StockDetailReportAdmin",
+        component: ()=> import("./pages/stocked_detail_report/admin/AdminStockDetailReportPage.vue"),
+        meta: {role:roleGroupId.Admin},
+        beforeEnter:()=>{
+            if(store.getters["auth/getUserRole"] == roleGroupId.Admin){
+                return true;
+            }
+            return {name:"StockDetailReport"};
+        }
+    },
     // {
     //     path: "products_admin/",
     //     name: "productListAdmin",

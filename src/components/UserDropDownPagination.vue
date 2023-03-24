@@ -1,5 +1,5 @@
 <template>
-    <DropDownPagination v-model="myValue" :options="getUsers" optionLabel="full_name" optionValue="id"
+    <DropDownPagination v-model="myValue" :options="getUsers" :optionLabel="optionLabel" :optionValue="optionValue"
     :disabled="false" id="id" inputId="id" placeholder="Please select a user" 
     :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
     :maxLength="getUserLength" :showClear="true"
@@ -10,15 +10,23 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import DropDownPagination from './DropDownPagination.vue';
+    import { mapGetters } from 'vuex';
+    import DropDownPagination from './DropDownPagination.vue';
 
     export default{
         props:{
             userSelector: null,
             loading: String,
             errorLoad: String,
-            rows: Number,            
+            rows: Number,
+            optionLabel:{
+                type: String,
+                default: "full_name",
+            },
+            optionValue:{
+                type: String,
+                default: "id"
+            }
         },
         emits:["update:userSelector"],
         components:{
@@ -56,7 +64,6 @@ import DropDownPagination from './DropDownPagination.vue';
             },
         },
         methods:{
-
             async findUser(filterValue) {
                 await this.$store.dispatch("user/fetchUser", {
                     offset: 0,
