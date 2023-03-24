@@ -98,7 +98,7 @@
                             {{ convert(data.created_at) }}
                         </template>
                     </Column>
-                    <Column field="movement_name" header="Movement Name" style="min-width:12rem"></Column>
+                    <Column field="movement_name" header="Movement" style="min-width:12rem"></Column>
                     <Column field="qty" header="Quantity" style="min-width:12rem"></Column>
                     <Column field="serial" header="Serial/Lot Number" style="min-width:12rem"></Column>
                     <Column field="odoo_reference" header="Odoo Reference" style="min-width:12rem"></Column>
