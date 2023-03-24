@@ -65,7 +65,8 @@
                     titleForm: "Transfer Detail",
                     titleField1: "Transfer Name",
                     titleField2: "Operation Type",
-					buttonSubmit:"Add Transfer Detail"
+					// I don't know how many times I have changed this, god.
+					buttonSubmit:"Add Product"
                 },
 				fieldNotActive: true,
 				oldData: null,
