@@ -53,10 +53,11 @@ export default{
         return res.data
     },
 
-    async getTransferTotalRecords(){
+    async getTransferTotalRecords(params){
         const res = await ApiConfig.getMethods({
-            api: "/transfer/total"
-        })
-        return res.data
+            api: "/transfer/total",
+            params: params
+        });
+        return res.data;
     }
 }
