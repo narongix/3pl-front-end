@@ -107,16 +107,17 @@ export default {
             commit("setProductLength", maxProductLength.total_products);
         },
 
-        async getDetailProductOnStockDetail({commit}, {productId, limit, offset, barcode}){
+        async getDetailProductOnStockDetail({commit}, {productId, limit, offset, barcode, userId}){
             const params = {
                 product_id: productId ?? null,
                 barcode: barcode ?? null,
                 limit: limit, 
                 offset: offset,
-            }
+                user_id: userId
+            };
             const response = await ApiService.getDetailOnProduct(params);
-            commit("updateProductState", [response])
-            return response
+            commit("updateProductState", [response]);
+            return response;
         },
 
         async getDetailProduct({commit}, productId) {

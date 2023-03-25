@@ -1,5 +1,4 @@
 import ApiService from "../../../service/ApiService";
-import store from "../../index";
 import TimeConvert from "../../../components/utils/TimeConvert";
 import { convertListToObject } from "../../../components/utils/MyList";
 
@@ -37,7 +36,7 @@ export default{
         }
     },
     actions:{
-        async onFetchStockReportTotal({ state }, {from_date, to_date, barcodes, sku, activeProduct}){
+        async onFetchStockReportTotal({ state }, {from_date, to_date, barcodes, sku, activeProduct, userId}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date);
             const newToDate = TimeConvert.formatDateToStockFormat(to_date);
 
@@ -45,10 +44,10 @@ export default{
             const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
  
             const params ={
-                owner_id: store.getters["auth/user"]?.odoo_id,
                 from_date: newFromDate,
                 to_date: newToDate,
                 active_product: activeProduct,
+                user_id: userId,
                 ...newProductIds,
                 ...newBarCodes
             }
@@ -60,7 +59,7 @@ export default{
             return data.count;
         },
 
-        async onfetchAndUpdateStockedList({ commit }, {from_date, to_date, limit, offset, barcodes, sku, activeProduct}){
+        async onfetchAndUpdateStockedList({ commit }, {from_date, to_date, limit, offset, barcodes, sku, activeProduct, userId}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date);
             const newToDate = TimeConvert.formatDateToStockFormat(to_date);
 
@@ -68,12 +67,12 @@ export default{
             const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
 
             const params= {
-                owner_id: store.getters["auth/user"]?.odoo_id,
                 from_date: newFromDate,
                 to_date: newToDate,
                 limit: limit ?? 10,
                 offset: offset ?? 0,
                 active_product: activeProduct,
+                user_id: userId,
                 ...newProductIds,
                 ...newBarCodes
             };
@@ -86,7 +85,7 @@ export default{
             return data;
         },
 
-        async onfetchedAndReplaceStockedList({ commit }, {from_date, to_date, limit, offset, barcodes, sku, activeProduct}){
+        async onfetchedAndReplaceStockedList({ commit }, {from_date, to_date, limit, offset, barcodes, sku, activeProduct, userId}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
             const newToDate = TimeConvert.formatDateToStockFormat(to_date)
 
@@ -94,12 +93,12 @@ export default{
             const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
             
             const param = {
-                owner_id: store.getters["auth/user"]?.odoo_id,
                 from_date: newFromDate,
                 to_date: newToDate,
                 limit: limit ?? 10,
-                offset: offset ?? 0,
+                offset: Number(offset ?? 0),
                 active_product: activeProduct,
+                user_id: userId,
                 ...newBarCodes,
                 ...newProductIds
             };

@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import CountDown from '../../../components/CountDown.vue';
+    import CountDown from '../../../components/CountDown.vue';
 
     export default{
     data() {
@@ -35,7 +35,7 @@ import CountDown from '../../../components/CountDown.vue';
             countdown: null,   
             filterValue: null,
             lastType: null,
-            outOfFetch: 3
+            outOfFetch: 3,
         }
     },
     components: { CountDown },
