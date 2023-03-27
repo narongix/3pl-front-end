@@ -5,8 +5,20 @@ import store from "@/store";
 import { roleGroupId } from './domains/domain';
 
 const adminRoutes = [
+    // {
+    //     path: "/products_admin",
+    //     name: "productListAdmin",
+    //     component: ()=>import('./pages/products/admin/AdminProductList.vue'),
+    //     meta:{role: roleGroupId.Admin},
+    //     beforeEnter:()=>{
+    //         if(store.getters["auth/getUserRole"] == roleGroupId.Admin){
+    //             return true;
+    //         }
+    //         return {name: "productList"};
+    //     }
+    // },
     {
-        path: "/products/new_admin/",
+        path: "/products/new_admin",
         name: "createProductAdmin",
         component: () => import("./pages/products/admin/AdminCreateProduct.vue"),
         meta: {requireAuth: true, role: roleGroupId.Admin},
@@ -29,12 +41,7 @@ const adminRoutes = [
             return {name:"StockDetailReport"};
         }
     },
-    // {
-    //     path: "products_admin/",
-    //     name: "productListAdmin",
-    //     component: ()=>import('./pages/products/admin/AdminProductList.vue'),
-    //     meta:{role: roleGroupId.Admin}
-    // }
+    
 ];
 
 const routes = [

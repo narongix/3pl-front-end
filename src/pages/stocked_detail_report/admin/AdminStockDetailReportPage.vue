@@ -3,7 +3,7 @@
         <template #body>
             <div class="field col-12 md:col-3">
                 <label>User</label>
-                <UserDropDownPagination v-model:userSelector="userSelector" ></UserDropDownPagination>
+                <UserDropDownPagination v-model:userSelector="userSelector"></UserDropDownPagination>
             </div>
         </template>
     </StockDetailReportPageTemplate>

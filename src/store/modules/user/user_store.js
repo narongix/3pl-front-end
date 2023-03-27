@@ -39,11 +39,11 @@ export default {
     },
 
     actions:{
-        async fetchUser({ commit }, {offset, limit, userName}){
+        async fetchUser({ commit }, {offset, limit, searchString}){
             const params ={
                 offset: offset,
                 limit: limit,
-                user_name: userName
+                search_string: searchString
             };
             const data = await ApiService.fetchUser(params);
 

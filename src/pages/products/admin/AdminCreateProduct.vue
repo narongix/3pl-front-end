@@ -4,12 +4,7 @@
             <template #body>
                 <div class="field col-12 md:col-12">
                     <label for="userId">Select User</label>
-                    <DropDownPagination v-model="userSelecter" :options="myUsersList" id="user" placeholder="Please select a user"
-                    :validation="validationField.userSelecter.value" :whenLoad="getUsers" :limit="myLimit"
-                    :whenSearch="findUsers" :maxLength="userMaxLength" :offset="offset ?? 0"
-                    :disabled="false" optionLabel="full_name" optionValue="id" :showOption="option=>option.full_name"
-                    >
-                    </DropDownPagination>
+                    <UserDropDownPaginationVue v-model:userSelecter="userSelecter"></UserDropDownPaginationVue>
                     <small>{{ validationField.userSelecter.value }}</small>
                 </div>
             </template>
@@ -18,16 +13,15 @@
 </template>
 
 <script>
-    import DropDownPagination from '../../../components/DropDownPagination.vue';
     import { mapGetters } from 'vuex';
     import MyToast from "../../../components/utils/MyToast";
     import CreateProductTemplate from '../components/CreateProductTemplate.vue';
 
     export default{
+        components: { CreateProductTemplate },
         data() {
             return {
                 userSelecter: null,
-                offset: 0,
 
                 validationField:{
                     userSelecter:{
@@ -47,7 +41,6 @@
             ...mapGetters({
                 userId: "auth/getUserId",
                 getUserRole: "auth/getUserRole",
-                myUsersList: "user/getUser"
             }),
 
             prodCategories() {
@@ -61,10 +54,6 @@
                     yesButton: "Yes",
                     noButton: "No"                
                 };
-            },
-
-            userMaxLength(){
-                return this.myUsersList.length;
             },
 
             errorToast(){
@@ -87,25 +76,11 @@
                 });
             },
 
-            async getUsers(offset){
-                await this.$store.dispatch("user/fetchUser", {
-                    offset: offset,
-                    limit: this.myLimit
-                });
-            },
-
-            async findUsers(filterValue){
-                await this.$store.dispatch("user/fetchUser", {
-                    offset: 0,
-                    userName: filterValue
-                });
-            },
-
             async onSubmit(newlyCreatedProduct){
                 const newProduct = await this.$store.dispatch('products/addProduct', {newlyCreatedProduct: newlyCreatedProduct, userId: this.userSelecter});
                 // TODO: Refactor this to push to admin product list instead
                 this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                await this.$router.push({ name: "productList", query: { id: newProduct.product_id, name: newProduct.product_name } });
+                await this.$router.push({ name: "productListAdmin", query: { id: newProduct.product_id, name: newProduct.product_name } });
             },
 
             async onValidate(){
@@ -136,7 +111,5 @@
                 }
             }
         },
-
-        components: { DropDownPagination, CreateProductTemplate }
     }
 </script>

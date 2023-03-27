@@ -1,10 +1,10 @@
 <template>
     <DropDownPagination v-model="myValue" :options="getUsers" :optionLabel="optionLabel" :optionValue="optionValue"
-    :disabled="false" id="id" inputId="id" placeholder="Please select a user" 
+    :disabled="disabled" id="id" inputId="id" placeholder="Please select a user" 
     :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
-    :maxLength="getUserLength" :showClear="true"
+    :maxLength="getUserLength" :showClear="true"  :class="myClass"
     :errorToastLoading="errorToastLoadingUsers" :messageLoad="messageLoadUser"
-    :showOption="option => option.full_name"
+    :showOption="option => option.full_name" :validation="validation"
     >
     </DropDownPagination>
 </template>
@@ -26,6 +26,15 @@
             optionValue:{
                 type: String,
                 default: "id"
+            },
+            myClass: String,
+            validation:{
+                type: Boolean,
+                default: true
+            },
+            disabled:{
+                type: Boolean,
+                default: false
             }
         },
         emits:["update:userSelector"],
@@ -67,15 +76,16 @@
             async findUser(filterValue) {
                 await this.$store.dispatch("user/fetchUser", {
                     offset: 0,
-                    userName: filterValue,
+                    searchString: filterValue,
                     limit: this.rows
                 });
             },
 
-            async onLoadUser(offset){
+            async onLoadUser(offset, outOfFetch, filterValue){
                 const users = await this.$store.dispatch("user/fetchUser", {
                     offset: offset,
                     limit: this.rows,
+                    searchString: filterValue,
                 });
 
                 return users.length;
