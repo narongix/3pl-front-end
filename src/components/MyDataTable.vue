@@ -24,13 +24,11 @@
         methods:{
             initList(){
                 this.myList.length=0;
-
                 for(let i=0; i<this.total; i++){
                     const tmp = {}
                     tmp[this.id ?? this.tmp] = i.toString()
                     this.myList.push(tmp)
                 }
-
                 this.updateList({
                     offset: 0,
                     row: this.row ?? 10,

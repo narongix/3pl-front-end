@@ -9,7 +9,7 @@
               :selectOnFocus="selectOnFocus ?? true"
               @filter="onFilter($event)" @blur="stopLoading"
               :virtualScrollerOptions="{lazy:true, onLazyLoad: onload, showLoader:true, loading: loading, itemSize:38}"
-              :inputId="inputId" :showClear="showClear"
+              :inputId="inputId" :showClear="showClear" @change="$emit('change', $event)"
     >
       <template #value="slotProps">
         <p v-if="showValue">{{ showValue?.(slotProps.value) }}</p>
@@ -42,6 +42,7 @@
     components:{
       CountDown
     },
+    emits:["update:modelValue", "change"],
     props: {
       inputId: String,
       modelValue: null,

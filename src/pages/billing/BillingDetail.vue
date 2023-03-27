@@ -17,7 +17,7 @@
                             </tr>
                             <tr>
                                 <th>Client</th>
-                                <td>{{ getFullName ?? "" }}</td>
+                                <td>{{ data?.billsummary?.full_name ?? getFullName ?? "" }}</td>
                             </tr>
                             <tr>
                                 <th>Total Amount</th>

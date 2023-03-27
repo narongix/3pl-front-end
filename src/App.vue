@@ -63,7 +63,7 @@ export default {
                 {
                     label: 'Billing',
                     items:[
-                        {label: 'Billing statement', icon: 'pi pi-fw pi-products', to: '/billing'}
+                        {label: 'Billing statement', icon: 'pi pi-fw pi-products', to: this.billingPage()}
 
                     ]
                 },
@@ -77,6 +77,14 @@ export default {
         }
     },
     methods: {
+        billingPage(){
+            const userRole = this.$store.getters["auth/getUserRole"];
+            if(userRole == roleGroupId.Admin){
+                return "/billing_admin";
+            }else{
+                return "/billing";
+            }  
+        },
         stockDetailPage(){
             const userRole = this.$store.getters["auth/getUserRole"];
             if(userRole == roleGroupId.Admin){
