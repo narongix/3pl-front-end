@@ -18,7 +18,7 @@ export default{
     },
 
     async logout(){
-        const response = await axios.post("/logout",{}, ApiConfig.header({}))
+        const response = await axios.post("/logout",{}, ApiConfig.header({}));
         return response.data
     }
 }

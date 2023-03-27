@@ -112,10 +112,17 @@ export default {
 
     onLogOut() {
       this.toload = async () => {
-        await this.$store.dispatch("auth/logout")
-        await this.$store.dispatch("clearAllStates")
+        try{
+          await this.$store.dispatch("auth/logout")
+          await this.$store.dispatch("clearAllStates")
 
-        await this.$router.replace({ name: "login" })
+          await this.$router.replace({ name: "login" })
+        }catch(e){
+          await this.$store.dispatch("clearAllStates")
+
+          await this.$router.replace({ name: "login" })
+        }
+        
       }
     },
 

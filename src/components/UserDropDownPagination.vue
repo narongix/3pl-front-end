@@ -4,7 +4,7 @@
     :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
     :maxLength="getUserLength" :showClear="true"  :class="myClass"
     :errorToastLoading="errorToastLoadingUsers" :messageLoad="messageLoadUser"
-    :showOption="option => option.full_name" :validation="validation"
+    :showOption="option => option.full_name" :validation="validation" @change="onChange"
     >
     </DropDownPagination>
 </template>
@@ -30,14 +30,14 @@
             myClass: String,
             validation:{
                 type: Boolean,
-                default: true
+                default: false
             },
             disabled:{
                 type: Boolean,
                 default: false
             }
         },
-        emits:["update:userSelector"],
+        emits:["update:userSelector", "onChange"],
         components:{
             DropDownPagination
         },
@@ -90,6 +90,10 @@
 
                 return users.length;
             },  
+
+            onChange(event){
+                this.$emit('onChange', event)
+            }
         }
     }
 </script>

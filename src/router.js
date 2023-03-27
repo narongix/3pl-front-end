@@ -18,6 +18,18 @@ const adminRoutes = [
     //     }
     // },
     {
+        path: "/billing_admin",
+        name: "adminBilling",
+        component: () => import("./pages/billing/admin/AdminBillingList.vue"),
+        meta: {requireAuth: true, role: roleGroupId.Admin},
+        beforeEnter: ()=>{
+            if(store.getters["auth/getUserRole"] == roleGroupId.Admin){
+                return true;
+            }
+            return {name: "billing"};
+        }
+    },
+    {
         path: "/products/new_admin",
         name: "createProductAdmin",
         component: () => import("./pages/products/admin/AdminCreateProduct.vue"),
