@@ -72,15 +72,7 @@
 
                         <div v-if="adminOrUser() && !vanishField['userSelector']" class="field col-12 md:col-3">
                             <label for="adminUserId" :class="{'p-error': validationField1.userId.value}">User</label>
-                            <DropDownPagination v-model="userSelector" :options="getUsers" optionLabel="full_name" optionValue="id"
-                            :disabled="FieldNotActive || disabledField['userSelector']" id="id" placeholder="Please select a user" 
-                            :validation="validationField1.userId.value!=null"
-                            :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
-                            :maxLength="getUserLength"
-                            :errorToastLoading="errorToastLoadingUsers" :messageLoad="messageLoadUser"
-                            :showOption="option => option.full_name"
-                            >
-                            </DropDownPagination>
+                            <UserDropDownPagination v-model:userSelector="userSelector" :disabled="FieldNotActive || disabledField['userSelector']" :validation="validationField1.userId.value!=null"></UserDropDownPagination>
                             <small id="adminuserId-help" class="p-error" v-if="validationField1.userId.value">{{ validationField1.userId.value }}</small>
                         </div>
 
@@ -221,6 +213,7 @@
     import RecipientField from './RecipientField.vue';
     import RetryField from '../../../components/prompt_field/RetryField.vue';
     import { roleGroupId } from '../../../domains/domain';
+    import UserDropDownPagination from '../../../components/UserDropDownPagination.vue';
 
 
     export default{
@@ -242,7 +235,8 @@
             DropDownPagination,
             PromptField,
             RecipientField,
-            RetryField
+            RetryField,
+            UserDropDownPagination
         },
 
         data(){
@@ -459,10 +453,6 @@
                 user: "auth/user",
                 userId: "auth/getUserId",
                 
-                getUsers: "user/getUser",
-                getUserLength: "user/getUserLength",
-                
-                getUserLimit: "user/getUserLimit",
                 getUserRole: "auth/getUserRole",
                 // Limit offset
                 getProductLimit: "products/limit",
@@ -500,21 +490,6 @@
 
             getFormatCalendar(){
                 return TimeConvert.getCalendarFormat()
-            },
-
-            messageLoadUser(){
-                return {
-                    failed: "Error loading Users, retry?",
-                    yesButton: "Yes",
-                    noButton: "No",
-                };
-            },
-            errorToastLoadingUsers(){
-                return{
-                    severity:"error",
-                    summary: "Error!",
-                    detail: "Failed Loading Users!"    
-                };
             }
         },
 
@@ -671,7 +646,6 @@
                 return this.getUserRole == roleGroupId.Admin
             },
 
-
             validateAndSubmit(e){
                 const index = this.onValidateField1();
                 if(index<0){
@@ -750,14 +724,6 @@
                 return recipients.length
             },
 
-            async onLoadUser(offset){
-                const users = await this.$store.dispatch("user/fetchUser", {
-                    offset: offset,
-                    limit: this.rows,
-                });
-
-                return users.length;
-            },
 
             stopLoadingProduct(){
                 this.productLoading=false
@@ -784,14 +750,6 @@
                     searchString: filterValue,
                     user_id: this.userSelector ?? this.userId
                 })
-            },
-
-            async findUser(filterValue){
-                await this.$store.dispatch("user/fetchUser", {
-                    offset: 0,
-                    userName: filterValue,
-                    limit: this.rows
-                });
             },
             
             changeRecipientState(){

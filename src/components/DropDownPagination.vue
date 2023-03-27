@@ -96,7 +96,7 @@
           if (event.last == this.maxLength && this.outOfFetch > 0) {
             this.loading = true;
             setTimeout(async ()=>{
-              const fetchLength = await this.whenLoad(this.myOffset, this.outOfFetch);
+              const fetchLength = await this.whenLoad(this.myOffset, this.outOfFetch, this.filterValue);
               this.myOffset = this.myOffset + this.limit;
               this.outOfFetch = fetchLength;
               this.loading = false;
