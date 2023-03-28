@@ -153,15 +153,15 @@
       this.toLoadRetry = this.initData
     },
     components: {
-    CalendarTime,
-    TransferItem,
-    RetryField,
-    PromptField,
-    TransferStatusField,
-    CountDown,
-    TransferTypeField,
-    UserDropDownPagination
-},
+      CalendarTime,
+      TransferItem,
+      RetryField,
+      PromptField,
+      TransferStatusField,
+      CountDown,
+      TransferTypeField,
+      UserDropDownPagination
+    },
     data() {
       return {
         loading1: false,
@@ -337,8 +337,7 @@
               limit: 10,
           });
         }
-
-        this.searchTransfer();
+        await this.searchTransfer();
       },
 
       async searchTransfer(pageNumber){
@@ -349,14 +348,12 @@
         });
 
         this.initList();
-
         const products = await this.$store.dispatch("transfers/getTransfers", {
             currentOffset: (pageNumber || 0) * this.rows,
             limit: this.rows ?? 0,
             userId: this.userSelector
         });
         this.updateList({offset: pageNumber? pageNumber*this.rows : 0, row: this.rows, tempList: products});
-        
       },
 
       initList(){

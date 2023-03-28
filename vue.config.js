@@ -1,6 +1,8 @@
 module.exports = {
 	transpileDependencies: [
-		"primevue"
+		"primevue",
+		"chart.js",
+		"vue-chartjs"
 	],
 	devServer:{
 		host: 'localhost'

@@ -39,12 +39,12 @@ export default {
             overlayMenuActive: false,
             mobileMenuActive: false,
             menu : [
-                // {
-                //     label: 'Home',
-                //     items: [{
-                //         label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'
-                //     }]
-                // },
+                {
+                    label: 'Home',
+                    items: [{
+                        label: 'Dashboard', icon: 'pi pi-fw pi-home', to: this.myHome()
+                    }]
+                },
                 {
                     label: 'Operations',
                     items: [
@@ -77,6 +77,14 @@ export default {
         }
     },
     methods: {
+        myHome(){
+            const userRole = this.$store.getters["auth/getUserRole"];
+            if(userRole == roleGroupId.Admin){
+                return "/admin";
+            }else{
+                return "/";
+            }  
+        },
         billingPage(){
             const userRole = this.$store.getters["auth/getUserRole"];
             if(userRole == roleGroupId.Admin){

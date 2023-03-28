@@ -39,6 +39,7 @@
             updateList({offset, row, tempList}){
                 let index=0;
                 for(let i=offset; i<row+offset; i++){
+                    
                     if(!(tempList?.[index])){
                         break;
                     }

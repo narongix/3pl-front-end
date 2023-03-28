@@ -243,7 +243,6 @@
 
 <script>
 import EventBus from '@/AppEventBus';
-import ProductService from '../service/ProductService';
 
 export default {
 	data() {
@@ -280,7 +279,6 @@ export default {
 	productService: null,
 	themeChangeListener: null,
 	mounted() {
-		this.productService.getProductsSmall().then(data => this.products = data);
 
 		this.themeChangeListener = (event) => {
             if (event.dark)
@@ -301,7 +299,6 @@ export default {
         EventBus.off('change-theme', this.themeChangeListener );
     },
 	created() {
-		this.productService = new ProductService();
 	},
 	methods: {
 		formatCurrency(value) {
