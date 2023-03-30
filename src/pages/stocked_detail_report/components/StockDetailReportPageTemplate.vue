@@ -38,15 +38,13 @@
                             <div class="field col-12 md:col-2">
                                 <Button icon="pi pi-external-link" label="Export" @click="exportStock($event)" />
                             </div>
-                            <div class="field col-12 md:col-2">
-                                <Button label="Previous Month" @click="goBackByOneMonth"></Button>
-                            </div>
-                            <div class="field col-12 md:col-2">
-                                <Button label="Next Month" @click="goForwardByOneMonth"></Button>
-                            </div>
 
                             <div class="field col-12 md:col-2">
                                 <Button label="This Month" @click="goToThisMonth"></Button>
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <Button label="Previous Month" @click="goBackByOneMonth"></Button>
                             </div>
                         </div>
                         <p></p>
@@ -352,7 +350,7 @@
                         })
                         if(this.myFilters.myBarcode.length==0 && this.myFilters.myProductSku.length==0){
                             this.initingOrigList()
-                           return this.updateList({offset: 0, row: this.rows, tempList: stockList})
+                            return this.updateList({offset: 0, row: this.rows, tempList: stockList})
                         }
                         // Incase there's filter, there's no pagination for it yet, so 
                         // we arrange the datatable to fit in the exact data
@@ -399,24 +397,24 @@
                     year: currentDate.getFullYear()
                 });
             },
-            
-            goForwardByOneMonth(){
-                // The reason we separate it into 2 variables are to calculate whether 
-                // we should set it to the current month or the next month
-                const currentDay = new Date();
-                const year = this.fromDate?.getFullYear() || currentDay.getFullYear();
-                // +1 to get the next month so we can calculate the last day of the next month
-                // Null safety doesn't cover NAN, || does
-                const userMonth = this.fromDate?.getMonth()+1 || currentDay.getMonth();
-                const lastDay = TimeConvert.getLastDayOfMonth(userMonth, year);
 
-                this.setDate({
-                    month: userMonth,
-                    firstDay: 1,
-                    lastDay: lastDay,
-                    year: year
-                });
-            },
+            // goForwardByOneMonth(){
+            //     // The reason we separate it into 2 variables are to calculate whether 
+            //     // we should set it to the current month or the next month
+            //     const currentDay = new Date();
+            //     const year = this.fromDate?.getFullYear() || currentDay.getFullYear();
+            //     // +1 to get the next month so we can calculate the last day of the next month
+            //     // Null safety doesn't cover NAN, || does
+            //     const userMonth = this.fromDate?.getMonth()+1 || currentDay.getMonth();
+            //     const lastDay = TimeConvert.getLastDayOfMonth(userMonth, year);
+
+            //     this.setDate({
+            //         month: userMonth,
+            //         firstDay: 1,
+            //         lastDay: lastDay,
+            //         year: year
+            //     });
+            // },
             
             goToThisMonth(){
                 const currentDay = new Date();
