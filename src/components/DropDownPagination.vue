@@ -24,6 +24,10 @@
           <p :onload="findData(myCountDown.startCountdown)">{{ emptyMessage }}</p>
       </template>
 
+      <template #empty>
+        <p v-if="loading"></p>
+      </template>
+
       <template v-slot:loader="{ options }">
         <div class="flex align-items-center p-2" style="height: 38px">
           <Skeleton :width="options.even ? '60%' : '50%'"/>
