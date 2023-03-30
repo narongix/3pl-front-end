@@ -42,5 +42,10 @@ export default {
         const lastDay = new Date(currentDay.getFullYear(), currentDay.getMonth()+1, 0);
         
         return lastDay.getDate();
+    },
+
+    convertDigitToMonth(digit){
+        const month = moment().month(digit-1).format("MMM");
+        return month;
     }
 }

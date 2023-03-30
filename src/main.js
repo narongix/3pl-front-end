@@ -106,6 +106,14 @@ import vSelect from "vue-select";
 
 import { FilterService, FilterMatchMode } from "primevue/api"
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+
+import { faSpinner, faCheck, faTruck } from '@fortawesome/free-solid-svg-icons';
+
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faSpinner, faCheck, faTruck);
+
 router.beforeEach(function(to, from, next) {
     window.scrollTo(0, 0);
     next();
@@ -208,6 +216,8 @@ app.directive('code', CodeHighlight);
 app.directive('badge', BadgeDirective);
 app.directive('styleclass', StyleClass);
 
+
+app.component('font-awesome-icon', FontAwesomeIcon)
 app.component('Accordion', Accordion);
 app.component('AccordionTab', AccordionTab);
 app.component('AutoComplete', AutoComplete);

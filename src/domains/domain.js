@@ -16,9 +16,14 @@ const transferId = {
     Canceled: 7
 }
 
-const transferType ={
+const transferTypeId ={
     1: "Receipt",
     2: "Delivery"
+}
+
+const transferType = {
+    Receipt: 1,
+    Delivery: 2,
 }
 
 const billStatus = {
@@ -32,5 +37,5 @@ const roleGroupId = {
     User: 2
 }
 
-export { transferStatus, transferType, transferId, billStatus, roleGroupId };
+export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId };
 

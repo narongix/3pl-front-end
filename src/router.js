@@ -18,6 +18,18 @@ const adminRoutes = [
     //     }
     // },
     {
+        path: "/admin", 
+        name: "admin",
+        component: () => import("./pages/dashboard/admin/DashboardAdmin.vue"),
+        meta:{role:roleGroupId.Admin},
+        beforeEnter:()=>{
+            if(store.getters["auth/getUserRole"] == roleGroupId.Admin){
+                return true;
+            }
+            return {name: "productList"};
+        }
+    },
+    {
         path: "/billing_admin",
         name: "adminBilling",
         component: () => import("./pages/billing/admin/AdminBillingList.vue"),
@@ -71,7 +83,12 @@ const routes = [
             {
                 path: '',
                 name: 'dashboard',
-                component: ()=> import("./pages/transfers/TransferList.vue"),
+                component: ()=> {
+                    if(store.getters["auth/getUserRole"] == roleGroupId.Admin){
+                        return import("./pages/dashboard/admin/DashboardAdmin.vue");
+                    }
+                    return import("./pages/dashboard/DashboardPage.vue");
+                },
             },
             {
                 path: '/transfers',

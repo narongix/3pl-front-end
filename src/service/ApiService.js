@@ -5,6 +5,7 @@ import ProductServices from "./mini_services/ProductServices";
 import StockDetailReportService from "./mini_services/StcokDetailReportService";
 import BillingServices from "./mini_services/BillingServices";
 import UserServices from "./mini_services/UserServices";
+import DashBoardServices from "./mini_services/DashBoardServices";
 
 export default {
     ...TransferServices,
@@ -13,5 +14,6 @@ export default {
     ...ProductServices,
     ...StockDetailReportService,
     ...BillingServices,
-    ...UserServices
+    ...UserServices,
+    ...DashBoardServices
 }
