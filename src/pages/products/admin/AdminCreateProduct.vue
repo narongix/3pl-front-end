@@ -4,7 +4,7 @@
             <template #body>
                 <div class="field col-12 md:col-12">
                     <label for="userId">Select User</label>
-                    <UserDropDownPaginationVue v-model:userSelecter="userSelecter"></UserDropDownPaginationVue>
+                    <UserDropDownPagination v-model:userSelector="userSelecter"></UserDropDownPagination>
                     <small>{{ validationField.userSelecter.value }}</small>
                 </div>
             </template>
@@ -16,9 +16,10 @@
     import { mapGetters } from 'vuex';
     import MyToast from "../../../components/utils/MyToast";
     import CreateProductTemplate from '../components/CreateProductTemplate.vue';
+    import UserDropDownPagination from '../../../components/UserDropDownPagination.vue';
 
     export default{
-        components: { CreateProductTemplate },
+        components: { CreateProductTemplate, UserDropDownPagination },
         data() {
             return {
                 userSelecter: null,
@@ -80,7 +81,7 @@
                 const newProduct = await this.$store.dispatch('products/addProduct', {newlyCreatedProduct: newlyCreatedProduct, userId: this.userSelecter});
                 // TODO: Refactor this to push to admin product list instead
                 this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                await this.$router.push({ name: "productListAdmin", query: { id: newProduct.product_id, name: newProduct.product_name } });
+                await this.$router.push({ name: "productList", query: { id: newProduct.product_id, name: newProduct.product_name } });
             },
 
             async onValidate(){
