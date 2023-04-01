@@ -14,12 +14,25 @@
             :rowsPerPageOptions="[10,20,30]" :totalRecords="getTotalRecords" removableSort
             >
 
-              <template v-if="isAdmin" #header>
-                <div class="formgrid grid">
-                  <div class="col-12">
+              <template #header>
+                <div class="flex flex-row-reverse">
+                  <Button @click="onSearch" label="Search"></Button>
+                </div>
+                <div class="p-fluid formgrid grid">
+                  <div v-if="isAdmin" class="field col-12 md:col-4 lg:col-3">
                     <label>User</label>
                     <UserDropDownPagination v-model:userSelector="userSelector" :rows="rows">
                     </UserDropDownPagination>  
+                  </div>
+
+                  <div class="field col-12 md:col-4 lg:col-3">
+                    <label for="transferId">Transfer Id</label>
+                    <Chips id="transferId" type="text" v-model="transferId" placeholder="Search By Id"></Chips>
+                  </div>
+
+                  <div class="field col-12 md:col-4 lg:col-3">
+                    <label for="transferName">Transfer Reference</label>
+                    <Chips id="transferName" type="text" v-model="transferReference" placeholder="Search By Reference"></Chips>
                   </div>
                 </div>
               </template>
@@ -147,7 +160,7 @@
   import TransferTypeField from "./components/TransferTypeField.vue"
   import UserDropDownPagination from "../../components/UserDropDownPagination.vue"
   import { roleGroupId } from "../../domains/domain"
-  
+
   export default {
     created() {
       this.toLoadRetry = this.initData
@@ -160,7 +173,7 @@
       TransferStatusField,
       CountDown,
       TransferTypeField,
-      UserDropDownPagination
+      UserDropDownPagination,
     },
     data() {
       return {
@@ -170,7 +183,6 @@
         selectedForDelete: null,
 
         dataList: [],
-
         rows: 10,
 
         filters: {
@@ -211,6 +223,9 @@
 
         userSelector: null,
         myPageTracker:0,
+
+        transferReference: [],
+        transferId: [],
       }
     },
     computed: {
@@ -322,7 +337,9 @@
             const transfers = await this.$store.dispatch("transfers/getTransfers", {
               currentOffset: event.first,
               limit: this.rows,
-              userId: this.userSelector
+              userId: this.userSelector,
+              transferReference: this.transferReference,
+              transfserId: this.transferId
             })
             const offset= event.first
             const limit = event.rows
@@ -344,14 +361,18 @@
         this.message.failed = "Loading failed, retry?"
 
         await this.$store.dispatch("transfers/getTotalRecords",{
-            userId: this.userSelector
+            userId: this.userSelector,
+            transferReference: this.transferReference,
+            transferId: this.transferId
         });
 
         this.initList();
         const products = await this.$store.dispatch("transfers/getTransfers", {
             currentOffset: (pageNumber || 0) * this.rows,
             limit: this.rows ?? 0,
-            userId: this.userSelector
+            userId: this.userSelector,
+            transferReference: this.transferReference,
+            transferId: this.transferId
         });
         this.updateList({offset: pageNumber? pageNumber*this.rows : 0, row: this.rows, tempList: products});
       },
@@ -404,11 +425,17 @@
           if(!(tempList?.[index])){
             break
           }
-          const myId = this.dataList[i].tmpId;
+          const myId = this.dataList[i]?.tmpId;
           this.dataList[i]={tmpId: myId, ...tempList[index]};
           index++;
         }
       },
+
+      onSearch(){
+        this.toLoadRetry = async() => {
+          await this.searchTransfer(this.myPageTracker);
+        };
+      }
     },
 
     watch: {
@@ -425,18 +452,13 @@
       },
 
       userSelector:{
-            immediate:true,
-            handler(newValue){
-                if(newValue){
-                    this.toLoadRetry = async () => {
-                      await this.searchTransfer(this.myPageTracker);
-                    }
-                }
-                this.toLoadRetry = async() => {
-                  await this.searchTransfer(this.myPageTracker);
-                };
-            }
-        }
+          immediate:true,
+          handler(){
+              this.toLoadRetry = async() => {
+                await this.searchTransfer(this.myPageTracker);
+              };
+          }
+      }
     }
   }
 </script>
