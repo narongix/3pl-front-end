@@ -20,10 +20,22 @@
                     @page="onPage"
                 >
                     <template v-if="isAdmin" #header>
-                        <div class="formgrid grid">
-                            <div class="col-12">
+                        <div class="flex flex-row-reverse">
+                            <Button @click="onSearch" label="Search"></Button>
+                        </div>
+                        <div class="p-fluid formgrid grid">
+                            <div class="field col-12 md:col-4 lg:col-3">
                                 <label for="id">User</label>
                                 <UserDropDownPagination v-model:userSelector="userSelector"></UserDropDownPagination>
+                            </div>
+                            <div class="field col-12 md:col-4 lg:col-3">
+                                <label for="productId">Product Id</label>
+                                <Chips id="productid" type="text" v-model="productId" placeholder="Search By Id"></Chips>
+                            </div>
+
+                            <div class="field col-12 md:col-4 lg:col-3">
+                                <label for="transferReference">Product Reference</label>
+                                <Chips id="transferReference" type="text" v-model="productReference" placeholder="Search By Reference"></Chips>
                             </div>
                         </div>
                     </template>
@@ -183,6 +195,9 @@ export default {
 
             userSelector: null,
             myPageTracker: 0,
+
+            productId: [],
+            productReference: []
         }
     },
     computed: {
@@ -244,17 +259,23 @@ export default {
         },
 
         async SearchProduct(pageNumber){
-            const products = await this.$store.dispatch("products/onFetchProducts", {
-                offset: (pageNumber || 0) * this.rows,
-                limit: this.rows,
-                userId: this.userSelector
-            });
 
             await this.$store.dispatch("products/getProductLength",{
-                userId: this.userSelector
+                userId: this.userSelector,
+                productId: this.productId,
+                productReference: this.productReference,
             });
     
             this.initList();
+
+            const products = await this.$store.dispatch("products/onFetchProducts", {
+                offset: (pageNumber || 0) * this.rows,
+                limit: this.rows,
+                userId: this.userSelector,
+                productId: this.productId,
+                productReference: this.productReference
+            });
+
             this.updateList({offset: pageNumber? pageNumber*this.rows : 0, row: this.rows, tempList: products});
         },
 
@@ -285,7 +306,7 @@ export default {
                 if(!(tempList?.[index])){
                     break
                 }
-                const myId = this.dataList[i].tmpId;
+                const myId = this.dataList[i]?.tmpId;
                 this.dataList[i]={tmpId: myId, ...tempList[index]};
                 index++
             }
@@ -301,6 +322,11 @@ export default {
         navigateToDetail(id){
             this.$router.push({name: "productDetail", params: {id: id}});
         },
+        onSearch(){
+        this.toLoadRetry = async() => {
+          await this.SearchProduct(this.myPageTracker);
+        };
+      }
     },
 
     watch:{

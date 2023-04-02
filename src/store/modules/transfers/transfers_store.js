@@ -142,7 +142,7 @@ export default{
 
         async getTotalRecords({commit}, { userId, transferReference, transferId }){
             const myTransferReference = transferReference?.map((e)=>e?.trim());
-            const myTransferId = transferId?.map((e)=>e.trim());
+            const myTransferId = transferId?.map((e)=>e?.trim());
             const params = {
                 user_id: userId,
                 transfer_reference: myTransferReference,
