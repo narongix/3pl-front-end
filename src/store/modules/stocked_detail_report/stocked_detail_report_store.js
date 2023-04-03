@@ -59,12 +59,12 @@ export default{
             return data.count;
         },
 
-        async onfetchAndUpdateStockedList({ commit }, {from_date, to_date, limit, offset, barcodes, sku, activeProduct, userId}){
+        async onfetchAndUpdateStockedList({ commit }, {from_date, to_date, limit, offset, sku, activeProduct, userId}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date);
             const newToDate = TimeConvert.formatDateToStockFormat(to_date);
 
-            const newProductIds = convertListToObject({myList: sku, name: "skus"}) ?? null;
-            const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
+            const newProductSkus = convertListToObject({myList: sku, name: "skus"}) ?? null;
+            // const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
 
             const params= {
                 from_date: newFromDate,
@@ -73,8 +73,8 @@ export default{
                 offset: offset ?? 0,
                 active_product: activeProduct,
                 user_id: userId,
-                ...newProductIds,
-                ...newBarCodes
+                ...newProductSkus,
+                // ...newBarCodes
             };
 
             const data = await ApiService.getStockedDetailReport({
@@ -85,12 +85,12 @@ export default{
             return data;
         },
 
-        async onfetchedAndReplaceStockedList({ commit }, {from_date, to_date, limit, offset, barcodes, sku, activeProduct, userId}){
+        async onfetchedAndReplaceStockedList({ commit }, {from_date, to_date, limit, offset, sku, activeProduct, userId}){
             const newFromDate = TimeConvert.formatDateToStockFormat(from_date)
             const newToDate = TimeConvert.formatDateToStockFormat(to_date)
 
             const newProductIds = convertListToObject({myList: sku, name: "skus"}) ?? null;
-            const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
+            // const newBarCodes = convertListToObject({myList: barcodes, name: "barcodes"}) ?? null;
             
             const param = {
                 from_date: newFromDate,
@@ -99,7 +99,7 @@ export default{
                 offset: Number(offset ?? 0),
                 active_product: activeProduct,
                 user_id: userId,
-                ...newBarCodes,
+                // ...newBarCodes,
                 ...newProductIds
             };
             const data = await ApiService.getStockedDetailReport({
