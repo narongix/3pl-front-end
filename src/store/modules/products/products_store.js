@@ -100,8 +100,13 @@ export default {
     },
     actions: {
         async getProductLength({ commit }, myParams){
+            const myProductReference = myParams?.productReference?.map((e)=>e?.trim());
+            const myProductId = myParams?.productId?.map((e)=>e?.trim());
             const params = {
-                user_id: myParams?.userId
+                user_id: myParams?.userId,
+                product_reference: myProductReference,
+                search_key: myParams?.searchKey,
+                product_id: myProductId
             };
             const maxProductLength = await ApiService.getProductLength(params);
             commit("setProductLength", maxProductLength.total_products);
@@ -173,13 +178,19 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ commit }, { offset, productName, limit, searchKey, userId}) {
+        async onFetchProducts({ commit }, { offset, productName, limit, searchKey, userId, productId, productReference}) {
+
+            const myProductReference = productReference?.map((e)=>e?.trim());
+            const myProductId = productId?.map((e)=>e?.trim());
+
             const params = {
                 offset: offset,
                 limit: limit,
                 product_name: productName,
                 search_key: searchKey,
-                user_id: userId 
+                user_id: userId,
+                product_id: myProductId,
+                product_reference: myProductReference
             }
             
             const products = await ApiService.getProducts(params)
