@@ -2,6 +2,7 @@
 	<BaseFieldForm  
 	:baseData="baseData" 
 	@onClickSubmit="onFormSubmit"
+	:userId="myUserId"
 	:data="oldData"
 	:FieldNotActive="fieldNotActive"
 	:disabledField="disabledField" :popup="myPopUp"

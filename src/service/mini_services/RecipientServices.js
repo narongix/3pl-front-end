@@ -12,7 +12,7 @@ export default{
     async createRecipient(data){
         const res = await ApiConfig.postMethods({
             api: "/contact",
-            data:data,
+            data: data,
         })
 
         return res.data

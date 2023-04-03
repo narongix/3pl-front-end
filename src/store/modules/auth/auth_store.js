@@ -40,7 +40,7 @@ export default {
         },
 
         getUserId(state, getters){
-            return getters.user.id;  
+            return getters.user?.id;  
         },
 
         getUserRole(state, getters){

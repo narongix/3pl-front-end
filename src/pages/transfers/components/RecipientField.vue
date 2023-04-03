@@ -2,20 +2,20 @@
     <Dialog :visible="diaglogState" :modal="true" @update:visible="hideHandler">
         <div class="p-fluid formgrid grid">
             <div class="field col-12 md:col-6 sm:col-12">
-                <label :class="{'p-error': validationField.first_name.value}">First Name</label>
+                <label :class="{'p-error': validationField.firstName.value}">First Name</label>
                 <InputText :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" placeholder="Enter your First Name"
-                :class="{'p-invalid': validationField.first_name.value}"
+                :class="{'p-invalid': validationField.firstName.value}"
                 ></InputText>
 
-                <small v-if="validationField.first_name.value">{{ validationField.first_name.value }}</small>
+                <small v-if="validationField.firstName.value">{{ validationField.firstName.value }}</small>
             </div>
             <div class="field col-12 md:col-6 sm:col-12">
                 <label>Last Name</label>
-                <InputText v-model.trim="form.last_name" placeholder="Enter your Last name"></InputText>
+                <InputText v-model.trim="form.lastName" placeholder="Enter your Last name"></InputText>
             </div>
             <div class="field col-12 md:col-6 sm:col-12">
                 <label>Phone Number</label>
-                <InputText v-model.trim="form.phone_number" placeholder="Enter your phonenumber"></InputText>
+                <InputText v-model.trim="form.phoneNumber" placeholder="Enter your phonenumber"></InputText>
             </div>
         </div>
 
@@ -38,37 +38,38 @@
 
         props:{
             modelValue: String,
-            state: Boolean
+            state: Boolean,
+            userId: String,
         },
         emits:["update:modelValue", "update:state"],
         data(){
             return {
                 form:{
-                    first_name: null,
-                    last_name: null,
-                    phone_number: null,
+                    firstName: null,
+                    lastName: null,
+                    phoneNumber: null,
                 },
 
                 validationField:{
-                    first_name: {
+                    firstName: {
                         value: null,
                         validate: ()=>{
-                            if(this.form.modelValue || this.form.first_name){
+                            if(this.form.modelValue || this.form.firstName){
                                 return this.validationField.value=null
                             }
                             this.validationField.value="Cannot be empty"
                         }
                     },
-                    last_name:{
+                    lastName:{
                         value: null,
                         validate: ()=>{
-                            this.form.last_name = this.form.last_name ?? ""
+                            this.form.lastName = this.form.lastName ?? ""
                         }
                     },
-                    phone_number:{
+                    phoneNumber:{
                         value:null,
                         validate:()=>{
-                            this.form.phone_number = this.form.phone_number ?? ""
+                            this.form.phoneNumber = this.form.phoneNumber ?? ""
                         }
                     }
                 },
@@ -99,9 +100,9 @@
         },
         methods:{
             removeAllData(){
-                this.form.first_name=null,
-                this.form.last_name=null,
-                this.form.phone_number=null
+                this.form.firstName=null,
+                this.form.lastName=null,
+                this.form.phoneNumber=null
             },
 
             onDiscard(){
@@ -121,16 +122,20 @@
 
             validateAndSubmit(){
                 this.toLoad = async ()=>{
-                    this.form.first_name = this.modelValue
+                    this.form.firstName = this.modelValue
                     const index = this.validate()
                     if(index<0){
                         await this.$store.dispatch("recipient/createRecipient", {
-                            recipient: this.form
+                            firstName: this.form.firstName,
+                            lastName: this.form.lastName,
+                            phoneNumber: this.form.phoneNumber,
+                            userId: this.userId
                         })
-                        const newContact = this.form.first_name + " " + this.form.last_name + " - " + this.form.phone_number
-                        this.$emit("update:modelValue", newContact)
-                        this.removeAllData()
-                        this.changeDiaglogState()
+                        const phoneNumber = this.form.phoneNumber? " - " + this.form.phoneNumber : "";
+                        const newContact = this.form.firstName + " " + (this.form.lastName ?? "") + phoneNumber;
+                        this.$emit("update:modelValue", newContact.trim());
+                        this.removeAllData();
+                        this.changeDiaglogState();
                     }
                 }
             },
