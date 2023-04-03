@@ -55,7 +55,7 @@
         placeholder: String,
         optionLabel: String,
         optionValue: null,
-        displayOption: Function
+        displayOption: Function,
     },
     emits:["update:modelValue", "update:offset", "onChange"],
     computed:{
@@ -133,7 +133,7 @@
         },
         filterValue(newValue) {
             if (!newValue) {
-            clearTimeout(this.countdownTracker);
+                clearTimeout(this.countdownTracker);
             }
         }
     }

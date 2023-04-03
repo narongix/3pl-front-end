@@ -49,43 +49,23 @@
                         </div>
                         <p></p>
                         <div class="p-fluid formgrid grid">
-                            <div class="field col-6 md:col-6 sm:col-6">
-                                <label>Barcode</label>
+                            <div class="field col-12 md:col-6">
+                                <label>Product</label>
                                 <MultiSelectPagination 
-                                    v-model="myFilters.myBarcode"
+                                    v-model="myFilters.myProductSku"
                                     :options="getProducts"
-                                    optionLabel="barcode"
-                                    optionValue="barcode"
+                                    optionLabel="search_key"
+                                    optionValue="sku"
                                     display="chip" 
-                                    placeholder="Filter by Barcode"
+                                    placeholder="Filter by sku or name"
                                     :whenLoad="whenLoadProduct"
                                     :whenSearch="whenSearchProduct"
                                     :maxLength="getProductCurrentLength"
-                                    :displayOption ="myOption=>myOption.barcode"
+                                    :displayOption ="myOption=>myOption.search_key"
                                     v-model:offset="myFilterOffset" 
                                     :limit="10"
                                     @onChange="onSelected"
                                 >
-
-                                </MultiSelectPagination>
-                            </div>
-                            <div class="field col-6 md:col-6 sm:col-6">
-                                <label>Product Name</label>
-
-                                <MultiSelectPagination 
-                                    v-model="myFilters.myProductSku"
-                                    :options="getProducts"
-                                    optionLabel="product_name"
-                                    optionValue="sku"
-                                    display="chip" 
-                                    placeholder="Filter by product name"
-                                    :whenLoad="whenLoadProduct"
-                                    :whenSearch="whenSearchProduct"
-                                    :maxLength="getProductCurrentLength"
-                                    :displayOption ="myOption=>myOption.product_name"
-                                    v-model:offset="myFilterOffset"
-                                    :limit="10"
-                                    @onChange="onSelected">
 
                                 </MultiSelectPagination>
                             </div>
@@ -158,9 +138,8 @@
         },
         data(){
             return {
-                myFilterOffset: 10,
+                myFilterOffset: 0,
                 myFilters:{
-                    myBarcode: [],
                     myProductSku: [],
                 },
                 
@@ -276,7 +255,6 @@
                         to_date: this.toDate,
                         limit: this.rows,
                         offset: event.first,
-                        barcodes:this.myFilters.myBarcode,
                         sku: this.myFilters.myProductSku,
                         activeProduct: this.productFilter,
                         userId: this.userId
@@ -295,7 +273,6 @@
                         this.productMaxLength = await this.$store.dispatch("stockedDetailReport/onFetchStockReportTotal", {
                             activeProduct: this.productFilter,
                             sku: this.myFilters.myProductSku,
-                            barcodes:this.myFilters.myBarcode,
                             from_date: this.fromDate,
                             to_date: this.toDate,
                             userId: this.userId
@@ -306,7 +283,6 @@
                             to_date: this.toDate,
                             limit: this.rows,
                             offset: (pageNumber || 0) * this.rows,
-                            barcodes:this.myFilters.myBarcode,
                             sku: this.myFilters.myProductSku,
                             activeProduct: this.productFilter,
                             userId: this.userId
@@ -343,12 +319,11 @@
                             limit: this.rows,
                             offset:0,
                             listFilter: value,
-                            barcodes:this.myFilters.myBarcode,
                             sku: this.myFilters.myProductSku,
                             activeProduct: this.productFilter?.code,
                             userId: this.userId
                         })
-                        if(this.myFilters.myBarcode.length==0 && this.myFilters.myProductSku.length==0){
+                        if(this.myFilters.myProductSku.length==0){
                             this.initingOrigList()
                             return this.updateList({offset: 0, row: this.rows, tempList: stockList})
                         }
@@ -451,12 +426,8 @@
 
             userId:{
                 immediate:true,
-                handler(newValue){
-                    if(newValue){
-                        this.toLoadRetry = async () => {
-                            await this.searchStockReport(this.myPageTracker);
-                        }                        
-                    }
+                handler(){
+                    this.myFilterOffset = 0;
                     this.toLoadRetry = async () => {
                         await this.searchStockReport(this.myPageTracker);
                     }
