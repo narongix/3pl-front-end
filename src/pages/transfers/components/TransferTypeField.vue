@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import { transferType } from '../../../domains/domain';
+    import { transferTypeId } from '../../../domains/domain';
 
     export default{
         props:{
@@ -11,7 +11,7 @@
         },
         computed:{
             converToName(){
-                return transferType?.[this.data?.transfer_type_id] ?? null
+                return transferTypeId?.[this.data?.transfer_type_id] ?? null
             }
         }
     }
