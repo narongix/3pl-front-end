@@ -7,19 +7,19 @@
                     <div class="field col-12 md:col-3 sm:col-12" >
                         <label>From Date</label>
                         <Calendar :manualInput="false" 
-                        v-model="fromDate" @date-select="onSelectDate"
+                        v-model="fromDate" @date-select="onSelectDate({limit: rows})"
                         :dateFormat="getCalendarFormat" :hideOnDateTimeSelect="false" placeholder="Select begining of Date"></Calendar>
                     </div>
                     
                     <div class="field col-12 md:col-3 sm:col-12">
                         <label>To Date</label>
                         <Calendar :manualInput="false" 
-                        v-model="toDate" @date-select="onSelectDate"
+                        v-model="toDate" @date-select="onSelectDate({limit: rows})"
                         :dateFormat="getCalendarFormat" :hideOnDateTimeSelect="false" placeholder="Select End of Date"></Calendar>
                     </div>
                     <div class="field col-12 md:col-3">
                         <label>Product Filters</label>
-                        <Dropdown :options="ProductListFilter" v-model="productFilter" @change="onSelectDate"
+                        <Dropdown :options="ProductListFilter" v-model="productFilter" @change="onSelectDate({limit: rows})"
                         class="p-column-filter" placeholder="Search by status" optionLabel="title" optionValue="code"
                         >
                         </Dropdown>
@@ -262,7 +262,7 @@
                  
                     const offset= event.first
                     const limit = event.rows    
-                    this.updateList({offset: offset, row:limit, tempList: stockReport})   
+                    this.updateList({start: offset, end:limit, tempList: stockReport})   
                 }
             },
             
@@ -281,7 +281,7 @@
                         const stockList = await this.$store.dispatch("stockedDetailReport/onfetchedAndReplaceStockedList", {
                             from_date: this.fromDate,
                             to_date: this.toDate,
-                            limit: this.rows,
+                            limit: query?.limit ?? this.rows,
                             offset: (pageNumber || 0) * this.rows,
                             sku: this.myFilters.myProductSku,
                             activeProduct: this.productFilter,
@@ -289,10 +289,12 @@
                         })
 
                         this.updateList({
-                            offset: (pageNumber || 0) * this.rows,
-                            row: this.rows,
+                            start: (pageNumber || 0) * this.rows,
+                            end: query?.limit ?? this.rows,
                             tempList: stockList
                         });
+
+                        await query.addtionalCommand?.();
                     }
                     this.offset = this.rows*2;
                 }
@@ -307,7 +309,13 @@
             },
 
             exportStock() {
-                this.$refs.dt.exportCSV();
+                if(this.validate()){
+                    this.toLoadRetry = async () => {
+                        await this.onSelectDate({limit: 100000000000000, addtionalCommand: ()=>{
+                            this.$refs.dt.exportCSV();
+                        }});
+                    };
+                }
             },
 
             onSelected(value){
@@ -325,7 +333,7 @@
                         })
                         if(this.myFilters.myProductSku.length==0){
                             this.initingOrigList()
-                            return this.updateList({offset: 0, row: this.rows, tempList: stockList})
+                            return this.updateList({start: 0, end: this.rows, tempList: stockList})
                         }
                         // Incase there's filter, there's no pagination for it yet, so 
                         // we arrange the datatable to fit in the exact data
@@ -348,9 +356,11 @@
                 }
             },
 
-            updateList({offset, row, tempList}){
+            updateList({start, end, tempList}){
                 let index=0;
-                for(let i=offset; i<row+offset; i++){
+                // say that its suppose to be 20-29
+                // start = 20, end 20+row(10) = 30, 20 - 29 (<30)
+                for(let i=start; i<end+start; i++){
                     if(!(tempList?.[index])){
                         break;
                     }
@@ -406,11 +416,11 @@
             setDate({month, firstDay, lastDay, year}){
                 this.fromDate = new Date(year, month, firstDay);
                 this.toDate = new Date(year, month, lastDay);
-                this.onSelectDate();
+                this.onSelectDate({limit: this.rows});
             },
 
             async searchStockReport(pageNumber){
-                await this.onSelectDate({pageNumber: pageNumber});
+                await this.onSelectDate({pageNumber: pageNumber, limit: this.rows});
             }
         },
         watch:{
