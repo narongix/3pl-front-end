@@ -11,7 +11,7 @@
         components: { StockDetailReportPageTemplate },
         data(){
             return {
-                rows: 10,
+                rows: 30,
             }
         },
         computed:{

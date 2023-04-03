@@ -17,7 +17,7 @@
         data() {
             return {
                 userSelector: null,
-                rows:10
+                rows: 30
             };
         },
         computed: {},
