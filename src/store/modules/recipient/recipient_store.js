@@ -81,8 +81,14 @@ export default{
             return data
         },
 
-        async createRecipient({commit}, {recipient}){
-            const newRecipient = await ApiService.createRecipient(recipient)
+        async createRecipient({commit}, {firstName, lastName, phoneNumber, userId}){
+            const data = {
+                first_name :firstName,
+                last_name: lastName,
+                phone_number: phoneNumber,
+                user_id: userId
+            };
+            const newRecipient = await ApiService.createRecipient(data)
             commit("updateRecipientState", [newRecipient])
         }
     }

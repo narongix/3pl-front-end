@@ -189,7 +189,7 @@
     </Dialog>
 
     <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="changeDeletedStateDialog" :message="messageDeletePrompt"/>
-    <RecipientField v-model="transferData.recipient" v-model:state="state"></RecipientField>
+    <RecipientField v-model="transferData.recipient" v-model:state="state" :userId="userSelector ?? userId"></RecipientField>
     <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
 </template>
 
@@ -228,6 +228,14 @@
                 productDemandDisplay: String
             },
             vanishField: Object,
+            userId: null,
+            // validatedBeforeCreatingRecipient: {
+            //     type: Function,
+            //     default: ()=>{
+            //         console.log("userselctor: "+this.userSelector)
+            //         return this.userSelector!=null
+            //     },
+            // }
         },
         
         emits:["onClickSubmit"],
@@ -451,7 +459,6 @@
                 transfer_type: "transferType/getTansferType",
                 
                 user: "auth/user",
-                userId: "auth/getUserId",
                 
                 getUserRole: "auth/getUserRole",
                 // Limit offset
@@ -494,24 +501,41 @@
         },
 
         methods:{
+            
             showValueRecipient(value){
                 return value ?? "Empty"
             },
             
             createRecipientTemplateNow(){
-                this.toLoad = async ()=>{
-                    const data = {
-                        first_name: this.transferData.recipient
-                    }
-                    await this.$store.dispatch("recipient/createRecipient", {
-                        recipient: data
+                if(this.validatedBeforeCreatingRecipient()){
+                    this.toLoad = async ()=>{                        
+                        await this.$store.dispatch("recipient/createRecipient", {
+                            firstName: this.transferData.recipient,
+                            userId: this.userSelector ?? this.userId
+                        })
+                    };
+                    this.$refs.myOverLayPanel.hide();
+                }else{
+                    this.$toast.add(this.toast ?? {
+                        severity: "error",
+                        summary: "No User",
+                        detail: "Please select a user before creating",
+                        life: 1000
                     })
                 }
-                this.$refs.myOverLayPanel.hide()
             },
 
             openCreateRecipientTemplate(){
-                this.changeRecipientTemplateState()
+                if(this.validatedBeforeCreatingRecipient()){
+                    this.changeRecipientTemplateState();
+                }else{
+                    this.$toast.add(this.toast ?? {
+                        severity: "error",
+                        summary: "No User",
+                        detail: "Please select a user before creating",
+                        life: 1000
+                    })
+                }
             },
 
             changeRecipientTemplateState(){
@@ -760,6 +784,14 @@
                 this.transferData.recipient = this.myContact
                 this.changeRecipientState()
             },
+
+            validatedBeforeCreatingRecipient(){
+                if(this.adminOrUser()){
+                    return this.userSelector!=null;
+                }else{
+                    return this.userId;
+                }
+            }
         },
         
         watch:{
