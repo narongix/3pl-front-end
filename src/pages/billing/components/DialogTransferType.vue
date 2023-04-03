@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Dialog header="Transfer Volumes" v-model:visible="myStatus" :modal="true">
+        <Dialog header="Transfer Volumes" v-model:visible="myStatus" :modal="true" maximizable :style="{ width: '75vw' }">
             <div class="card">
                 <MyDataTable v-slot="mySlot" :initializeList="tempData" :row="row">
                     <DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" dataKey="id"
