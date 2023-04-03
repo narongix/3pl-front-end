@@ -21,7 +21,7 @@
 						<div class="col-12 md:col-4">
 							<SpecialCard title="Deliveries" 
 							title2="On Time Rate" underBodyGrey="For This Month"
-							:body="(monthlyMetric?.deliveries_on_time_rate?.count ?? 0) + ' %' "></SpecialCard>
+							:body="(monthlyMetric?.deliveries_on_time_rate?.on_time ?? 0) + ' %' "></SpecialCard>
 						</div>
 					</div>
 				</div>
@@ -197,21 +197,21 @@
 	import MyDashBoardIcon from './MyDashBoardIcon.vue';
 
 	export default {
-		mounted() {
-			// this.themeChangeListener = (event) => {
-			// 	if (event.dark)
-			// 		this.applyDarkTheme();
-			// 	else
-			// 		this.applyLightTheme();
-			// };
-			// EventBus.on("change-theme", this.themeChangeListener);
-			// if (this.isDarkTheme()) {
-			// 	this.applyDarkTheme();
-			// }
-			// else {
-			// 	this.applyLightTheme();
-			// }
-		}, 
+		// mounted() {
+		// 	// this.themeChangeListener = (event) => {
+		// 	// 	if (event.dark)
+		// 	// 		this.applyDarkTheme();
+		// 	// 	else
+		// 	// 		this.applyLightTheme();
+		// 	// };
+		// 	// EventBus.on("change-theme", this.themeChangeListener);
+		// 	// if (this.isDarkTheme()) {
+		// 	// 	this.applyDarkTheme();
+		// 	// }
+		// 	// else {
+		// 	// 	this.applyLightTheme();
+		// 	// }
+		// }, 
 		created() {
 			this.initData();
 		},
