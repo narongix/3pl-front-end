@@ -223,12 +223,12 @@
             data: Object,
             disabledField: Object,
             offset: Number,
+            // userId: String,
             popup: {
                 header: String,
                 productDemandDisplay: String
             },
             vanishField: Object,
-            userId: null,
             // validatedBeforeCreatingRecipient: {
             //     type: Function,
             //     default: ()=>{
@@ -457,9 +457,8 @@
                 getProducts: "products/getProductState",
                 getRecipientsState: "recipient/getRecipientsState",
                 transfer_type: "transferType/getTansferType",
-                
                 user: "auth/user",
-                
+                userId: "auth/getUserId",
                 getUserRole: "auth/getUserRole",
                 // Limit offset
                 getProductLimit: "products/limit",
