@@ -169,7 +169,7 @@
     <Dialog v-model:visible="promptFindRecipient" header="Choose from template" :style="{width: '350px'}">
         <div class="grid">
             <div class="col-12 md:col-12 sm:col-12">
-                <DropDownPagination v-model="myContact" :options="getRecipientByUser" optionLabel="full_name" optionValue="full_name"
+                <DropDownPagination v-model="myContact" :options="getRecipientByUser"
                 :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
                 :validation="validationField1.recipient.value"
                 :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
@@ -177,7 +177,6 @@
                 :showOption="option=>option.full_name"
                 :showValue="showValueRecipient" :offset="offset ?? 0"
                 >
-
                 </DropDownPagination>
             </div>
         </div>
@@ -502,7 +501,7 @@
         methods:{
             
             showValueRecipient(value){
-                return value ?? "Empty"
+                return value?.full_name ?? "Empty"
             },
             
             createRecipientTemplateNow(){
@@ -526,7 +525,13 @@
 
             openCreateRecipientTemplate(){
                 if(this.validatedBeforeCreatingRecipient()){
-                    this.changeRecipientTemplateState();
+                    this.toLoad = async ()=>{
+                        await this.$store.dispatch("user/fetchCountries");
+                        await this.$store.dispatch("user/fetchCities");
+                        await this.$store.dispatch("user/fetchDistricts");
+
+                        this.changeRecipientTemplateState();
+                    };
                 }else{
                     this.$toast.add(this.toast ?? {
                         severity: "error",
@@ -780,8 +785,13 @@
             },
 
             onConfirmSelectRecipientState(){
-                this.transferData.recipient = this.myContact
+                this.transferData.recipient = this.getRecipientValue();
                 this.changeRecipientState()
+            },
+
+            getRecipientValue(){
+                const myAddress = this.myContact.street_address? " - "+this.myContact.street_address : "";
+                return this.myContact.full_name + myAddress;
             },
 
             validatedBeforeCreatingRecipient(){
