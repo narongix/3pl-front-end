@@ -2,11 +2,12 @@
 	<BaseFieldForm  
 	:baseData="baseData" 
 	@onClickSubmit="onFormSubmit"
-	:userId="myUserId"
 	:data="oldData"
+	:myUserId="selectedUserId ?? myUserId"
 	:FieldNotActive="fieldNotActive"
 	:disabledField="disabledField" :popup="myPopUp"
 	:vanishField="vanishField"
+	:editMode="true"
 	>
 		<template #myTop="">
 			<RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -76,14 +77,16 @@
 				isDraftStatus: false,
 				isCancelStatus: false,
 
-				toLoad:null,
+				selectedUserId: null,
 
+				toLoad:null
 			}
 		},
 		computed:{
 			...mapGetters({
 				userRole: "auth/getUserRole",
 				myUserId: "auth/getUserId"
+				// getSelectedUserId: "admin/getSelectedUserId"
 			}),
 
 			getDataState(){
@@ -125,7 +128,9 @@
 						id : this.transferDetail.id,
 						created, 
 						updated, 
-						deleted})
+						deleted,
+						userId: this.selectedUserId
+					})
 
 					this.isDraftStatus=false
 					this.$toast.add({severity:"success",summary:"Success", detail:"Transfer Edited Successfully", life:3000})
@@ -152,16 +157,14 @@
 			},
 
 			async loadData(){
+				this.transferDetail = await this.getTransferDetail()
 				await this.$store.dispatch("transferType/getTransferType")
 				await this.$store.dispatch("recipient/getRecipients",{
 					offset: 0,
-					userId: this.myUserId
+					userId: this.selectedUserId ?? this.myUserId
 				})
 
 				await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
-
-				
-				this.transferDetail = await this.getTransferDetail()
 
 				if(this.transferDetail.transfer_status_id == transferId.Draft){
 					this.isDraftStatus=true
@@ -175,8 +178,9 @@
 			async getTransferDetail(){
 				const transferDetail = await this.$store.dispatch("transfers/getTransferDetail", {
 					transferId: this.$route.params.id
-				})
-				return transferDetail
+				});
+				this.selectedUserId = transferDetail.user_id;
+				return transferDetail;
 			},
 
 			async onFormSubmit(transfer, created, updated, deleted){
@@ -189,6 +193,7 @@
 						created, 
 						updated, 
 						deleted,
+						userId: this.userSelector ?? this.myUserId
 					});
 
 					this.changeEditState();
