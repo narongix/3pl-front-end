@@ -121,6 +121,7 @@
                     });
 
                     const newTransfer = await this.$store.dispatch("transfers/createTransfers", {tempTransfer: transfer, userId: userId ?? this.myuserId}); 
+                    console.log(newTransfer);
                     await this.$router.replace({name:"TransferDetail", params:{id: newTransfer.id}});
                     this.$toast.add({severity:'success', summary: 'Success', detail:'Transfer Created Successfully', life: 3000});
                 }
