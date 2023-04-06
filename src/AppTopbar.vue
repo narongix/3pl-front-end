@@ -2,7 +2,7 @@
   <div class="layout-topbar">
     <router-link to="/" class="layout-topbar-logo">
       <img alt="Logo" :src="topbarImage()" />
-      <span>HLH 3PL</span>
+      <!-- <span>/b HLH 3PL</span> -->
     </router-link>
     <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle">
       <i class="pi pi-bars"></i>
@@ -51,9 +51,9 @@
 </template>
 
 <style>
-.fullWidth {
-  width: 100%;
-}
+  .fullWidth {
+    width: 100%;
+  }
 </style>
 
 <script>
@@ -103,7 +103,7 @@ export default {
 
     topbarImage() {
       // TODO: create new logo 
-      return this.$appState.darkTheme ? 'images/HLH-Express-Logo.png' : 'images/HLH-Express-Logo.png';
+      return this.$appState.darkTheme ? 'images/logo2.png' : 'images/logo2.png';
     },
 
     toggleoProfilepanel(event) {
