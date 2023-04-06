@@ -267,7 +267,7 @@ export default {
         }
     },
 
-    computed: {
+    computed: { 
         barcode() {
             if (!this.product) {
                 return this.product.barcode;

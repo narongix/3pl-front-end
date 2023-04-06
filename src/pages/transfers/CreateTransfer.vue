@@ -4,6 +4,7 @@
     @onClickSubmit="onFormSubmit"
     :FieldNotActive="FieldNotActive"
     :disabledField="disabledField"
+	:myUserId="myUserId"
     :data="{}" :popup="myPopUp" :vanishField="vanishField"
     >
         <template #myTop>
@@ -79,7 +80,7 @@
         computed:{
             ...mapGetters({
                 products: "products/getProductState",
-                myuserId: "auth/getUserId",
+                myUserId: "auth/getUserId",
                 userRole: "auth/getUserRole"
             }),
 
