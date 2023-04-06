@@ -17,7 +17,7 @@
 			<Button v-if="fieldNotActive" label="Submit" :disabled="!isDraftStatus || isCancelStatus" @click="onUpgradeStatus" class="mr-2"></Button>
 			<Button v-if="fieldNotActive" label="Cancel" :disabled="!isDraftStatus || isCancelStatus" @click="onCancelStatus" class="p-button-secondary noFocus"></Button>
 			<Button v-if="!fieldNotActive" label="Save" :disabled="isCancelStatus" class="p-button-success mr-2" type="submit" />
-			<Button v-if="!fieldNotActive" label="Discard" :disabled="isCancelStatus" class="p-button-secondary mr-2" @click="revertBack(mySlot.myDiscardField)" />	
+			<Button v-if="!fieldNotActive" label="Discard" :disabled="isCancelStatus" class="p-button-secondary mr-2" @click="revertBack(mySlot.myDiscardField)" />
 		</template>
 	</BaseFieldForm>
 </template>

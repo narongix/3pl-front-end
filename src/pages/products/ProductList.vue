@@ -110,7 +110,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By On Hands"/>
                         </template>
                     </Column>
-                    <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
+                    <!-- <Column headerStyle="min-width:10rem;" header="Actions" style="width:5%">
                         <template #body="slotProps">
                             <Button v-if="slotProps.data.product_name" icon="pi pi-trash" class="p-button-rounded p-button-warning m-0"
                                 @click="confirmDeleteProduct(slotProps.data)" />
@@ -120,20 +120,9 @@
                                     <p></p>
                                 </div>
                         </template>
-                    </Column>
+                    </Column> -->
                 </DataTable>
-                <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm"
-                    :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete <b>{{ product.product_name }}</b>?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text"
-                            @click="deleteProductDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteProduct" />
-                    </template>
-                </Dialog>
+                
             </div>
         </div>
     </div>
@@ -162,9 +151,8 @@ export default {
     data() {
         return {
             rows: 10,        
-            product: null,
+            productV2: null,
             productDialog: false,
-            deleteProductDialog: false,
             disabled: false,
             dataList: [],
             filters: {
@@ -196,7 +184,9 @@ export default {
             myPageTracker: 0,
 
             productId: [],
-            productReference: []
+            productReference: [],
+
+            archivedProduct: 0
         }
     },
     computed: {
@@ -227,24 +217,6 @@ export default {
             }else{
                 router.push({name: "createProduct"});
             }
-            
-        },
-        confirmDeleteProduct(product) {
-            this.product = product;
-            this.deleteProductDialog = true;
-        },
-        async deleteProduct() {
-            this.toLoadRetry = async () => {
-                this.deleteProductDialog = false;
-                const actionPayload = {
-                    id: this.product.product_id,
-                };
-                await this.$store.dispatch('products/deleteProduct', actionPayload);
-                this.onDeleteList(this.product.product_id)
-
-                this.product = {};
-                this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
-            }
         },
 
         async initData() {
@@ -264,7 +236,6 @@ export default {
                 productId: this.productId,
                 productReference: this.productReference,
             });
-    
             this.initList();
 
             const products = await this.$store.dispatch("products/onFetchProducts", {

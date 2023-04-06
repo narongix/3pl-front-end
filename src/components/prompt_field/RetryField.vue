@@ -22,15 +22,36 @@
         props:{
             toLoad: Function,
             message: {
-              failed: String,
-              yesButton: String,
-              noButton: String
+              failed: {
+                type: String,
+                default: "failed"
+              },
+              yesButton: {
+                type: String,
+                default: "Yes"
+              },
+              noButton: {
+                type: String,
+                default: "No"
+              }
             },
             errorToast: {
-                severity: String,
-                summary: String,
-                detail: String,
-                life: Number
+                severity: {
+                    type: String,
+                    default: "error"
+                },
+                summary: {
+                    type: String,
+                    default: "Error!"
+                },
+                detail: {
+                    type: String,
+                    default: "Failed Loading"
+                },
+                life: {
+                    type: Number,
+                    default: 2000
+                }
             }
         },
         data(){

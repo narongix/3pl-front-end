@@ -94,6 +94,7 @@ export default {
         },
         deleteProductCategoryState(state, productState) {
             const index = state.prodCategories.findIndex(e => e.id == productState.id)
+            // state.prodCategories[index].archived=1
             state.prodCategories.splice(index, 1)
         },
 
@@ -131,6 +132,7 @@ export default {
             }
             const response = await ApiService.getDetailOnProduct(data);
             commit("updateProductState", [response])
+            return response;
         },
         async addProduct(context, {newlyCreatedProduct, userId}) {
             try {
