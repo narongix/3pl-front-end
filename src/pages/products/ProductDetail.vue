@@ -28,6 +28,24 @@
                         <label for="sku">Universal Product Code (UPC)</label>
                         <InputText id="sku" type="text" :disabled="editDisabled" v-model="product.upc.newVal" />
                     </div>
+                    
+                    <div class="field col-12 md:col-3">
+                        <label for="qty-available">On Hands</label>
+                        <InputText id="qty-available" type="text" v-model="product.onhands.newVal" :disabled=true />
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="incoming-qty">Incoming</label>
+                        <InputText id="incoming-qty" type="text" v-model="product.incoming.newVal" :disabled=true />
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="outgoing-qty">Outgoing</label>
+                        <InputText id="outgoing-qty" type="text" v-model="product.outgoing.newVal" :disabled=true />
+                    </div>
+                    <div class="field col-12 md:col-3">
+                        <label for="forecasted-qty">Forecasted</label>
+                        <InputText id="forecasted-qty" type="text" v-model="product.forecasted.newVal" :disabled=true />
+                    </div>
+
                     <div class="field col-12 md:col-3">
                         <label for="product-category">Product Category</label>
                         <v-select id="category-name" :options="prodCategories" label="category_name"
@@ -42,18 +60,6 @@
                             </template>
                         </v-select>
                     </div>
-                    <div class="field col-12 md:col-3">
-                        <label for="qty-available">On Hands</label>
-                        <InputText id="qty-available" type="text" v-model="product.onhands.newVal" :disabled=true />
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <label for="incoming-qty">Incoming</label>
-                        <InputText id="incoming-qty" type="text" v-model="product.incoming.newVal" :disabled=true />
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <label for="outgoing-qty">Outgoing</label>
-                        <InputText id="outgoing-qty" type="text" v-model="product.outgoing.newVal" :disabled=true />
-                    </div>
                     <div class="field col-12 md:col-12"></div><!-- empty space -->
                 </div>
             </div>
@@ -62,10 +68,6 @@
                 <hr>
                 <p></p>
                 <div class="p-fluid formgrid grid">
-                    <div class="field col-12 md:col-3">
-                        <label for="forecasted-qty">Forecasted</label>
-                        <InputText id="forecasted-qty" type="text" v-model="product.forecasted.newVal" :disabled=true />
-                    </div>
                     <!-- TODO1: disabled product details field -->
                     <div class="field col-12 md:col-3">
                         <label for="width">Width(cm)</label>
@@ -79,11 +81,17 @@
                         <label for="height">Height(cm)</label>
                         <InputText id="height" type="text" v-model="product.height.newVal" :disabled=true />
                     </div>
+                    <div v-if="false" class="field col-12 md:col-3">
+                        <label for="weight">Weight(cbm)</label>
+                        <InputText id="weight" type="text" v-model="product.weight.newVal" :disabled=true />
+                    </div>
                     <div class="field col-12 md:col-3">
                         <label for="dimension">Dimensions</label>
                         <InputText id="dimension" type="text" v-model="product.dimensions.newVal" :disabled=true />
                     </div>
-                    <div class="field col-12 md:col-6">
+                    <div class="field col-12 md:col-3">
+                        <label for="volume">Volumes(m³)</label>
+                        <InputText id="volume" type="text" v-model="product.volume.newVal" :disabled=true />
                     </div>
                 </div>
             </div>
@@ -206,7 +214,17 @@ export default {
                     newVal: null,
                     isValid: true,
                 },
+                weight: {
+                    val: null,
+                    newVal: null,
+                    isValid: true,
+                },
                 dimensions: {
+                    val: null,
+                    newVal: null,
+                    isValid: true,
+                },
+                volume: {
                     val: null,
                     newVal: null,
                     isValid: true,
@@ -326,9 +344,19 @@ export default {
                     newVal: this.products.height,
                     isValid: true,
                 },
+                weight: {
+                    val: this.products.weight,
+                    newVal: this.products.weight,
+                    isValid: true,
+                },
                 dimensions: {
                     val: this.products.dimensions,
                     newVal: this.products.dimensions,
+                    isValid: true,
+                },
+                volume: {
+                    val: this.products.volume,
+                    newVal: this.products.volume,
                     isValid: true,
                 }
             })
