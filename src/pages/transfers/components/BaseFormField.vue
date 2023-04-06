@@ -465,7 +465,7 @@
                 getRecipientsState: "recipient/getRecipientsState",
                 transfer_type: "transferType/getTansferType",
                 user: "auth/user",
-                // userId: "auth/getUserId",
+                userId: "auth/getUserId",
                 getUserRole: "auth/getUserRole",
                 // Limit offset
                 getProductLimit: "products/limit",
@@ -687,7 +687,7 @@
                 if(index<0){
                     // TODO: Implement Proper Time conversion to API
                     // this.transferData.scheduledDate = this.transferData.scheduledDate.toUTCString()
-                    this.$emit('onClickSubmit', this.transferData, this.addedTransferProducts, this.updatedTransferProducts,  this.deletedTransferProducts, this.userSelector)
+                    this.$emit('onClickSubmit', this.transferData, this.addedTransferProducts, this.updatedTransferProducts,  this.deletedTransferProducts, this.userSelector ?? this.myUserId)
                 }
                 e.preventDefault();
             },
@@ -746,7 +746,7 @@
             async onLoadProductV2(offset){
                 const products = await this.$store.dispatch("products/onFetchProducts", {
                     offset: offset,
-                    userId: this.userSelector ?? this.myUserId,
+                    userId: this.userSelector ?? this.myUserId ?? this.userId,
                 })
 
                 return products.length

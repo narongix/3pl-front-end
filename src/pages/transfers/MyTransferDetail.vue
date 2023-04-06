@@ -86,7 +86,6 @@
 			...mapGetters({
 				userRole: "auth/getUserRole",
 				myUserId: "auth/getUserId"
-				// getSelectedUserId: "admin/getSelectedUserId"
 			}),
 
 			getDataState(){
