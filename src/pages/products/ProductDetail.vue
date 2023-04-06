@@ -5,6 +5,7 @@
                 <h5>Product Details/{{ $route.params.id }}</h5>
                 <Button :label="buttonLabel" class="p-button-success mr-2" @click="changeEditMode" />
                 <Button v-if="!editDisabled" label="Discard" class="p-button-secondary" @click="discard"></Button>
+                <Button :disabled="false" severity="danger" label="Delete" @click="confirmDeleteProduct"></Button>
                 <hr>
                 <p></p>
                 <div class="p-fluid formgrid grid">
@@ -117,22 +118,53 @@
     <PromptField :loading="promptCreated" @onAccept="onComfirmCreated" @onDecline="onDecline" :message="message">
         <p>{{ message?.prompt ?? "Are you sure you want to create this?" }} <strong>{{ selectedCreated }}</strong>?</p>
     </PromptField>
+
+    <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm"
+        :modal="true">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+            <span v-if="product">Are you sure you want to delete <b>{{ product.product_name }}</b>?</span>
+        </div>
+        <template #footer>
+            <Button label="No" icon="pi pi-times" class="p-button-text"
+                @click="deleteProductDialog = false" />
+            <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteProduct" />
+        </template>
+    </Dialog>
+    <RetryField :toLoad="toLoad" :message="messageV2"></RetryField>
+
 </template>
+
 <script>
 import PromptField from "../../components/prompt_field/PromptField.vue"
 import TimeConvert from "../../components/utils/TimeConvert";
+import RetryField from "../../components/prompt_field/RetryField.vue";
 
 export default {
+    components: {
+        RetryField,
+        PromptField
+    },
     created() {
         // TODO: REFACTOR LOAD DATA
         this.loadData();
         this.loadProdCategories();
     },
-    components: {
-        PromptField
-    },
     data() {
         return {
+            toLoad: null,
+            messageV2: {
+                failed: "Error Loading Data. Try again?",
+                yesButton: "Yes",
+                noButton: "No",
+            },
+            errorToastDeletingProduct: {
+                severity: "error",
+                summary: "Error!",
+                detail: "Failed Deleting Product!"
+            },
+            deleteProductDialog: false,
+
             message: {
                 failed: "Error Loading Data. Try again?",
                 yesButton: "Yes",
@@ -141,6 +173,7 @@ export default {
                 accept: "yes",
                 prompt: null
             },
+            productV2: null,
             promptCreated: false,
             selectedCreated: null,
             prodCategory: null,
@@ -231,6 +264,37 @@ export default {
                 },
                 updatedFields: [],
             }
+        }
+    },
+
+    computed: {
+        barcode() {
+            if (!this.product) {
+                return this.product.barcode;
+            } else {
+                return null;
+            }
+        },
+        buttonLabel() {
+            let label = "";
+            if (this.editDisabled) {
+                label = "Edit";
+            } else {
+                label = "Save"
+            }
+            return label;
+        },
+        updatedName() {
+            return this.product.name.val === this.product.name.newVal ? false : true;
+        },
+        prodCategories() {
+            return this.$store.getters['products/prodCategories'];
+        },
+        listDetail() {
+            const products = this.$store.getters['products/getProductState'].filter(product => {
+                return product.product_id == this.$route.params.id;
+            })[0];
+            return products
         }
     },
     methods: {
@@ -361,7 +425,7 @@ export default {
                 }
             })
 
-            await this.$store.dispatch("products/getDetailProduct", this.$route.params.id);
+            this.productV2 = await this.$store.dispatch("products/getDetailProduct", this.$route.params.id);
             this.productHistory = this.listDetail.product_moves
         },
         async newCategory(name) {
@@ -392,38 +456,28 @@ export default {
         },
         convert(time){
             return TimeConvert.formatUTCToDate(time)
-        }
-    },
-    computed: {
-        barcode() {
-            if (!this.product) {
-                return this.product.barcode;
-            } else {
-                return null;
+        },
+
+        confirmDeleteProduct() {
+            this.deleteProductDialog = true;
+        },
+
+        async deleteProduct() {
+            this.toLoad = async () => {
+                this.deleteProductDialog = false; 
+                console.log(this.productV2);
+                const actionPayload = {
+                    id: this.productV2.product_id,
+                };
+                await this.$store.dispatch('products/deleteProduct', actionPayload);
+                // this.onDeleteList(this.productV2.product_id)
+
+                this.productV2 = {};
+                this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+                this.$router.push({name:'productList'});
             }
-        },
-        buttonLabel() {
-            let label = "";
-            if (this.editDisabled) {
-                label = "Edit";
-            } else {
-                label = "Save"
-            }
-            return label;
-        },
-        updatedName() {
-            return this.product.name.val === this.product.name.newVal ? false : true;
-        },
-        prodCategories() {
-            return this.$store.getters['products/prodCategories'];
-        },
-        listDetail() {
-            const products = this.$store.getters['products/getProductState'].filter(product => {
-                return product.product_id == this.$route.params.id;
-            })[0];
-            return products
         }
-    },
+    }
 }
 </script>
 
