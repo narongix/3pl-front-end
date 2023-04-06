@@ -6,7 +6,7 @@
         props: ["data"],
         methods:{
             pushing(){
-                this.$router.push({name:"TransferDetail", params:{id: this.data?.id}})
+                this.$router.push({name:"TransferDetail", params:{id: this.data?.id}});
             }
         }
     }

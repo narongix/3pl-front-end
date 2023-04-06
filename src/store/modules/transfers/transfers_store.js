@@ -118,9 +118,13 @@ export default{
                 addedTransferProducts: created,
                 deletedTransferProducts: deleted,
                 updatedTransferProducts: updated,
+            };
+
+            const params = {
                 user_id: userId
-            }
-            const newTransferV2 = await ApiService.updateTransfer(newTransfer, id)
+            };
+
+            const newTransferV2 = await ApiService.updateTransfer(newTransfer, id, params)
             
             commit("updateTransferState", [newTransferV2])
             return newTransferV2

@@ -465,7 +465,6 @@ export default {
         async deleteProduct() {
             this.toLoad = async () => {
                 this.deleteProductDialog = false; 
-                console.log(this.productV2);
                 const actionPayload = {
                     id: this.productV2.product_id,
                 };

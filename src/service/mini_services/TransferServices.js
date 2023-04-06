@@ -29,10 +29,11 @@ export default{
         return res.data;
     }, 
 
-    async updateTransfer(data, id){
+    async updateTransfer(data, id, params){
         const res = await ApiConfig.patchMethods({
             api: `/transfer/${ id }`,
             data: data,
+            params: params,
             contentType: "application/json"
         })
         return res.data

@@ -1,195 +1,196 @@
 <template>
+    <div>
+        <slot name="myTop"></slot>
+        <div class="card">
+            <form @submit="validateAndSubmit">
+                <div class="grid">
+                    <div class="col-12">
+                        <h5>{{ baseData.titleForm }}</h5>
+                        <slot name="myButton" :onClick="validateAndSubmit" :myDiscardField="changeStateDiaglog"></slot>
+                        <hr>
+                        <p></p>
 
-    <slot name="myTop"></slot>
-    <div class="card">
-        <form @submit="validateAndSubmit">
-            <div class="grid">
-                <div class="col-12">
-                    <h5>{{ baseData.titleForm }}</h5>
-                    <slot name="myButton" :onClick="validateAndSubmit" :myDiscardField="changeStateDiaglog"></slot>
-                    <hr>
-                    <p></p>
+                        <div class="p-fluid formgrid grid">
+                            <div class="field col-12 md:col-4 sm:col-12">
+                                <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
 
-                    <div class="p-fluid formgrid grid">
-                        <div class="field col-12 md:col-4 sm:col-12">
-                            <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
+                                <!-- A bug from the dev team, not from the code's fault -->
+                                <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
+                                        id="scheduleDate" v-model="transferData.scheduledDate"
+                                        :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar" :inputClass="{'p-invalid': validationField1.scheduledDate.value}"/>
+                                <small id="scheduleDate-help" class="p-error" v-if="validationField1.scheduledDate.value">Cannot be Empty</small>
+                            </div>
 
-                            <!-- A bug from the dev team, not from the code's fault -->
-                            <Calendar :manualInput="false" :showIcon="true" :disabled="FieldNotActive || disabledField['scheduleDate']"
-                                      id="scheduleDate" v-model="transferData.scheduledDate"
-                                      :showTime="true" hourFormat="12" showButtonbar="true" :dateFormat="getFormatCalendar" :inputClass="{'p-invalid': validationField1.scheduledDate.value}"/>
-                            <small id="scheduleDate-help" class="p-error" v-if="validationField1.scheduledDate.value">Cannot be Empty</small>
-                        </div>
+                            <div class="field col-12 md:col-3 sm:col-12">
+                                <label for="transfer_type_id" :class="{'p-error': validationField1.transfer_type_id.value}">Transfer Type</label>
 
-                        <div class="field col-12 md:col-3 sm:col-12">
-                            <label for="transfer_type_id" :class="{'p-error': validationField1.transfer_type_id.value}">Transfer Type</label>
+                                <Dropdown :disabled="FieldNotActive || disabledField['transfer_type_id']" 
+                                id="transfer_type_id" v-model="transferData.transfer_type_id"
+                                :options="transfer_type" :optionLabel="getTransferTypeName"
+                                :class="{'p-invalid': validationField1.transfer_type_id.value}"
+                                :placeholder="transferLoading? 'Loading' : 'Please select a transfer'"
+                                :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="false"                              >
+                                </Dropdown>
 
-                            <Dropdown :disabled="FieldNotActive || disabledField['transfer_type_id']" 
-                              id="transfer_type_id" v-model="transferData.transfer_type_id"
-                              :options="transfer_type" :optionLabel="getTransferTypeName"
-                              :class="{'p-invalid': validationField1.transfer_type_id.value}"
-                              :placeholder="transferLoading? 'Loading' : 'Please select a transfer'"
-                              :loading="transferLoading" optionValue="transfer_type_id" :selectOnFocus="false"                              >
-                            </Dropdown>
+                                <small id="transfer_type_id-help" class="p-error" v-if="validationField1.transfer_type_id.value">{{ validationField1.transfer_type_id.value }}</small>
+                            </div>
 
-                            <small id="transfer_type_id-help" class="p-error" v-if="validationField1.transfer_type_id.value">{{ validationField1.transfer_type_id.value }}</small>
-                        </div>
+                            <div v-if="showRecipientField" class="field col-12 md:col-5 sm:col-12">
+                                <label for="recipient" :class="{'p-error': validationField1.recipient.value}">Recipient</label>
+                                <div class="field grid col-12 md:col-9 sm:col-12">
+                                    <div class="col-11 pl-0">
+                                        <InputText v-model="transferData.recipient" @input="onInput" 
+                                        placeholder="Recipient" type="text" :disabled="FieldNotActive || disabledField['recipient']"
+                                        :class="{'p-invalid': validationField1.recipient.value}"
+                                        >
+                                        </InputText>
+                                        <small id="recipient-help" class="p-error" v-if="validationField1.recipient.value">Cannot be Empty</small>
 
-                        <div v-if="showRecipientField" class="field col-12 md:col-5 sm:col-12">
-                            <label for="recipient" :class="{'p-error': validationField1.recipient.value}">Recipient</label>
-                            <div class="field grid col-12 md:col-9 sm:col-12">
-                                <div class="col-11 pl-0">
-                                    <InputText v-model="transferData.recipient" @input="onInput" 
-                                    placeholder="Recipient" type="text" :disabled="FieldNotActive || disabledField['recipient']"
-                                    :class="{'p-invalid': validationField1.recipient.value}"
-                                    >
-                                    </InputText>
-                                    <small id="recipient-help" class="p-error" v-if="validationField1.recipient.value">Cannot be Empty</small>
-
-                                    <OverlayPanel ref="myOverLayPanel">
-                                        <div>
-                                            <Button label="Create Template" class="p-button-link" @click="createRecipientTemplateNow"></Button>
-                                        </div>
-                                        <div>
-                                            <Button label="Create and edit" class="p-button-link" @click="openCreateRecipientTemplate"></Button>
-                                        </div>                                        
-                                    </OverlayPanel>
-                                </div>
-                                
-                                <div class="field col-1">
-                                    <Button icon="pi pi-bookmark" :disabled="FieldNotActive || disabledField['recipient']" 
-                                    class="p-button-rounded p-button-secondary p-button-text" @click="openRecipientPanel" 
-                                    v-tooltip="'Choose From Template'"/>
+                                        <OverlayPanel ref="myOverLayPanel">
+                                            <div>
+                                                <Button label="Create Template" class="p-button-link" @click="createRecipientTemplateNow"></Button>
+                                            </div>
+                                            <div>
+                                                <Button label="Create and edit" class="p-button-link" @click="openCreateRecipientTemplate"></Button>
+                                            </div>                                        
+                                        </OverlayPanel>
+                                    </div>
+                                    
+                                    <div class="field col-1">
+                                        <Button icon="pi pi-bookmark" :disabled="FieldNotActive || disabledField['recipient']" 
+                                        class="p-button-rounded p-button-secondary p-button-text" @click="openRecipientPanel" 
+                                        v-tooltip="'Choose From Template'"/>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="field col-12 md:col-4">
-                            <label for="InternalReference" :class="{'p-error': validationField1.reference.value}">Internal Reference</label>
-                            <InputText :disabled="FieldNotActive || disabledField['reference']" id="InternalReference" 
-                            type="text" v-model.trim="transferData.reference" :class="{'p-invalid': validationField1.reference.value}"></InputText>
-                            <small id="InternalReference-help" class="p-error" v-if="validationField1.reference.value">{{ validationField1.reference.value }}</small>
-                        </div>
+                            <div class="field col-12 md:col-4">
+                                <label for="InternalReference" :class="{'p-error': validationField1.reference.value}">Internal Reference</label>
+                                <InputText :disabled="FieldNotActive || disabledField['reference']" id="InternalReference" 
+                                type="text" v-model.trim="transferData.reference" :class="{'p-invalid': validationField1.reference.value}"></InputText>
+                                <small id="InternalReference-help" class="p-error" v-if="validationField1.reference.value">{{ validationField1.reference.value }}</small>
+                            </div>
 
-                        <div v-if="adminOrUser() && !vanishField['userSelector']" class="field col-12 md:col-3">
-                            <label for="adminUserId" :class="{'p-error': validationField1.userId.value}">User</label>
-                            <UserDropDownPagination v-model:userSelector="userSelector" :disabled="FieldNotActive || disabledField['userSelector']" :validation="validationField1.userId.value!=null"></UserDropDownPagination>
-                            <small id="adminuserId-help" class="p-error" v-if="validationField1.userId.value">{{ validationField1.userId.value }}</small>
-                        </div>
+                            <div v-if="adminOrUser() && !vanishField['userSelector']" class="field col-12 md:col-3">
+                                <label for="adminUserId" :class="{'p-error': validationField1.userId.value}">User</label>
+                                <UserDropDownPagination v-model:userSelector="userSelector" :disabled="FieldNotActive || disabledField['userSelector']" :validation="validationField1.userId.value!=null"></UserDropDownPagination>
+                                <small id="adminuserId-help" class="p-error" v-if="validationField1.userId.value">{{ validationField1.userId.value }}</small>
+                            </div>
 
-                        <div class="field col-12 md:col-3 sm:col-12">
-                            <label for="status">Status</label>
-                            <InputText :disabled="true" id="status" 
-                            type="text" v-model="myTransferStatus"></InputText>
+                            <div class="field col-12 md:col-3 sm:col-12">
+                                <label for="status">Status</label>
+                                <InputText :disabled="true" id="status" 
+                                type="text" v-model="myTransferStatus"></InputText>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
-    </div>  
+            </form>
+        </div>  
 
-    <div class="card">
-        <div class="grid">
-            <div class="col-12 md:col-12 sm:col-12">
-                <Button v-if="!FieldNotActive" label="SAVE" class="p-button-success mr-2 mb-2" @click='changeStateDiaglog'>
-                    {{ baseData.buttonSubmit }}
-                </Button>
-            </div>
+        <div class="card">
+            <div class="grid">
+                <div class="col-12 md:col-12 sm:col-12">
+                    <Button v-if="!FieldNotActive" label="SAVE" class="p-button-success mr-2 mb-2" @click='changeStateDiaglog'>
+                        {{ baseData.buttonSubmit }}
+                    </Button>
+                </div>
 
-            <div class="col-12 md:col-12 sm:col-12">
-                <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
-                <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="promptEditField"
-                :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll"
-                v-model:filters="filters"  filterDisplay="menu"
-                >
-                    <template #empty>
-                        <p :class="{'p-error': validationField1.transferProducts.value}">Please create transfer detail</p>
-                    </template>
-
-                    <Column field="product_name" header="Name" :sortable="true" style="min-width:12rem">
-                        <template #body="{ data }">
-                            <p :class="{highlight: !FieldNotActive}">{{ data.product_name }}</p>
+                <div class="col-12 md:col-12 sm:col-12">
+                    <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
+                    <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="promptEditField"
+                    :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll"
+                    v-model:filters="filters"  filterDisplay="menu"
+                    >
+                        <template #empty>
+                            <p :class="{'p-error': validationField1.transferProducts.value}">Please create transfer detail</p>
                         </template>
 
-                      <template #filter="{filterModel, filterCallback}">
-                        <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name"></InputText>
-                      </template>
-                    </Column>
-                    <Column field="sku" header="Internal Reference" style="min-width:12rem"></Column>
-                    <Column field="barcode" header="Barcode" style="min-width:15rem"></Column>
-                    <Column field="demand" header="Demands" :sortable="true" style="min-width:12rem">
-                        <template #body="{ data }">
-                            <p :class="{highlight: !FieldNotActive}">{{ data.demand }}</p>
-                        </template>
+                        <Column field="product_name" header="Name" :sortable="true" style="min-width:12rem">
+                            <template #body="{ data }">
+                                <p :class="{highlight: !FieldNotActive}">{{ data.product_name }}</p>
+                            </template>
 
-                        <template #filter="{ filterModel, filterCallback }">
-                          <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by demands"></InputText>
+                        <template #filter="{filterModel, filterCallback}">
+                            <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name"></InputText>
                         </template>
-                    </Column>
-                    <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
-                        <template #body="props">
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="onPopUpDeletedPrompt(props)" />
-                        </template>
-                    </Column>
-                </DataTable>
+                        </Column>
+                        <Column field="sku" header="Internal Reference" style="min-width:12rem"></Column>
+                        <Column field="barcode" header="Barcode" style="min-width:15rem"></Column>
+                        <Column field="demand" header="Demands" :sortable="true" style="min-width:12rem">
+                            <template #body="{ data }">
+                                <p :class="{highlight: !FieldNotActive}">{{ data.demand }}</p>
+                            </template>
+
+                            <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by demands"></InputText>
+                            </template>
+                        </Column>
+                        <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
+                            <template #body="props">
+                                <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="onPopUpDeletedPrompt(props)" />
+                            </template>
+                        </Column>
+                    </DataTable>
+                </div>
             </div>
         </div>
+
+        <Dialog v-model:visible="promptCreateField" :style="{width: '450px'}" :header="popup.header ?? 'Select New Product'" :modal=true>
+            <div class="p-fluid formgrid grid">
+                <div class="field col-12 md:col-12 sm:col-12">
+                    <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
+                    <DropDownPagination v-model="product_id" :options="getProductByUser" optionLabel="search_key" optionValue="product_id"
+                    :disabled="FieldNotActive" id="product_id" placeholder="Please select a product" 
+                    :validation="validationField2.product_id.value"
+                    :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
+                    :maxLength="getProductLength"
+                    :errorToastLoading="errorToastLoadingProducts" :messageLoad="messageLoadProducts"
+                    :showOption="option => option.search_key"
+                    >
+
+                    </DropDownPagination>
+                    <small id="product_id-help" class="p-error" v-if="validationField2.product_id.value!=null">{{ validationField2.product_id.value }}</small>
+                </div>
+
+                <div class="field col-12 md:col-12 sm:col-12">
+                    <label for="demand" :class="{'p-error': validationField2.demand.value!=null}">{{ popup.productDemandDisplay ?? "Product Quantity" }}</label>
+                    <InputText :disabled="FieldNotActive" id="demand" type="text" v-model="demand" :class="{'p-invalid':validationField2.demand.value}"></InputText>
+                    <small id="demand-help" class="p-error" v-if="validationField2.demand.value!=null">{{ validationField2.demand.value }}</small>
+                </div>
+            </div>
+
+            <template #footer>
+                <Button label="Discard" class="p-button-secondary p-button-text" @click="changeStateDiaglog"></Button>
+                <Button v-if="editedIndex!=null" :disabled="productLoading" label="Update" class="p-button-text" @click="updateField"></Button>
+                <Button v-else :disabled="productLoading" label="Create" class="p-button-text" @click="createTransferProduct"></Button>
+            </template>
+        </Dialog>
+
+        <Dialog v-model:visible="promptFindRecipient" header="Choose from template" :style="{width: '350px'}">
+            <div class="grid">
+                <div class="col-12 md:col-12 sm:col-12">
+                    <DropDownPagination v-model="myContact" :options="getRecipientByUser"
+                    :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
+                    :validation="validationField1.recipient.value"
+                    :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
+                    :maxLength="getRecipientLength"
+                    :showOption="option=>option.full_name"
+                    :showValue="showValueRecipient" :offset="offset ?? 0"
+                    >
+                    </DropDownPagination>
+                </div>
+            </div>
+
+            <template #footer>
+                <Button label="Discard" @click="changeRecipientState"></Button>
+                <Button label="Select" @click="onConfirmSelectRecipientState"></Button>
+            </template>
+        </Dialog>
+
+        <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="changeDeletedStateDialog" :message="messageDeletePrompt"/>
+        <RecipientField v-model="transferData.recipient" v-model:state="state" :userId="userSelector ?? myUserId"></RecipientField>
+        <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
     </div>
-
-    <Dialog v-model:visible="promptCreateField" :style="{width: '450px'}" :header="popup.header ?? 'Select New Product'" :modal=true>
-        <div class="p-fluid formgrid grid">
-            <div class="field col-12 md:col-12 sm:col-12">
-                <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
-                <DropDownPagination v-model="product_id" :options="getProductByUser" optionLabel="search_key" optionValue="product_id"
-                :disabled="FieldNotActive" id="product_id" placeholder="Please select a product" 
-                :validation="validationField2.product_id.value"
-                :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
-                :maxLength="getProductLength"
-                :errorToastLoading="errorToastLoadingProducts" :messageLoad="messageLoadProducts"
-                :showOption="option => option.search_key"
-                >
-
-                </DropDownPagination>
-                <small id="product_id-help" class="p-error" v-if="validationField2.product_id.value!=null">{{ validationField2.product_id.value }}</small>
-            </div>
-
-            <div class="field col-12 md:col-12 sm:col-12">
-                <label for="demand" :class="{'p-error': validationField2.demand.value!=null}">{{ popup.productDemandDisplay ?? "Product Quantity" }}</label>
-                <InputText :disabled="FieldNotActive" id="demand" type="text" v-model="demand" :class="{'p-invalid':validationField2.demand.value}"></InputText>
-                <small id="demand-help" class="p-error" v-if="validationField2.demand.value!=null">{{ validationField2.demand.value }}</small>
-            </div>
-        </div>
-
-        <template #footer>
-            <Button label="Discard" class="p-button-secondary p-button-text" @click="changeStateDiaglog"></Button>
-            <Button v-if="editedIndex!=null" :disabled="productLoading" label="Update" class="p-button-text" @click="updateField"></Button>
-            <Button v-else :disabled="productLoading" label="Create" class="p-button-text" @click="createTransferProduct"></Button>
-        </template>
-    </Dialog>
-
-    <Dialog v-model:visible="promptFindRecipient" header="Choose from template" :style="{width: '350px'}">
-        <div class="grid">
-            <div class="col-12 md:col-12 sm:col-12">
-                <DropDownPagination v-model="myContact" :options="getRecipientByUser"
-                :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
-                :validation="validationField1.recipient.value"
-                :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
-                :maxLength="getRecipientLength"
-                :showOption="option=>option.full_name"
-                :showValue="showValueRecipient" :offset="offset ?? 0"
-                >
-                </DropDownPagination>
-            </div>
-        </div>
-
-        <template #footer>
-            <Button label="Discard" @click="changeRecipientState"></Button>
-            <Button label="Select" @click="onConfirmSelectRecipientState"></Button>
-        </template>
-    </Dialog>
-
-    <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="changeDeletedStateDialog" :message="messageDeletePrompt"/>
-    <RecipientField v-model="transferData.recipient" v-model:state="state" :userId="userSelector ?? userId"></RecipientField>
-    <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
 </template>
 
 <style scoped>
@@ -222,7 +223,11 @@
             data: Object,
             disabledField: Object,
             offset: Number,
-            // userId: String,
+            myUserId: null,
+            editMode: {
+                type: Boolean,
+                default: false
+            },
             popup: {
                 header: String,
                 productDemandDisplay: String
@@ -310,6 +315,9 @@
                     userId:{
                         value: null,
                         myFunction:()=>{
+                            if(this.editMode){
+                                return this.validationField1.userId.value = null
+                            }
                             if(this.getUserRole == roleGroupId.User){
                                 return this.validationField1.userId.value = null
                             }
@@ -457,7 +465,7 @@
                 getRecipientsState: "recipient/getRecipientsState",
                 transfer_type: "transferType/getTansferType",
                 user: "auth/user",
-                userId: "auth/getUserId",
+                // userId: "auth/getUserId",
                 getUserRole: "auth/getUserRole",
                 // Limit offset
                 getProductLimit: "products/limit",
@@ -466,13 +474,13 @@
 
 
             getProductByUser(){
-                const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? this.userId));
+                const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? this.myUserId));
                 return newProduct;
             },
 
             getRecipientByUser(){
                 // TODO: Fix Dialog Select Recipient. Everytime Recipient Dialog is loaded, it would refresh the entire widget
-                const newRecipient = this.getRecipientsState.filter((e)=>e.user_id == (this.userSelector ?? this.userId))
+                const newRecipient = this.getRecipientsState.filter((e)=>e.user_id == (this.userSelector ?? this.myUserId))
 
                 return newRecipient;
             },
@@ -509,7 +517,7 @@
                     this.toLoad = async ()=>{                        
                         await this.$store.dispatch("recipient/createRecipient", {
                             firstName: this.transferData.recipient,
-                            userId: this.userSelector ?? this.userId
+                            userId: this.userSelector ?? this.myUserId
                         })
                     };
                     this.$refs.myOverLayPanel.hide();
@@ -738,7 +746,7 @@
             async onLoadProductV2(offset){
                 const products = await this.$store.dispatch("products/onFetchProducts", {
                     offset: offset,
-                    userId: this.userSelector,
+                    userId: this.userSelector ?? this.myUserId,
                 })
 
                 return products.length
@@ -747,7 +755,7 @@
             async onloadRecipientV2(offset){
                 const recipients = await this.$store.dispatch("recipient/getRecipients",{
                     offset: offset,
-                    userId: this.userSelector ?? this.userId
+                    userId: this.userSelector ?? this.myUserId
                 })
                 return recipients.length
             },
@@ -776,7 +784,7 @@
                 await this.$store.dispatch("recipient/getRecipients", {
                     offset: 0,
                     searchString: filterValue,
-                    user_id: this.userSelector ?? this.userId
+                    user_id: this.userSelector ?? this.myUserId
                 })
             },
             
@@ -798,7 +806,7 @@
                 if(this.adminOrUser()){
                     return this.userSelector!=null;
                 }else{
-                    return this.userId;
+                    return this.myUserId;
                 }
             }
         },

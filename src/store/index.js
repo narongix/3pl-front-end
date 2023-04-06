@@ -19,7 +19,7 @@ const store = createStore({
         stockedDetailReport: stockedDetailReportModule,
         billing: billing_store,
         user: user_store,
-        dashboard: dashboard_store
+        dashboard: dashboard_store,
     },
     actions:{
         clearAllStates({ commit }){
