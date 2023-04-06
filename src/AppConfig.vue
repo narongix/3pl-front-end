@@ -6,14 +6,14 @@
 		<Button class="p-button-danger layout-config-close p-button-rounded p-button-text" icon="pi pi-times" @click="hideConfigurator" :style="{'z-index': 1}"></Button>
 
 		<div class="layout-config-content">
-			<h5 class="mt-0">Component Scale</h5>
+			<!-- <h5 class="mt-0">Component Scale</h5>
 			<div class="config-scale">
 				<Button icon="pi pi-minus" @click="decrementScale()" class="p-button-text" :disabled="scale === scales[0]"/>
 				<i class="pi pi-circle-on" v-for="s of scales" :class="{'scale-active': s === scale}" :key="s"/>
 				<Button icon="pi pi-plus"  @click="incrementScale()" class="p-button-text" :disabled="scale === scales[scales.length - 1]" />
-			</div>
+			</div> -->
 
-			<h5>Input Style</h5>
+			<!-- <h5>Input Style</h5>
 			<div class="p-formgroup-inline">
 				<div class="field-radiobutton">
 					<RadioButton id="input_outlined" name="inputstyle" value="outlined" :modelValue="$primevue.config.inputStyle" @change="changeInputStyle('outlined')" />
@@ -26,9 +26,9 @@
 			</div>
 
 			<h5>Ripple Effect</h5>
-			<InputSwitch :modelValue="rippleActive" @update:modelValue="changeRipple" />
+			<InputSwitch :modelValue="rippleActive" @update:modelValue="changeRipple" /> -->
 
-			<h5>Menu Type</h5>
+			<!-- <h5>Menu Type</h5>
 			<div class="p-formgroup-inline">
 				<div class="field-radiobutton">
 					<RadioButton id="static" name="layoutMode" value="static" v-model="d_layoutMode" @change="changeLayout($event, 'static')" />
@@ -38,10 +38,10 @@
 					<RadioButton id="overlay" name="layoutMode" value="overlay" v-model="d_layoutMode" @change="changeLayout($event, 'overlay')" />
 					<label for="overlay">Overlay</label>
 				</div>
-			</div>
+			</div> -->
 
 			<h5>Themes</h5>
-			<h6 class="mt-0">Bootstrap</h6>
+			<!-- <h6 class="mt-0">Bootstrap</h6>
 			<div class="grid free-themes">
 				<div class="col-3 text-center">
 					<button class="p-link" type="button" @click="changeTheme($event, 'bootstrap4-light-blue', false)">
@@ -129,9 +129,9 @@
 						<img class="block" src="images/themes/fluent-light.png" alt="Fluent Light"/>
 					</button>
 				</div>
-			</div>
+			</div> -->
 
-			<h6>PrimeOne Design - 2022</h6>
+			<!-- <h6>PrimeOne Design - 2022</h6>
 			<div class="grid free-themes">
 				<div class="col-3 text-center">
 					<button class="p-link" type="button" @click="changeTheme($event, 'lara-light-indigo', false)">
@@ -173,21 +173,21 @@
 						<img class="block" src="images/themes/lara-dark-teal.png" alt="Lara Dark Teal" />
 					</button>
 				</div>
-			</div>
+			</div> -->
 
-			<h6>PrimeOne Design - 2021</h6>
+			<!-- <h6>PrimeOne Design - 2021</h6> -->
 			<div class="grid free-themes">
-				<div class="col-3 text-center">
+				<!-- <div class="col-3 text-center">
 					<button class="p-link" type="button" @click="changeTheme($event, 'saga-blue', false)">
 						<img class="block" src="images/themes/saga-blue.png" alt="Saga Blue" />
 					</button>
-				</div>
+				</div> -->
 				<div class="col-3 text-center">
 					<button class="p-link" type="button" @click="changeTheme($event, 'saga-green', false)">
 						<img class="block" src="images/themes/saga-green.png" alt="Saga Green" />
 					</button>
 				</div>
-				<div class="col-3 text-center">
+				<!-- <div class="col-3 text-center">
 					<button class="p-link" type="button" @click="changeTheme($event, 'saga-orange', false)">
 						<img class="block" src="images/themes/saga-orange.png" alt="Saga Orange" />
 					</button>
@@ -201,13 +201,13 @@
 					<button class="p-link" type="button" @click="changeTheme($event, 'vela-blue', true)">
 						<img class="block" src="images/themes/vela-blue.png" alt="Vela Blue" />
 					</button>
-				</div>
+				</div> -->
 				<div class="col-3 text-center">
 					<button class="p-link" type="button" @click="changeTheme($event, 'vela-green', true)">
 						<img class="block" src="images/themes/vela-green.png" alt="Vela Green" />
 					</button>
 				</div>
-				<div class="col-3 text-center">
+				<!-- <div class="col-3 text-center">
 					<button class="p-link" type="button" @click="changeTheme($event, 'vela-orange', true)">
 						<img class="block" src="images/themes/vela-orange.png" alt="Vela Orange" />
 					</button>
@@ -221,8 +221,8 @@
 					<button class="p-link" type="button" @click="changeTheme($event, 'arya-blue', true)">
 						<img class="block" src="images/themes/arya-blue.png" alt="Arya Blue" />
 					</button>
-				</div>
-				<div class="col-3 text-center">
+				</div> -->
+				<!-- <div class="col-3 text-center">
 					<button class="p-link" type="button" @click="changeTheme($event, 'arya-green', true)">
 						<img class="block" src="images/themes/arya-green.png" alt="Arya Green" />
 					</button>
@@ -236,7 +236,7 @@
 					<button class="p-link" type="button" @click="changeTheme($event, 'arya-purple', true)">
 						<img class="block" src="images/themes/arya-purple.png" alt="Arya Purple" />
 					</button>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</div>

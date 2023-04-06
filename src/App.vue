@@ -1,7 +1,9 @@
 <template>
     <Toast />
 	<div :class="containerClass" @click="onWrapperClick">
-        <AppTopBar @menu-toggle="onMenuToggle" />
+        <AppTopBar @menu-toggle="onMenuToggle" >
+            
+        </AppTopBar>
         <div class="layout-sidebar" @click="onSidebarClick">
             <AppMenu :model="menu" @menuitem-click="onMenuItemClick" />
         </div>
@@ -27,14 +29,18 @@ import AppMenu from './AppMenu.vue';
 import AppConfig from './AppConfig.vue';
 import { mapGetters } from 'vuex';
 import { roleGroupId } from './domains/domain';
+import EventBus from './AppEventBus';
 
 // import AppFooter from './AppFooter.vue';
 
 export default {
+    created(){
+        EventBus.emit('theme-change', { theme: "saga-green", dark: false });
+    },
     emits: ['change-theme'],
     data() {
         return {
-            layoutMode: 'static',
+            layoutMode: 'overlay',
             staticMenuInactive: true,
             overlayMenuActive: false,
             mobileMenuActive: false,
@@ -46,25 +52,24 @@ export default {
                     }]
                 },
                 {
-                    label: 'Operations',
+                    label: 'Operation',
                     items: [
-                        {label: 'Transfers', icon: 'pi pi-fw pi-transfer', to: '/transfers'},
+                        {label: 'Transfers', faIcon: 'fa-truck', to: '/transfers'},
                         // { label: 'Inventory Adjustments', icon: 'pi pi-fw pi-inven-adjust', to: '/inventory-adjustment'}
-                        {label: "Stock Detail Report", icon: 'pi pi-fw pi-file-word',  to: this.stockDetailPage()}
                     ]
-                },
+                },   
                 {
                     label: 'Products',
                     items: [
-                        {label: 'Products', icon: 'pi pi-fw pi-products', to: '/products'},
-                        {label: 'Product Categories', icon: 'pi pi-fw pi-products', to: '/product-categories'},
+                        {label: 'Products', faIcon: 'fa-box', to: '/products'},
+                        {label: 'Product Categories', faIcon:'fa-table-cells-large', to: '/product-categories'},
                     ]
                 },
                 {
-                    label: 'Billing',
+                    label: 'Reports',
                     items:[
-                        {label: 'Billing statement', icon: 'pi pi-fw pi-products', to: this.billingPage()}
-
+                        {label: "Stock", faIcon: 'fa-boxes-stacked',  to: this.stockDetailPage()},
+                        {label: 'Billing statement', faIcon: 'fa-file-invoice', to: this.billingPage()}
                     ]
                 },
             ]
