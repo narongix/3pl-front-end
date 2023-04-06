@@ -120,9 +120,9 @@
                         }
                     });
 
-                    const newTransfer = await this.$store.dispatch("transfers/createTransfers", {tempTransfer: transfer, userId: userId ?? this.myuserId}); 
-                    console.log(newTransfer);
-                    await this.$router.replace({name:"TransferDetail", params:{id: newTransfer.id}});
+                    await this.$store.dispatch("transfers/createTransfers", {tempTransfer: transfer, userId: userId ?? this.myuserId}); 
+                    // TODO: Once the bug is fixed, movet his back to transferDetail
+                    await this.$router.replace({name:"TransferList"});
                     this.$toast.add({severity:'success', summary: 'Success', detail:'Transfer Created Successfully', life: 3000});
                 }
             },
