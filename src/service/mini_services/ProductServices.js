@@ -84,5 +84,13 @@ export default {
             data: category
         })
         return res.data
+    },
+
+    async getTotalSku(params){
+        const res = await ApiConfig.getMethods({
+            api: "/product/sku",
+            params: params
+        });
+        return res.data;
     }
 }

@@ -67,6 +67,7 @@ export default {
         additionalValidation: Function,
         onInit: Function,
         productCategoryOption: Array,
+        myUserId: String
     },
     components: {
         RetryField,
@@ -82,6 +83,11 @@ export default {
                         const haveData = this.sku.val
                         if(!haveData){
                             return this.validationField.sku.value="Reference is required"
+                        }
+                        for(let i in this.mySku){
+                            if(this.sku.val.toLowerCase()==this.mySku[i]){
+                                return this.validationField.sku.value = "Sku must be unique";
+                            }
                         }
                         this.validationField.sku.value=null
                     }
@@ -112,7 +118,9 @@ export default {
                 summary: "Failed",
                 detail: "Error Creating Product",
                 life: 3000
-            }
+            },
+
+            mySku: []
         };
     },
     computed:{
@@ -142,19 +150,26 @@ export default {
         },
         async submitForm() {
             this.submitted = true;
-            this.validateForm();
-            if (!this.formIsValid) {
-                return;
-            }
-            const actionPayload = {
-                name: this.productName.val,
-                sku: this.sku.val,
-                categoryId: this.prodCategory?.id ?? null
-            };
+            
+            this.toLoad = async () =>{
+                const allSku = await this.$store.dispatch('products/getTotalSku', this.myUserId);
+                this.mySku = allSku.map((e)=>e.toLowerCase());
 
-            this.toLoad = () => {
+                this.validateForm();
+
+                if (!this.formIsValid) {
+                return;
+                }
+
+                const actionPayload = {
+                    name: this.productName.val,
+                    sku: this.sku.val,
+                    categoryId: this.prodCategory?.id ?? null
+                };
+
                 this.$emit("onSubmit", actionPayload);
-            }
+            };
+            
         },
         validateForm() {
             this.formIsValid = true;

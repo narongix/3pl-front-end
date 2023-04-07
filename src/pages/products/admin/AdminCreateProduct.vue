@@ -1,6 +1,7 @@
 <template>
     <div>
-        <CreateProductTemplate @onSubmit="onSubmit" :onInit="onInit" :additionalValidation="onValidate" :productCategoryOption="prodCategories">
+        <CreateProductTemplate @onSubmit="onSubmit" :onInit="onInit" :additionalValidation="onValidate" 
+        :productCategoryOption="prodCategories" :myUserId="userSelecter ?? userId">
             <template #body>
                 <div class="field col-12 md:col-12">
                     <label for="userId">Select User</label>
