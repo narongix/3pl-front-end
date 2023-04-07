@@ -21,7 +21,7 @@
                             </tr>
                             <tr>
                                 <th>Total Amount</th>
-                                <td>{{ data?.billsummary?.calculated_bill_total ?? "" }}</td>
+                                <td>{{ roundMyNumber(data?.billsummary?.calculated_bill_total ?? "") }}$</td>
                             </tr>
                         </table>
                     </div>
@@ -70,10 +70,19 @@
                         </template>
                     </Column>
                     <Column field="qty" header="QTY"></Column>
-                    <Column field="volume" header="Volume"></Column>
-                    <Column field="charged_volume" header="Charge Volume"></Column>
+                    <Column field="volume" header="Volume(m³)">
+                        <template #body="{ data }">
+                            {{ roundMyNumber(data.volume) }}
+                        </template>
+                        
+                    </Column>
+                    <Column field="charged_volume" header="Charge Volume">
+                        <template #body="{ data }">
+                            {{ roundMyNumber(data.charged_volume ?? "") }}
+                        </template>
+                    </Column>
                     <Column field="rate" header="Rate"></Column>
-                    <Column field="base_fee" header="Subtotal"></Column>
+                    <Column field="base_fee" header="Subtotal($)"></Column>
                     
                     <ColumnGroup type="footer">
                         <Row>
@@ -104,15 +113,23 @@
                             </Column>
 
                             
-                            <Column field="total_volume" header="Total Volume" style="min-width: 3rem;"></Column>
+                            <Column field="total_volume" header="Total Volume(m³)" style="min-width: 3rem;">
+                                <template #body="{ data }">
+                                    {{ roundMyNumber(data.total_volume) }}
+                                </template>
+                            </Column>
                             <Column field="rate" header="Rate"></Column>
-                            <Column field="total_volume_fee" header="Subtotal"></Column>
+                            <Column field="total_volume_fee" header="Subtotal($)">
+                                <template #body="{ data }">
+                                    {{ roundMyNumber(data.total_volume_fee) }}
+                                </template>
+                            </Column>
                             <ColumnGroup type="footer">
                                 <Row>
                                     <Column footer=""></Column>
                                     <Column footer=""></Column>
                                     <Column footer="Total"></Column>
-                                    <Column :footer="data?.volume_trx_summary?.total_volume_fee ?? 0"></Column>
+                                    <Column :footer="roundMyNumber(data?.volume_trx_summary?.total_volume_fee ?? 0)"></Column>
                                 </Row>
                             </ColumnGroup>
                         </DataTable>
@@ -160,6 +177,7 @@
     import { mapGetters } from 'vuex';
     import VolumeProductDate from './VolumeProductDate.vue';
     import LinkParagraph from '../../components/LinkParagraph.vue';
+    import { convertToTwoDecimal } from '../../components/utils/MyNumber';
 
     export default{
         created() {
@@ -199,6 +217,11 @@
             })
         },
         methods:{
+            roundMyNumber(data){
+                const num = convertToTwoDecimal(data);
+                return num;
+            },
+
             async initData(){
                 this.data = await this.$store.dispatch("billing/onFetchDetailBilling", {
                     month: this.$route.query.month, 

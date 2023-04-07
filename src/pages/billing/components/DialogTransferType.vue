@@ -12,7 +12,11 @@
                         </template>
                         <Column field="id" header="Id"></Column>
                         <Column field="reference" header="Reference"></Column>
-                        <Column field="volume" header="Volume"></Column>
+                        <Column field="volume" header="Volume">
+                            <template #body="{ data }">
+                                {{ roundMyNumber(data.volume) }}
+                            </template>
+                        </Column>
                         <Column field="created_at" header="CreatedAt">
                             <template #body="{ data }">
                                 <p>{{ convertUTCToTimeFormat(data.created_at) }}</p>
@@ -36,6 +40,7 @@
     import RetryField from '../../../components/prompt_field/RetryField.vue'
     import MyDataTable from '../../../components/MyDataTable.vue';
     import TimeConvert from '../../../components/utils/TimeConvert';
+    import { convertToTwoDecimal } from '../../../components/utils/MyNumber';
 
     export default{
         props:{
@@ -90,6 +95,10 @@
             }
         },
         methods:{
+            roundMyNumber(data){
+                return convertToTwoDecimal(data);
+            },
+
             async initData(){
                 const data = await this.$store.dispatch("billing/onFetchTransferTrx", {
                     offset: 0,
