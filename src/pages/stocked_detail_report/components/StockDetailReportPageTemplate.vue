@@ -76,15 +76,15 @@
                     </template>
                     <Column selectionMode="single"></Column>
                     <Column field="product_name" header="Product Name" exportHeader="Product Name" 
-                    exportFooter="Product Name" :sortable="true" style="min-width:15rem" 
+                    exportFooter="Product Name" :sortable="false" style="min-width:15rem" 
                     :showFilterMatchModes="false">
                     </Column>
-                    <Column field="sku" header="Internal Reference" exportHeader="Internal Reference" exportFooter="Internal Reference" :sortable="true" style="min-width:10rem"></Column>
-                    <Column field="beginning" header="Beginning" exportHeader="Beginning" exportFooter="Beginning" :sortable="true"></Column>
-                    <Column field="incoming" header="Incoming" exportHeader="Incoming" exportFooter="Incoming" :sortable="true"></Column>
-                    <Column field="outgoing" header="Outgoing" exportHeader="Outgoing" exportFooter="Outgoing" :sortable="true"></Column>
-                    <Column field="adjusted" header="Adjusted" exportHeader="Adjusted" exportFooter="Adjusted" :sortable="true"></Column>
-                    <Column field="ending" header="Ending" exportHeader="Ending" exportFooter="Ending" :sortable="true"></Column>
+                    <Column field="sku" header="Internal Reference" exportHeader="Internal Reference" exportFooter="Internal Reference" :sortable="false" style="min-width:10rem"></Column>
+                    <Column field="beginning" header="Beginning" exportHeader="Beginning" exportFooter="Beginning" :sortable="false"></Column>
+                    <Column field="incoming" header="Incoming" exportHeader="Incoming" exportFooter="Incoming" :sortable="false"></Column>
+                    <Column field="outgoing" header="Outgoing" exportHeader="Outgoing" exportFooter="Outgoing" :sortable="false"></Column>
+                    <Column field="adjusted" header="Adjusted" exportHeader="Adjusted" exportFooter="Adjusted" :sortable="false"></Column>
+                    <Column field="ending" header="Ending" exportHeader="Ending" exportFooter="Ending" :sortable="false"></Column>
                 </DataTable>
             </div>
         </div>
