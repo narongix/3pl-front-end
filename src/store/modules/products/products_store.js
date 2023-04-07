@@ -254,5 +254,13 @@ export default {
                 throw error;
             }
         },
+
+        async getTotalSku(context, { userId }){
+            const params = {
+                user_id: userId
+            };
+            const data = await  ApiService.getTotalSku(params);
+            return data;
+        }
     },
 }
