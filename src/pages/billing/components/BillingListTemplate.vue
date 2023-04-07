@@ -25,7 +25,11 @@
                         </Column>
                         <Column field="month" header="Month"></Column>
                         <Column field="year" header="Year"></Column>
-                        <Column field="bill_total" header="Total"></Column>
+                        <Column field="bill_total" header="Total">
+                            <template #body="{ data }">
+                                {{ roundMyNumber(data.bill_total) }}$
+                            </template>
+                        </Column>
                         <Column field="bill_status_id" header="Status"></Column>
                         <Column field="created_at" header="CreatedAt">
                             <template #body="{ data }">
@@ -47,6 +51,7 @@
     import TimeConvert from '../../../components/utils/TimeConvert';
     import ReferenceItem from './ReferenceItem.vue';
     import { roleGroupId } from '../../../domains/domain';
+    import { convertToTwoDecimal } from '../../../components/utils/MyNumber';
 
     export default {
         props: {
@@ -102,6 +107,10 @@
             }
         },
         methods: {
+            roundMyNumber(data){
+                return convertToTwoDecimal(data);
+            },
+
             async initData() {
                 const myData = await this.toInitData?.();
 
