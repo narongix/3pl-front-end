@@ -18,12 +18,15 @@
                     v-model:filters="filters" 
                     @page="onPage"
                 >
-                    <template v-if="isAdmin" #header>
+                <template #empty>
+                    <p>Empty...</p>
+                </template>
+                    <template #header>
                         <div class="flex flex-row-reverse">
                             <Button @click="onSearch" label="Search"></Button>
                         </div>
                         <div class="p-fluid formgrid grid">
-                            <div class="field col-12 md:col-4 lg:col-3">
+                            <div v-if="isAdmin" class="field col-12 md:col-4 lg:col-3">
                                 <label for="id">User</label>
                                 <UserDropDownPagination v-model:userSelector="userSelector"></UserDropDownPagination>
                             </div>
@@ -232,7 +235,7 @@ export default {
         async SearchProduct(pageNumber){
 
             await this.$store.dispatch("products/getProductLength",{
-                userId: this.userSelector,
+                userId: this.userSelector ?? this.getUserId,
                 productId: this.productId,
                 productReference: this.productReference,
             });
@@ -241,7 +244,7 @@ export default {
             const products = await this.$store.dispatch("products/onFetchProducts", {
                 offset: (pageNumber || 0) * this.rows,
                 limit: this.rows,
-                userId: this.userSelector,
+                userId: this.userSelector ?? this.getUserId,
                 productId: this.productId,
                 productReference: this.productReference
             });
@@ -255,7 +258,7 @@ export default {
                 const products = await this.$store.dispatch("products/onFetchProducts", {
                     offset: event.first,
                     limit: this.rows,
-                    userId: this.userSelector
+                    userId: this.userSelector ?? this.getUserId
                 })
                 const offset = event.first
                 const limit = event.rows
