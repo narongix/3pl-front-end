@@ -5,17 +5,11 @@
                 <h5>Stock Detail Report</h5>
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-3 sm:col-12" >
-                        <label>From Date</label>
-                        <Calendar :manualInput="false" 
-                        v-model="fromDate" @date-select="onSelectDate({limit: rows})"
-                        :dateFormat="getCalendarFormat" :hideOnDateTimeSelect="false" placeholder="Select begining of Date"></Calendar>
+                        <FromDate v-model="fromDate" :rows="rows" @onSelectDate="onSelectDate({limit: $event})"></FromDate>
                     </div>
                     
                     <div class="field col-12 md:col-3 sm:col-12">
-                        <label>To Date</label>
-                        <Calendar :manualInput="false" 
-                        v-model="toDate" @date-select="onSelectDate({limit: rows})"
-                        :dateFormat="getCalendarFormat" :hideOnDateTimeSelect="false" placeholder="Select End of Date"></Calendar>
+                        <ToDate v-model="toDate" :rows="rows" @onSelectDate="onSelectDate({limit: $event})"></ToDate>
                     </div>
                     <div class="field col-12 md:col-3">
                         <label>Product Filters</label>
@@ -114,6 +108,8 @@
     import MultiSelectPagination from './MultiSelectPagination.vue';
     import ProductDialogMoveLines from './ProductDialogMoveLines.vue';
     import TimeConvert from '../../../components/utils/TimeConvert';
+    import FromDate from '../../../components/FromDate.vue';
+    import ToDate from '../../../components/ToDate.vue';
 
     export default{
         unmounted(){
@@ -137,7 +133,9 @@
             RetryField,
             HiddenRetryField,
             ProductDialogMoveLines,
-            MultiSelectPagination
+            MultiSelectPagination,
+            FromDate,
+            ToDate
         },
         data(){
             return {
