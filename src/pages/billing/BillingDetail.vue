@@ -82,7 +82,11 @@
                         </template>
                     </Column>
                     <Column field="rate" header="Rate"></Column>
-                    <Column field="base_fee" header="Subtotal($)"></Column>
+                    <Column field="base_fee" header="Subtotal($)">
+                        <template #body="{ data }">
+                            {{ roundMyNumber(data.base_fee) }}
+                        </template>
+                    </Column>
                     
                     <ColumnGroup type="footer">
                         <Row>
@@ -91,7 +95,7 @@
                             <Column footer=""></Column>
                             <Column footer=""></Column>
                             <Column footer="Total"></Column>
-                            <Column :footer="data?.transfer_trx_summary?.transfer_fee_total ?? 0"></Column>
+                            <Column :footer="roundMyNumber(data?.transfer_trx_summary?.transfer_fee_total ?? 0)"></Column>
                         </Row>
                     </ColumnGroup>
                 </DataTable>
