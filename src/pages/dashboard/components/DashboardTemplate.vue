@@ -1,6 +1,74 @@
 <template>
 	<div class="grid">
 		<div class="col-12">
+
+			<div class="grid">
+				<div class="col-12 md:col-6">
+					<div class="grid">
+						<div class="col-12 md:col-4">
+							<SpecialCard title="Pending Receipts" underBodyGrey="Today" title2="" myClass="text-red"
+							:body="dailyMetric?.pending_receipts  ?? 0">
+								<MyDashBoardIcon class="bg-red-400">
+									<font-awesome-icon :icon="['fass', 'spinner']" style="color: #00e7f3;"/>
+								</MyDashBoardIcon>
+							</SpecialCard>
+						</div>
+						<div class="col-12 md:col-4">
+							<SpecialCard title="Incoming Receipts" title2="" underBodyGrey="Today" :body="dailyMetric?.incoming_receipts ?? 0">
+								<MyDashBoardIcon>
+									<font-awesome-icon :icon="['fas', 'truck']" />
+								</MyDashBoardIcon>
+							</SpecialCard>
+						</div>
+						<div class="col-12 md:col-4">
+							<SpecialCard title="Completed Receipts" title2="" underBodyGrey="Today" :body="dailyMetric?.complete_receipts  ?? 0">
+								<MyDashBoardIcon class="bg-green-300">
+									<font-awesome-icon icon="fa-check" />								
+								</MyDashBoardIcon>
+							</SpecialCard>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="flex align-items-center justify-content-center myChart">
+							<ReceiptDoughnutChart :dailyMetric="dailyMetric"></ReceiptDoughnutChart>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 md:col-6">
+					<div class="grid">
+						<div class="col-12 md:col-4">
+							<SpecialCard title="Pending Deliveries" 
+							:body="dailyMetric?.pending_deliveries ?? 0" underBodyGrey="Today" myClass="text-red">
+								<MyDashBoardIcon class="bg-red-400">
+									<font-awesome-icon :icon="['fass', 'spinner']" style="color: #00e7f3;"/>
+								</MyDashBoardIcon>
+							</SpecialCard>
+						</div>
+						<div class="col-12 md:col-4">
+							<SpecialCard title="Outgoing Deliveries" underBodyGrey="Today" :body="dailyMetric?.outgoing_deliveries ?? 0">
+								<MyDashBoardIcon>
+									<font-awesome-icon :icon="['fas', 'truck']" />
+								</MyDashBoardIcon>
+							</SpecialCard>
+						</div>
+						<div class="col-12 md:col-4">
+							<SpecialCard title="Completed Deliveries" underBodyGrey="Today" :body="dailyMetric?.completed_deliveries ?? 0">
+								<MyDashBoardIcon class="bg-green-300">
+									<font-awesome-icon icon="fa-check" />								
+								</MyDashBoardIcon>
+							</SpecialCard>
+						</div>
+					</div>
+
+					<div class="card">
+						<div class="flex justify-content-center myChart">
+							<DeliveryDoughnutChart :dailyMetric="dailyMetric"></DeliveryDoughnutChart>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<div class="grid">
 				<div class="col-12 md:col-6">
 					<div class="grid">
@@ -41,137 +109,52 @@
 				</div>
 			</div>
 
-			<div class="grid">
-				<div class="col-12 md:col-6">
-					<div class="grid">
-						<div class="col-12 md:col-4">
-							<SpecialCard title="Pending Receipts" underBodyGrey="For This Month" title2="" myClass="text-red"
-							:body="dailyMetric?.pending_receipts  ?? 0">
-								<MyDashBoardIcon class="bg-red-400">
-									<font-awesome-icon :icon="['fass', 'spinner']" style="color: #00e7f3;"/>
-								</MyDashBoardIcon>
-							</SpecialCard>
-						</div>
-						<div class="col-12 md:col-4">
-							<SpecialCard title="Incoming Receipts" title2="" underBodyGrey="For This Month" :body="dailyMetric?.incoming_receipts ?? 0">
-								<MyDashBoardIcon>
-									<font-awesome-icon :icon="['fas', 'truck']" />
-								</MyDashBoardIcon>
-							</SpecialCard>
-						</div>
-						<div class="col-12 md:col-4">
-							<SpecialCard title="Completed Receipts" title2="" underBodyGrey="For This Month" :body="dailyMetric?.complete_receipts  ?? 0">
-								<MyDashBoardIcon class="bg-green-300">
-									<font-awesome-icon icon="fa-check" />								
-								</MyDashBoardIcon>
-							</SpecialCard>
-						</div>
-					</div>
 
-					<div class="card">
-						<div class="flex align-items-center justify-content-center myChart">
-							<ReceiptDoughnutChart :dailyMetric="dailyMetric"></ReceiptDoughnutChart>
-						</div>
-					</div>
-
-					<div class="card mt-5">
-						<h5>RECENTLY COMPLETED RECEIPTS</h5>
-						<MyDataTable v-slot="mySlot" :initializeList="tempData1" :row="myRows1" :total="total1">
-							<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
-								:rowHover="true" responsiveLayout="scroll" @page="onPage1($event, mySlot.update)"
-								:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows1">		
-								
-								<template #empty>
-									Empty...
+		<div class="grid">
+			<div class="col-12 md:col-6">
+				<div class="card">
+					<h5>RECENTLY COMPLETED RECEIPTS</h5>
+					<MyDataTable v-slot="mySlot" :initializeList="tempData1" :row="myRows1" :total="total1">
+						<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
+							:rowHover="true" responsiveLayout="scroll" @page="onPage1($event, mySlot.update)"
+							:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows1">		
+							
+							<template #empty>
+								Empty...
+							</template>
+							<Column header="Transfer ID" field="id"></Column>
+							<Column header="Customer" field="customer_name"></Column>
+							<Column header="Time Taken" field="order_cycle_time">
+								<template #body="{ data }">
+									<p>{{ (Number(data.order_cycle_time) || 0).toFixed(2) }}hr</p>
 								</template>
-								<Column header="Transfer ID" field="id"></Column>
-								<Column header="Customer" field="customer_name"></Column>
-								<Column header="Time Taken" field="order_cycle_time">
-									<template #body="{ data }">
-										<p>{{ (Number(data.order_cycle_time) || 0).toFixed(2) }}hr</p>
-									</template>
-								</Column>
-								<Column header="On Time" field="on_time"></Column>
-							</DataTable>
-						</MyDataTable>
-					</div>
-				</div>
-				<div class="col-12 md:col-6">
-					<div class="grid">
-						<div class="col-12 md:col-4">
-							<SpecialCard title="Pending Deliveries" 
-							:body="dailyMetric?.pending_deliveries ?? 0" underBodyGrey="For This Month" myClass="text-red">
-								<MyDashBoardIcon class="bg-red-400">
-									<font-awesome-icon :icon="['fass', 'spinner']" style="color: #00e7f3;"/>
-								</MyDashBoardIcon>
-							</SpecialCard>
-						</div>
-						<div class="col-12 md:col-4">
-							<SpecialCard title="Outgoing Deliveries" underBodyGrey="For This Month" :body="dailyMetric?.outgoing_deliveries ?? 0">
-								<MyDashBoardIcon>
-									<font-awesome-icon :icon="['fas', 'truck']" />
-								</MyDashBoardIcon>
-							</SpecialCard>
-						</div>
-						<div class="col-12 md:col-4">
-							<SpecialCard title="Completed Deliveries" underBodyGrey="For This Month" :body="dailyMetric?.completed_deliveries ?? 0">
-								<MyDashBoardIcon class="bg-green-300">
-									<font-awesome-icon icon="fa-check" />								
-								</MyDashBoardIcon>
-							</SpecialCard>
-						</div>
-					</div>
-
-					<div class="card">
-						<div class="flex justify-content-center myChart">
-							<DeliveryDoughnutChart :dailyMetric="dailyMetric"></DeliveryDoughnutChart>
-						</div>
-					</div>
-
-					<div class="card mt-5">
-						<h5>RECENTLY COMPLETED DELIVERIES</h5>
-						<MyDataTable v-slot="mySlot" :initializeList="tempData2" :row="myRows2" :total="total2">
-							<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
-								:rowHover="true" responsiveLayout="scroll" @page="onPage2($event, mySlot.update)"
-								:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows2">
-
-								<template #empty>
-									Empty...
-								</template>
-								<Column header="Transfer ID" field="id"></Column>
-								<Column header="Customer" field="customer_name"></Column>
-								<Column header="Time Taken" field="order_cycle_time">
-									<template #body="{ data }">
-										<p>{{ (Number(data.order_cycle_time) || 0).toFixed(2) }}hr</p>
-									</template>
-								</Column>
-								<Column header="On Time" field="on_time"></Column>
-							</DataTable>
-						</MyDataTable>
-					</div>
+							</Column>
+							<Column header="On Time" field="on_time"></Column>
+						</DataTable>
+					</MyDataTable>
 				</div>
 			</div>
 
-			<div class="grid">
-				<div class="col-12 md:col-6">
-					<div class="card">
-						<h5>UNMEASURED PRODUCTS ({{ total3 }})</h5>
-						<MyDataTable v-slot="mySlot" :initializeList="tempData3" :row="myRows3" :total="total3">
-							<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
-								:rowHover="true" responsiveLayout="scroll" @page="onPage3($event, mySlot.update)"
-								:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows3">
-								
-								<template #empty>
-									Empty...
-								</template>
-								<Column header="Customer" field="customer_name"></Column>
-								<Column header="Count" field="count"></Column>
-							</DataTable>
-						</MyDataTable>
-					</div>
+			<div class="col-12 md:col-6">
+				<div class="card">
+					<h5>UNMEASURED PRODUCTS ({{ total3 }})</h5>
+					<MyDataTable v-slot="mySlot" :initializeList="tempData3" :row="myRows3" :total="total3">
+						<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
+							:rowHover="true" responsiveLayout="scroll" @page="onPage3($event, mySlot.update)"
+							:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows3">
+							
+							<template #empty>
+								Empty...
+							</template>
+							<Column header="Customer" field="customer_name"></Column>
+							<Column header="Count" field="count"></Column>
+						</DataTable>
+					</MyDataTable>
 				</div>
 			</div>
 		</div>
+		</div>
+
 		<RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToast"></RetryField>
 	</div>
 </template>
