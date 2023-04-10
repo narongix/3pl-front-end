@@ -1,7 +1,6 @@
 <template>
 	<div class="grid">
 		<div class="col-12">
-
 			<div class="grid">
 				<div class="col-12 md:col-6">
 					<div class="grid">
@@ -89,7 +88,7 @@
 						<div class="col-12 md:col-4">
 							<SpecialCard title="Deliveries" 
 							title2="On Time Rate" underBodyGrey="For This Month"
-							:body="(monthlyMetric?.deliveries_on_time_rate?.on_time ?? 0) + ' %' "></SpecialCard>
+							:body="myNumConvert(monthlyMetric?.deliveries_on_time_rate?.on_time ?? 0) + ' %' "></SpecialCard>
 						</div>
 					</div>
 				</div>
@@ -178,6 +177,7 @@
 	import DeliveryLineChart from './DeliveryLineChart.vue';
 	import ReceiptLineChart from './ReceiptLineChart.vue';
 	import MyDashBoardIcon from './MyDashBoardIcon.vue';
+	import MyNumber from '../../../components/utils/MyNumber';
 
 	export default {
 		// mounted() {
@@ -223,7 +223,6 @@
 
 		data() {
 			return {
-
 				lineDataReceipt: {
 					labels: [],
 					datasets:[
@@ -322,6 +321,10 @@
 		},
 		
 		methods: {
+			myNumConvert(data){
+				return MyNumber.convertToTwoDecimal(data);
+			},
+
 			async initData(){
 				this.toLoadRetry = async ()=>{
 					const { completeReceipt, completeDelivery, unmeasuredProduct } = await this.toLoadAdditional(this.total1, this.tempData1, this.total2, this.tempData2, this.total3, this.tempData3);
