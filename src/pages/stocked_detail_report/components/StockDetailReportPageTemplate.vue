@@ -35,16 +35,16 @@
                     @page="onPage($event)" selectionMode="single" :metaKeySelection="false">
                     <template #header>
                         <div class="p-fluid formgrid grid">
-                            <div class="field col-12 md:col-2">
-                                <Button icon="pi pi-external-link" label="Export" @click="exportStock($event)" />
+                            <div class="field col-2 xl:col-1 smallerButton">
+                                <Button icon="pi pi-external-link" size="small" class="" label="Export" @click="exportStock($event)" text/>
                             </div>
 
-                            <div class="field col-12 md:col-2">
-                                <Button label="This Month" @click="goToThisMonth"></Button>
+                            <div class="field col-12 md:col-3 lg:col-2 xl:col-1 myMinWidth">
+                                <Button label="This Month" size="small" class="smallerButton" @click="goToThisMonth"></Button>
                             </div>
 
-                            <div class="field col-12 md:col-2">
-                                <Button label="Previous Month" @click="goBackByOneMonth"></Button>
+                            <div class="field col-12 md:col-3 lg:col-2 xl:col-1 myMinWidth">
+                                <Button label="Previous Month" size="small" class="smallerButton" @click="goBackByOneMonth"></Button>
                             </div>
                         </div>
                         <p></p>
@@ -101,6 +101,9 @@
     }
     .p-multiselect-header{
         display: none !important;
+    }
+    .myMinWidth{
+        min-width:150px
     }
 </style>
 

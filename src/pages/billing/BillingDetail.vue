@@ -39,7 +39,7 @@
                             </tr>
                             <tr>
                                 <th>Payment Date</th>
-                                <td>{{ data?.billsummary?.calculated_bill_total ?? "" }}</td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <th>Status</th>
@@ -115,7 +115,6 @@
                                     <LinkParagraph :data="formatDateTime(data.created_at)" @pushing="onClickToVolume(data.created_at)"></LinkParagraph>
                                 </template>
                             </Column>
-
                             
                             <Column field="total_volume" header="Total Volume(m³)" style="min-width: 3rem;">
                                 <template #body="{ data }">
