@@ -12,7 +12,7 @@
                         </template>
                         <Column field="id" header="Id"></Column>
                         <Column field="reference" header="Reference"></Column>
-                        <Column field="charged_volume" header="Charge Volume">
+                        <Column field="charged_volume" header="Charged Volume">
                             <template #body="{ data }">
                                 {{ roundMyNumber(data.charged_volume) }}
                             </template>
