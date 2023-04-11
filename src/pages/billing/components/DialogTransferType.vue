@@ -19,7 +19,7 @@
                         </Column>
                         <Column field="volume" header="Volume">
                             <template #body="{ data }">
-                                {{ roundMyNumber(data.volume) }}
+                                {{ round4Number(data.volume) }}
                             </template>
                         </Column>
                         <Column field="created_at" header="CreatedAt">
@@ -45,7 +45,7 @@
     import RetryField from '../../../components/prompt_field/RetryField.vue'
     import MyDataTable from '../../../components/MyDataTable.vue';
     import TimeConvert from '../../../components/utils/TimeConvert';
-    import { convertToTwoDecimal } from '../../../components/utils/MyNumber';
+    import { convertToTwoDecimal, convertToFourDecimal } from '../../../components/utils/MyNumber';
 
     export default{
         props:{
@@ -102,6 +102,10 @@
         methods:{
             roundMyNumber(data){
                 return convertToTwoDecimal(data);
+            },
+            
+            round4Number(data){
+                return convertToFourDecimal(data);
             },
 
             async initData(){
