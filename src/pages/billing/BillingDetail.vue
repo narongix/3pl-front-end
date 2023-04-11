@@ -72,7 +72,7 @@
                     <Column field="qty" header="QTY"></Column>
                     <Column field="volume" header="Volume(m³)">
                         <template #body="{ data }">
-                            {{ roundMyNumber(data.volume) }}
+                            {{ round4Number(data.volume) }}
                         </template>
                         
                     </Column>
@@ -81,7 +81,11 @@
                             {{ roundMyNumber(data.charged_volume ?? "") }}
                         </template>
                     </Column>
-                    <Column field="rate" header="Rate"></Column>
+                    <Column field="rate" header="Rate">
+                        <template #body="{ data }">
+                            {{ roundMyNumber(data.rate) }}
+                        </template>
+                    </Column>
                     <Column field="base_fee" header="Subtotal($)">
                         <template #body="{ data }">
                             {{ roundMyNumber(data.base_fee) }}
@@ -118,7 +122,7 @@
                             
                             <Column field="total_volume" header="Total Volume(m³)" style="min-width: 3rem;">
                                 <template #body="{ data }">
-                                    {{ roundMyNumber(data.total_volume) }}
+                                    {{ round4Number(data.total_volume) }}
                                 </template>
                             </Column>
                             <Column field="rate" header="Rate"></Column>
@@ -180,7 +184,7 @@
     import { mapGetters } from 'vuex';
     import VolumeProductDate from './VolumeProductDate.vue';
     import LinkParagraph from '../../components/LinkParagraph.vue';
-    import { convertToTwoDecimal } from '../../components/utils/MyNumber';
+    import { convertToTwoDecimal, convertToFourDecimal } from '../../components/utils/MyNumber';
 
     export default{
         created() {
@@ -220,6 +224,11 @@
             })
         },
         methods:{
+            round4Number(data){
+                const num = convertToFourDecimal(data);
+                return num;
+            },
+
             roundMyNumber(data){
                 const num = convertToTwoDecimal(data);
                 return num;

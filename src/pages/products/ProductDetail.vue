@@ -156,7 +156,8 @@
     import RetryField from "../../components/prompt_field/RetryField.vue";
     import FromDate from "../../components/FromDate.vue";
     import ToDate from "../../components/ToDate.vue";
-import { mapGetters } from "vuex";
+    import { mapGetters } from "vuex";
+    import MyNumber from "../../components/utils/MyNumber";
 
     export default {
         components: {
@@ -353,6 +354,10 @@ import { mapGetters } from "vuex";
             }
         },
         methods: {
+            convertMyNum(data){
+                return MyNumber.convertToFourDecimal(data);
+            },
+
             onSelectPreset(){
                 this.presetOption[this.myPresetValue]?.();
             },
@@ -606,8 +611,8 @@ import { mapGetters } from "vuex";
                             isValid: true,
                         },
                         volume: {
-                            val: this.products.volume,
-                            newVal: this.products.volume,
+                            val: this.convertMyNum(this.products.volume),
+                            newVal: this.convertMyNum(this.products.volume),
                             isValid: true,
                         }
                     });
