@@ -97,11 +97,27 @@
                 </div>
             </div>
             <div class="card">
-                <DataTable :value="productHistory" :paginator="true" class="p-datatable-gridlines" :rows="10"
-                    dataKey="id" :rowHover="true" filterDisplay="menu" responsiveLayout="scroll">
+                <div class="p-fluid formgrid grid">
+                    <div class="field col-12 md:col-4">
+                        <FromDate v-model="fromDate" :rows="rows" @onSelectDate="onSelectDate"></FromDate>
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        <ToDate v-model="toDate" :rows="rows" @onSelectDate="onSelectDate"></ToDate>
+                    </div>
+
+                    <div class="field col-12 md:col-4">
+                        <label>Preset</label>
+                        <Dropdown v-model="myPresetValue" :options="getPresetFilter" @change="onSelectPreset"
+                            optionLabel="name" optionValue="id" showClear>
+                        </Dropdown>
+                    </div>
+                </div>
+                <DataTable :value="dataList" :paginator="true" class="p-datatable-gridlines" :rows="10"
+                    dataKey="id" :rowHover="true" filterDisplay="menu" responsiveLayout="scroll" @page="onPage($event)">
                     <template #empty>
                         No product history found.
                     </template>
+
                     <Column field="created_at" header="Created at">
                         <template #body="{ data }">
                             {{ convert(data.created_at) }}
@@ -132,351 +148,517 @@
         </template>
     </Dialog>
     <RetryField :toLoad="toLoad" :message="messageV2"></RetryField>
-
 </template>
 
 <script>
-import PromptField from "../../components/prompt_field/PromptField.vue"
-import TimeConvert from "../../components/utils/TimeConvert";
-import RetryField from "../../components/prompt_field/RetryField.vue";
+    import PromptField from "../../components/prompt_field/PromptField.vue"
+    import TimeConvert from "../../components/utils/TimeConvert";
+    import RetryField from "../../components/prompt_field/RetryField.vue";
+    import FromDate from "../../components/FromDate.vue";
+    import ToDate from "../../components/ToDate.vue";
+import { mapGetters } from "vuex";
 
-export default {
-    components: {
-        RetryField,
-        PromptField
-    },
-    created() {
-        // TODO: REFACTOR LOAD DATA
-        this.loadData();
-        this.loadProdCategories();
-    },
-    data() {
-        return {
-            toLoad: null,
-            messageV2: {
-                failed: "Error Loading Data. Try again?",
-                yesButton: "Yes",
-                noButton: "No",
-            },
-            errorToastDeletingProduct: {
-                severity: "error",
-                summary: "Error!",
-                detail: "Failed Deleting Product!"
-            },
-            deleteProductDialog: false,
+    export default {
+        components: {
+            RetryField,
+            PromptField,
+            FromDate,
+            ToDate,
+        },
+        created() {
+            // TODO: REFACTOR LOAD DATA
+            this.loadData();
+        },
+        data() {
+            return {
+                toLoad: null,
+                messageV2: {
+                    failed: "Error Loading Data. Try again?",
+                    yesButton: "Yes",
+                    noButton: "No",
+                },
+                errorToastDeletingProduct: {
+                    severity: "error",
+                    summary: "Error!",
+                    detail: "Failed Deleting Product!"
+                },
+                deleteProductDialog: false,
 
-            message: {
-                failed: "Error Loading Data. Try again?",
-                yesButton: "Yes",
-                noButton: "No",
-                decline: "no",
-                accept: "yes",
-                prompt: null
-            },
-            productV2: null,
-            promptCreated: false,
-            selectedCreated: null,
-            prodCategory: null,
-            editDisabled: true,
-            productHistory: null,
-            products: null,
-            product: {
-                id: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
+                message: {
+                    failed: "Error Loading Data. Try again?",
+                    yesButton: "Yes",
+                    noButton: "No",
+                    decline: "no",
+                    accept: "yes",
+                    prompt: null
                 },
-                name: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
+                productV2: null,
+                promptCreated: false,
+                selectedCreated: null,
+                prodCategory: null,
+                editDisabled: true,
+                products: null,
+                product: {
+                    id: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    name: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    sku: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    prodCategory: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    barcode: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    upc: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    onhands: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    incoming: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    outgoing: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    forecasted: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    // TODO1: waiting api field
+                    width: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    length: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    height: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    weight: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    dimensions: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    volume: {
+                        val: null,
+                        newVal: null,
+                        isValid: true,
+                    },
+                    updatedFields: [],
                 },
-                sku: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                prodCategory: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                barcode: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                upc: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                onhands: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                incoming: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                outgoing: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                forecasted: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                // TODO1: waiting api field
-                width: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                length: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                height: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                weight: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                dimensions: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                volume: {
-                    val: null,
-                    newVal: null,
-                    isValid: true,
-                },
-                updatedFields: [],
-            }
-        }
-    },
 
-    computed: { 
-        barcode() {
-            if (!this.product) {
-                return this.product.barcode;
-            } else {
-                return null;
+                toDate: null,
+                fromDate: null,
+                rows: 10,
+                productMovesLenght: null,
+                dataList: [],
+                myPresetValue: null,
+                myPageNumber: 0
             }
         },
-        buttonLabel() {
-            let label = "";
-            if (this.editDisabled) {
-                label = "Edit";
-            } else {
-                label = "Save"
-            }
-            return label;
-        },
-        updatedName() {
-            return this.product.name.val === this.product.name.newVal ? false : true;
-        },
-        prodCategories() {
-            return this.$store.getters['products/prodCategories'];
-        },
-        listDetail() {
-            const products = this.$store.getters['products/getProductState'].filter(product => {
-                return product.product_id == this.$route.params.id;
-            })[0];
-            return products
-        }
-    },
-    methods: {
-        onDecline() {
-            this.promptCreated = false
-        },
-        async onComfirmCreated() {
-            this.promptCreated = false
-            const data = {
-                category_name: this.selectedCreated
-            }
-            const newData = await this.$store.dispatch("products/addProductCategory", data);
-            this.prodCategory = newData
-            this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Category Created', life: 3000 });
-        },
-        changeEditMode() {
-            this.editDisabled = !this.editDisabled;
-            if (this.editDisabled) {
-                this.saveData();
-            }
-        },
-        discard() {
-            if (typeof this.product.name && (this.product.name.val !== this.product.name.newVal)) {
-                this.product.name.newVal = this.product.name.val;
-            }
-            if (typeof this.product.sku !== "undefined" && (this.product.sku.val !== this.product.sku.newVal)) {
-                this.product.sku.newVal = this.product.sku.val;
-            }
-            if (typeof this.product.upc !== "undefined" && (this.product.upc.val !== this.product.upc.newVal)) {
-                this.product.upc.newVal = this.product.upc.val;
-            }
-            this.editDisabled = !this.editDisabled;
-        },
-        async loadData() {
-            this.products = await this.$store.getters['products/getProductState'].filter(product => {
-                return product.product_id == this.$route.params.id;
-            })[0];
-            // refresh when got data 
-            if (!(this.products == null)) {
-                localStorage.setItem("localStorageKeys", JSON.stringify(this.products))
-            }
-            const product = localStorage.getItem("localStorageKeys")
-            this.products = JSON.parse(product) // parse json object
-            // details product 
-            this.product = Object.assign({
-                id: {
-                    val: this.products.product_id,
-                    newVal: this.products.product_id,
-                    isValid: true,
-                },
-                name: {
-                    val: this.products.product_name,
-                    newVal: this.products.product_name,
-                    isValid: true
-                },
-                sku: {
-                    val: this.products.sku,
-                    newVal: this.products.sku,
-                    isValid: true,
-                },
-                upc: {
-                    val: this.products.upc,
-                    // ?? null safety
-                    // newVal: this.products.upc ?? "null",
-                    newVal: this.products.upc,
-                    isValid: true,
-                },
-                prodCategory: {
-                    val: this.products.category_name,
-                    newVal: this.products.category_name, 
-                    isValid: true,
-                },
-                barcode: {
-                    val: this.products.barcode,
-                    newVal: this.products.barcode,
-                    isValid: true,
-                },
-                onhands: {
-                    val: this.products.on_hands,
-                    newVal: this.products.on_hands,
-                    isValid: true,
-                },
-                incoming: {
-                    val: this.products.incoming,
-                    newVal: this.products.incoming,
-                    isValid: true,
-                },
-                outgoing: {
-                    val: this.products.outgoing,
-                    newVal: this.products.outgoing,
-                    isValid: true,
-                },
-                forecasted: {
-                    val: this.products.forecasted,
-                    newVal: this.products.forecasted,
-                    isValid: true,
-                },
-                // TODO1: waiting api field
-                width: {
-                    val: this.products.width,
-                    newVal: this.products.width,
-                    isValid: true,
-                },
-                length: {
-                    val: this.products.length,
-                    newVal: this.products.length,
-                    isValid: true,
-                },
-                height: {
-                    val: this.products.height,
-                    newVal: this.products.height,
-                    isValid: true,
-                },
-                weight: {
-                    val: this.products.weight,
-                    newVal: this.products.weight,
-                    isValid: true,
-                },
-                dimensions: {
-                    val: this.products.dimensions,
-                    newVal: this.products.dimensions,
-                    isValid: true,
-                },
-                volume: {
-                    val: this.products.volume,
-                    newVal: this.products.volume,
-                    isValid: true,
+
+        computed: { 
+            ...mapGetters({
+                myUserId: "auth/getUserId"
+            }),
+            getPresetFilter(){
+                return [
+                    {
+                        name: "Today",
+                        id: 1
+                    },
+                    {
+                        name: "This Month",
+                        id:0
+                    },
+                    {
+                        name: "Back Month",
+                        id:2
+                    }
+                ];
+            },
+
+            presetOption(){
+                return {
+                    0: this.goToThisMonth,
+                    1: this.goToToday,
+                    2: this.goBackByOneMonth,
+                    null: ()=>this.clearDate(this.myPageNumber)
                 }
-            })
+            },
 
-            this.productV2 = await this.$store.dispatch("products/getDetailProduct", this.$route.params.id);
-            this.productHistory = this.listDetail.product_moves
-        },
-        async newCategory(name) {
-            this.selectedCreated = name
-            this.promptCreated = true
-            this.message.prompt = `Do you want to create`
-        },
-        async saveData() {
-            let actionPayload = {
-                id: this.product.id.newVal,
-                prodCategory: this.product.prodCategory.newVal.id ?? "null"
-            }
-            for (const field of Object.keys(this.product)) {
-                if (this.product[field].val !== this.product[field].newVal) {
-                    actionPayload[field] = this.product[field].newVal;
+            barcode() {
+                if (!this.product) {
+                    return this.product.barcode;
+                } else {
+                    return null;
                 }
+            },
+            buttonLabel() {
+                let label = "";
+                if (this.editDisabled) {
+                    label = "Edit";
+                } else {
+                    label = "Save"
+                }
+                return label;
+            },
+            updatedName() {
+                return this.product.name.val === this.product.name.newVal ? false : true;
+            },
+            prodCategories() {
+                return this.$store.getters['products/prodCategories'];
+            },
+            listDetail() {
+                const products = this.$store.getters['products/getProductState'].filter(product => {
+                    return product.product_id == this.$route.params.id;
+                })[0];
+                return products
             }
-            // refresh after save data 
-            const refresh = await this.$store.dispatch('products/updateProduct', actionPayload);
-            localStorage.setItem("localStorageKeys", JSON.stringify(refresh))
         },
-        async loadProdCategories() {
-            try {
-                await this.$store.dispatch('products/getProdCategories', {});
-            } catch (e) {
-                console.log(e);
-            }
-        },
-        convert(time){
-            return TimeConvert.formatUTCToDate(time)
-        },
+        methods: {
+            onSelectPreset(){
+                this.presetOption[this.myPresetValue]?.();
+            },
 
-        confirmDeleteProduct() {
-            this.deleteProductDialog = true;
-        },
+            initingOrigList(){
+                this.dataList.length=0;
+                for(let i=0; i<this.productMovesLenght; i++){
+                    this.dataList.push({tmpId: i.toString()})
+                }
+            },
 
-        async deleteProduct() {
-            this.toLoad = async () => {
-                this.deleteProductDialog = false; 
-                const actionPayload = {
-                    id: this.productV2.product_id,
-                };
-                await this.$store.dispatch('products/deleteProduct', actionPayload);
-                // this.onDeleteList(this.productV2.product_id)
+            onPage(event){
+                this.myPageNumber = event.page;
+                
+                this.toLoad = async()=>{
+                    const data = await this.$store.dispatch("products/getProductMoves", {
+                        productId: this.$route.params.id,
+                        fromDate: this.fromDate,
+                        toDate: this.toDate,
+                        userId: this.myUserId
+                    });
+                 
+                    const offset= event.first
+                    const limit = event.rows    
+                    this.updateList({start: offset, end:limit, tempList: data.rows})   
+                }
+            },
 
-                this.productV2 = {};
-                this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
-                this.$router.push({name:'productList'});
+            updateList({start, end, tempList}){
+                let index=0;
+                // say that its suppose to be 20-29
+                // start = 20, end 20+row(10) = 30, 20 - 29 (<30)
+                for(let i=start; i<end+start; i++){
+                    if(!(tempList?.[index])){
+                        break;
+                    }
+                    const myId = this.dataList[i].tmpId;
+                    this.dataList[i]={tmpId: myId,...tempList[index]}
+                    index++
+                }
+            },
+
+
+            goBackByOneMonth(){
+                const currentDate = this.fromDate || new Date();
+                currentDate.setMonth(currentDate.getMonth()-1)
+                const lastDay = TimeConvert.getLastDayOfMonth(currentDate.getMonth(), this.fromDate?.getYear());
+
+                this.setDate({
+                    month: currentDate.getMonth(),
+                    firstDay: 1,
+                    lastDay: lastDay,
+                    year: currentDate.getFullYear()
+                });
+            },
+
+
+            goToThisMonth(){
+                const currentDay = new Date();
+                const lastDay = TimeConvert.getLastDayOfMonth(currentDay.getMonth(), currentDay.getFullYear());
+
+                this.setDate({
+                    month: currentDay.getMonth(),
+                    firstDay: 1,
+                    lastDay: lastDay,
+                    year: currentDay.getFullYear()
+                });
+            },
+
+            goToToday(){
+                const midnight = new Date();
+                const finalTime = new Date();
+
+                midnight.setHours(0,0,0,0);
+                finalTime.setHours(23, 59, 59, 999);
+
+                this.fromDate = midnight;
+                this.toDate = finalTime;
+                this.onSelectDate({limit: this.rows});
+            },
+
+            clearDate(){
+                this.fromDate = null;
+                this.toDate = null;
+
+                this.searchProductMoves({limit: this.rows});
+            },
+
+            setDate({month, firstDay, lastDay, year}){
+                this.fromDate = new Date(year, month, firstDay);
+                this.toDate = new Date(year, month, lastDay);
+                this.onSelectDate({limit: this.rows});
+            },
+
+            onSelectDate(query){
+                if(this.validate()){
+                    const pageNumber = query?.pageNumber ?? 0; 
+                    this.searchProductMoves(pageNumber);
+                }
+            },
+
+            searchProductMoves(query){
+                this.toLoad = async()=>{
+                    const data = await this.$store.dispatch("products/getProductMoves", {
+                        productId: this.$route.params.id,
+                        fromDate: this.fromDate,
+                        toDate: this.toDate,
+                        userId: this.myUserId
+                    });
+                    this.productMovesLenght = data?.rows_total ?? 0;
+                    this.initingOrigList();
+                    this.updateList({
+                        start: (this.myPageNumber || 0) * this.rows,
+                        end: query?.limit ?? this.rows,
+                        tempList: data?.rows
+                    });
+                }
+            },
+
+            validate(){
+                const correctDate = TimeConvert.convertToMs(this.toDate) >= TimeConvert.convertToMs(this.fromDate);
+                return correctDate;
+            },
+
+            onDecline() {
+                this.promptCreated = false
+            },
+            async onComfirmCreated() {
+                this.promptCreated = false
+                const data = {
+                    category_name: this.selectedCreated
+                }
+                const newData = await this.$store.dispatch("products/addProductCategory", data);
+                this.prodCategory = newData
+                this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Category Created', life: 3000 });
+            },
+            changeEditMode() {
+                this.editDisabled = !this.editDisabled;
+                if (this.editDisabled) {
+                    this.saveData();
+                }
+            },
+            discard() {
+                if (typeof this.product.name && (this.product.name.val !== this.product.name.newVal)) {
+                    this.product.name.newVal = this.product.name.val;
+                }
+                if (typeof this.product.sku !== "undefined" && (this.product.sku.val !== this.product.sku.newVal)) {
+                    this.product.sku.newVal = this.product.sku.val;
+                }
+                if (typeof this.product.upc !== "undefined" && (this.product.upc.val !== this.product.upc.newVal)) {
+                    this.product.upc.newVal = this.product.upc.val;
+                }
+                this.editDisabled = !this.editDisabled;
+            },
+            async loadData(pageNumber) {
+                this.toLoad = async () => {
+                    this.productV2 = await this.$store.dispatch("products/getDetailProduct", {productId: this.$route.params.id});
+                    this.products = await this.$store.getters['products/getProductState'].find(product => {
+                        return product.product_id == this.$route.params.id;
+                    });
+
+                    const productMoves = await this.$store.dispatch("products/getProductMoves", {
+                        productId: this.$route.params.id,
+                        fromDate: this.fromDate,
+                        toDate: this.toDate,
+                        userId: this.myUserId
+                    });
+
+                    this.productMovesLenght = productMoves?.rows_total ?? 0;
+
+                    await this.$store.dispatch('products/getProdCategories', {})
+
+                    // details product 
+                    this.product = Object.assign({
+                        id: {
+                            val: this.products.product_id,
+                            newVal: this.products.product_id,
+                            isValid: true,
+                        },
+                        name: {
+                            val: this.products.product_name,
+                            newVal: this.products.product_name,
+                            isValid: true
+                        },
+                        sku: {
+                            val: this.products.sku,
+                            newVal: this.products.sku,
+                            isValid: true,
+                        },
+                        upc: {
+                            val: this.products.upc,
+                            // ?? null safety
+                            // newVal: this.products.upc ?? "null",
+                            newVal: this.products.upc,
+                            isValid: true,
+                        },
+                        prodCategory: {
+                            val: this.products.category_name,
+                            newVal: this.products.category_name, 
+                            isValid: true,
+                        },
+                        barcode: {
+                            val: this.products.barcode,
+                            newVal: this.products.barcode,
+                            isValid: true,
+                        },
+                        onhands: {
+                            val: this.products.on_hands,
+                            newVal: this.products.on_hands,
+                            isValid: true,
+                        },
+                        incoming: {
+                            val: this.products.incoming,
+                            newVal: this.products.incoming,
+                            isValid: true,
+                        },
+                        outgoing: {
+                            val: this.products.outgoing,
+                            newVal: this.products.outgoing,
+                            isValid: true,
+                        },
+                        forecasted: {
+                            val: this.products.forecasted,
+                            newVal: this.products.forecasted,
+                            isValid: true,
+                        },
+                        // TODO1: waiting api field
+                        width: {
+                            val: this.products.width,
+                            newVal: this.products.width,
+                            isValid: true,
+                        },
+                        length: {
+                            val: this.products.length,
+                            newVal: this.products.length,
+                            isValid: true,
+                        },
+                        height: {
+                            val: this.products.height,
+                            newVal: this.products.height,
+                            isValid: true,
+                        },
+                        weight: {
+                            val: this.products.weight,
+                            newVal: this.products.weight,
+                            isValid: true,
+                        },
+                        dimensions: {
+                            val: this.products.dimensions,
+                            newVal: this.products.dimensions,
+                            isValid: true,
+                        },
+                        volume: {
+                            val: this.products.volume,
+                            newVal: this.products.volume,
+                            isValid: true,
+                        }
+                    });
+
+
+                    this.initingOrigList();
+                    this.updateList({start: pageNumber? pageNumber*this.rows : 0, end: this.rows, tempList: productMoves.rows})
+                }
+            },
+            async newCategory(name) {
+                this.selectedCreated = name
+                this.promptCreated = true
+                this.message.prompt = `Do you want to create`
+            },
+            async saveData() {
+                let actionPayload = {
+                    id: this.product.id.newVal,
+                    prodCategory: this.product.prodCategory.newVal.id ?? "null"
+                }
+                for (const field of Object.keys(this.product)) {
+                    if (this.product[field].val !== this.product[field].newVal) {
+                        actionPayload[field] = this.product[field].newVal;
+                    }
+                }
+                // refresh after save data 
+                const refresh = await this.$store.dispatch('products/updateProduct', actionPayload);
+                localStorage.setItem("localStorageKeys", JSON.stringify(refresh))
+            },
+            convert(time){
+                return TimeConvert.formatUTCToDate(time)
+            },
+
+            confirmDeleteProduct() {
+                this.deleteProductDialog = true;
+            },
+
+            async deleteProduct() {
+                this.toLoad = async () => {
+                    this.deleteProductDialog = false; 
+                    const actionPayload = {
+                        id: this.productV2.product_id,
+                    };
+                    await this.$store.dispatch('products/deleteProduct', actionPayload);
+                    // this.onDeleteList(this.productV2.product_id)
+
+                    this.productV2 = {};
+                    this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+                    this.$router.push({name:'productList'});
+                }
             }
         }
     }
-}
 </script>
 

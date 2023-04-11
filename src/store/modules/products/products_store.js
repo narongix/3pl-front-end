@@ -1,4 +1,5 @@
 import ApiService from "../../../service/ApiService.js";
+import TimeConvert from "../../../components/utils/TimeConvert.js";
 
 export default {
     namespaced: true,
@@ -60,6 +61,13 @@ export default {
                     state.products.push(element)
                 }
             });
+        },
+
+        IntegrateProductMoveWithProduct(state, {data, id}){
+            const index = state.products.findIndex((e)=>e.product_id==id);
+            // I know, this is stupid but it does work, push accepts multiple argument
+            // so with the spread operator, this is possible.
+            state.products[index]["product_moves"].push(...data); 
         },
 
         deleteProductState(state, productState) {
@@ -126,7 +134,7 @@ export default {
             return response;
         },
 
-        async getDetailProduct({commit}, productId) {
+        async getDetailProduct({commit}, {productId}) {
             const data = {
                 product_id: productId
             }
@@ -134,6 +142,23 @@ export default {
             commit("updateProductState", [response])
             return response;
         },
+
+        async getProductMoves({ commit }, {fromDate, toDate, productId, userId}){
+            const newFromDate = TimeConvert.formatDateToStockFormat(fromDate);
+            const newToDate = TimeConvert.formatDateToStockFormat(toDate);
+            
+            const params ={
+                product_id: productId,
+                from_date: newFromDate,
+                to_date: newToDate,
+                user_id: userId
+            }
+            const response = await ApiService.getProductMoves(params);
+            
+            commit("IntegrateProductMoveWithProduct", {id: productId, data: response.rows});
+            return response;
+        },
+
         async addProduct(context, {newlyCreatedProduct, userId}) {
             try {
                 const data = {
