@@ -528,7 +528,9 @@
 
                     this.productMovesLenght = productMoves?.rows_total ?? 0;
 
-                    await this.$store.dispatch('products/getProdCategories', {})
+                    await this.$store.dispatch('products/getProdCategories', {
+                        userId: this.myUserId
+                    })
 
                     // details product 
                     this.product = Object.assign({
