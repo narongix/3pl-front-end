@@ -43,35 +43,42 @@
                         <template #body="{ data }">
                             <LinkParagraph :data="data.barcode" @pushing="navigateToDetail(data.product_id)" :myClass="{ shake: activateOrNot(data.product_name) }"></LinkParagraph>
                         </template>
-                        <template #filter="{ filterModel, filterCallback }">
+                        <!-- <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
                                 optionValue="value" @input="filterCallback()" />
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
                                 class="p-column-filter mt-3" placeholder="Search By Barcode" />
-                        </template>
+                        </template> -->
                     </Column>
                     <Column field="sku" header="Internal Reference" style="min-width:12rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.sku }}</p>
                         </template>
-                        <template #filter="{ filterModel, filterCallback }">
+                        <!-- <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
                                 class="p-column-filter mt-3" placeholder="Search By Internal Reference"/>
-                        </template>
+                        </template> -->
                     </Column>
                     <Column field="product_name" header="Product Name" style="min-width:15rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.product_name }}</p>
                         </template>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
-                                optionValue="value" @input="filterCallback()" />
-                            <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search By Name" />
+                        <template #filter>
+                            <!-- <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
+                                optionValue="value" @input="filterCallback()" /> -->
+                            <InputText type="text" v-model="myFilter.product_name"
+                                class="p-column-filter mt-3" placeholder="Search By Name"/>
+                        </template>
+
+                        <template #filterclear>
+                            <Button type="button" label="Clear" @click="onClearProductNameFilter()" severity="secondary" outlined></Button>
+                        </template>
+                        <template #filterapply>
+                            <Button type="button" label="Apply" @click="onApplyProductNameFilter()" severity="success"></Button>
                         </template>
                     </Column>
                     <Column field="upc" header="UPC" style="min-width:12rem" :sortable="false"
@@ -79,36 +86,36 @@
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.upc }}</p>
                         </template>
-                        <template #filter="{ filterModel, filterCallback }">
+                        <!-- <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
                                 class="p-column-filter mt-3" placeholder="Search By UPC"/>
-                        </template>
+                        </template> -->
                     </Column>
                     <Column field="category_name" header="Product Category" style="min-width:12rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.category_name }}</p>
                         </template>
-                        <template #filter="{ filterModel, filterCallback }">
+                        <!-- <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
                                 class="p-column-filter mt-3" placeholder="Search By Product Category"/>
-                        </template>
+                        </template> -->
                     </Column>
                     <Column field="on_hands" header="On Hands" style="width:10%" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.on_hands }}</p>
                         </template>
-                        <template #filter="{ filterModel, filterCallback }">
+                        <!-- <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
                                 class="p-column-filter mt-3" placeholder="Search By On Hands"/>
-                        </template>
+                        </template> -->
                     </Column>
                 </DataTable>
             </div>
@@ -143,6 +150,9 @@
         emits:["update:myRows"],
         data() {
             return {
+                myFilter:{
+                    product_name: null,
+                },
                 // rows: 10,        
                 productV2: null,
                 productDialog: false,
@@ -225,6 +235,7 @@
                     userId: myId ?? this.userId,
                     productId: this.productId,
                     productReference: this.productReference,
+                    productName: this.myFilter.product_name
                 });
                 this.initList();
 
@@ -233,7 +244,8 @@
                     limit: this.rows,
                     userId: myId ?? this.userId,
                     productId: this.productId,
-                    productReference: this.productReference
+                    productReference: this.productReference,
+                    productName: this.myFilter.product_name
                 });
 
                 this.updateList({offset: pageNumber? pageNumber*this.rows : 0, row: this.rows, tempList: products});
@@ -282,11 +294,24 @@
             navigateToDetail(id){
                 this.$router.push({name: "productDetail", params: {id: id}});
             },
+
             onSearch(){
-            this.toLoadRetry = async() => {
-            await this.SearchProduct(this.myPageTracker);
-            };
-        }
+                this.toLoadRetry = async() => {
+                    await this.SearchProduct(this.myPageTracker);
+                };
+            },
+            
+            onClearProductNameFilter(){
+                this.toLoadRetry = async() => {
+                    await this.SearchProduct(this.myPageTracker);
+                };
+            },
+
+            onApplyProductNameFilter(){
+                this.toLoadRetry = async() => {
+                    await this.SearchProduct(this.myPageTracker);
+                };
+            }
         },
 
         watch:{

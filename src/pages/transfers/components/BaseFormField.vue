@@ -105,25 +105,25 @@
                             <p :class="{'p-error': validationField1.transferProducts.value}">Please create transfer detail</p>
                         </template>
 
-                        <Column field="product_name" header="Name" :sortable="true" style="min-width:12rem">
+                        <Column field="product_name" header="Name" :sortable="false" style="min-width:12rem">
                             <template #body="{ data }">
                                 <p :class="{highlight: !FieldNotActive}">{{ data.product_name }}</p>
                             </template>
 
-                        <template #filter="{filterModel, filterCallback}">
+                        <!-- <template #filter="{filterModel, filterCallback}">
                             <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name"></InputText>
-                        </template>
+                        </template> -->
                         </Column>
                         <Column field="sku" header="Internal Reference" style="min-width:12rem"></Column>
                         <Column field="barcode" header="Barcode" style="min-width:15rem"></Column>
-                        <Column field="demand" header="Demands" :sortable="true" style="min-width:12rem">
+                        <Column field="demand" header="Demands" :sortable="false" style="min-width:12rem">
                             <template #body="{ data }">
                                 <p :class="{highlight: !FieldNotActive}">{{ data.demand }}</p>
                             </template>
 
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                             <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by demands"></InputText>
-                            </template>
+                            </template> -->
                         </Column>
                         <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
                             <template #body="props">

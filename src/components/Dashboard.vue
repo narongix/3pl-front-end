@@ -73,8 +73,8 @@
 						<img :src="'images/product/' + slotProps.data.image" :alt="slotProps.data.image" width="50" class="shadow-2" />
 					</template>
 				</Column>
-				<Column field="name" header="Name" :sortable="true" style="width:35%"></Column>
-				<Column field="price" header="Price" :sortable="true" style="width:35%">
+				<Column field="name" header="Name" :sortable="false" style="width:35%"></Column>
+				<Column field="price" header="Price" :sortable="false" style="width:35%">
 					<template #body="slotProps">
 						{{formatCurrency(slotProps.data.price)}}
 					</template>

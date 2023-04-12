@@ -115,7 +115,8 @@ export default {
                 user_id: myParams?.userId,
                 product_reference: myProductReference,
                 search_key: myParams?.searchKey,
-                product_id: myProductId
+                product_id: myProductId,
+                product_name: myParams?.productName
             };
             const maxProductLength = await ApiService.getProductLength(params);
             commit("setProductLength", maxProductLength.total_products);
