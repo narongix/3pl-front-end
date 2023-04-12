@@ -10,7 +10,7 @@
                     :rowsPerPageOptions="[10, 20, 30]">
                     <template #loading v-if="isLoading">
                     </template>
-                    <Column field="category_name" header="Category Name" style="min-width:12rem" :sortable="true">
+                    <Column field="category_name" header="Category Name" style="min-width:12rem" :sortable="false">
                         <template #body="{ data }">
                             <categories-item :data="data" :class="{ shake: activateOrNot(data.id) }"></categories-item>
                         </template>

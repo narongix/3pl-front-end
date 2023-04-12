@@ -10,33 +10,33 @@
                 <template #empty>
                     No product history found.
                 </template>
-                <Column field="created_at" header="Created at" :sortable="true" sort :showFilterMatchModes="false">
-                    <template #filter>
+                <Column field="created_at" header="Created at" :sortable="false" sort :showFilterMatchModes="false">
+                    <!-- <template #filter>
                         <CalendarTime @getValueMode="storeCreatedAtMode" @getValue="storeCreatedAtValue"></CalendarTime>
-                    </template>
+                    </template> -->
                     <template #body="{ data }">
                         {{ convert(data.created_at) }}
                     </template>
                 </Column>
-                <Column field="movement_name" header="Movement" style="min-width:12rem" :sortable="true">
-                    <template #filter="{filterModel, filterCallBack}">
+                <Column field="movement_name" header="Movement" style="min-width:12rem" :sortable="false">
+                    <!-- <template #filter="{filterModel, filterCallBack}">
                         <inputText v-model="filterModel.value" @input="filterCallBack()"></inputText>
-                    </template>
+                    </template> -->
                 </Column>
-                <Column field="qty" header="Quantity" style="min-width:12rem" :sortable="true">
-                    <template #filter="{filterModel, filterCallBack}">
+                <Column field="qty" header="Quantity" style="min-width:12rem" :sortable="false">
+                    <!-- <template #filter="{filterModel, filterCallBack}">
                         <inputText v-model="filterModel.value" @input="filterCallBack()"></inputText>
-                    </template>
+                    </template> -->
                 </Column>
-                <Column field="serial" header="Serial/Lot Number" style="min-width:12rem" :sortable="true">
-                    <template #filter="{filterModel, filterCallBack}">
+                <Column field="serial" header="Serial/Lot Number" style="min-width:12rem" :sortable="false">
+                    <!-- <template #filter="{filterModel, filterCallBack}">
                         <inputText v-model="filterModel.value" @input="filterCallBack()"></inputText>
-                    </template>
+                    </template> -->
                 </Column>
-                <Column field="odoo_reference" header="Odoo Reference" style="min-width:12rem" :sortable="true">
-                    <template #filter="{filterModel, filterCallBack}">
+                <Column field="odoo_reference" header="Odoo Reference" style="min-width:12rem" :sortable="false">
+                    <!-- <template #filter="{filterModel, filterCallBack}">
                         <inputText v-model="filterModel.value" @input="filterCallBack()"></inputText>
-                    </template>
+                    </template> -->
                 </Column>
             </DataTable>
         </Dialog>
@@ -51,9 +51,15 @@
     import HiddenRetryField from '../../../components/prompt_field/HiddenRetryField.vue';
     import RetryField from '../../../components/prompt_field/RetryField.vue'
     import TimeConvert from '../../../components/utils/TimeConvert'
-    import CalendarTime from "@/pages/transfers/components/CalendarTime.vue";
+    // import CalendarTime from "@/pages/transfers/components/CalendarTime.vue";
 
     export default{
+
+    components: { 
+        RetryField, 
+        HiddenRetryField, 
+        // CalendarTime 
+    },
     props: {
         modelValue: Boolean,
         productId: String,
@@ -174,7 +180,6 @@
                 this.initData();
             }
         }
-    },
-    components: { RetryField, HiddenRetryField, CalendarTime }
+    }
 }
 </script>

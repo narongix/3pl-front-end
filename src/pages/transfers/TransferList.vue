@@ -47,18 +47,18 @@
                   <TransferItem :data="data" :onload="MyCountDown.stopCountDown()"></TransferItem>
                 </template>
 
-                <template #filter="{ filterModel, filterCallback }">
+                <!-- <template #filter="{ filterModel, filterCallback }">
                   <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
                             placeholder="Search by id"></InputText>
-                </template>
+                </template> -->
               </Column>
 
               <Column field="reference" header="Internal Reference" :sortable="false" style="min-width:12rem" :showFilterMatchModes="false">
-                <template #filter="{ filterModel, filterCallback }">
+                <!-- <template #filter="{ filterModel, filterCallback }">
                   <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter"
                     placeholder="Search By Reference"
                   ></InputText>
-                </template>
+                </template> -->
               </Column>
 
               <Column field="transfer_type_id" :sortable="false" style="min-width:12rem" header="Transfer Type">
@@ -74,9 +74,9 @@
                   <p>{{ formatDate(data?.scheduled_time) }}</p>
                 </template>
 
-                <template #filter>
+                <!-- <template #filter>
                   <CalendarTime @getValueMode="storeScheduleTimeMode" @getValue="storeScheduleTimeValue"></CalendarTime>
-                </template>
+                </template> -->
               </Column>
 
               <Column field="transfer_status_id" :sortable="false" style="min-width:8rem" :showFilterMatchModes="false"
@@ -85,17 +85,17 @@
                   <TransferStatusField :data='data'></TransferStatusField>
                 </template>
 
-                <template #filter = "{filterModel, filterCallback}">
+                <!-- <template #filter = "{filterModel, filterCallback}">
                   <MultiSelect :options="convertToList" v-model="filterModel.value" @change="onInputStatusId($event.value, filterCallback)" optionLabel="name" optionValue="id"
                               class="p-column-filter" placeholder="Search by status"></MultiSelect>
-                </template>
+                </template> -->
               </Column>
 
               <Column field="recipient" header="Recipient" style="min-width:14rem">
-                <template #filter="{ filterModel, filterCallback }">
+                <!-- <template #filter="{ filterModel, filterCallback }">
                   <InputText v-model="filterModel.value" @input="filterCallback()"
                             placeholder="Search by Recipient"></InputText>
-                </template>
+                </template> -->
               </Column>
 
               <Column field="completed_time" :sortable="false" style="min-width:14rem" header="Complete Time"
@@ -104,11 +104,11 @@
                   {{ formatDate(data?.completed_time) }}
                 </template>
 
-                <template #filter>
+                <!-- <template #filter>
                     <CalendarTime @getValueMode="storeCompleteTimeMode"
                                 @getValue="storeCompleteTimeValue">
                     </CalendarTime>
-                </template>
+                </template> -->
               </Column>
 
               <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:14rem" :sortable="false">
@@ -116,9 +116,9 @@
                   {{ formatDate(data?.created_at) }}
                 </template>
 
-                <template #filter>
+                <!-- <template #filter>
                   <CalendarTime @getValueMode="storeCreatedAtMode" @getValue="storeCreatedAtValue" @onLoad="loadCalendarParam"></CalendarTime>
-                </template>
+                </template> -->
               </Column>
             </DataTable>
           
@@ -155,7 +155,7 @@
   import TransferStatusField from "./components/TransferStatusField.vue"
 
   import {transferStatus} from "../../domains/domain"
-  import CalendarTime from "@/pages/transfers/components/CalendarTime.vue";
+  // import CalendarTime from "@/pages/transfers/components/CalendarTime.vue";
   import CountDown from "../../components/CountDown.vue"
   import TransferTypeField from "./components/TransferTypeField.vue"
   import UserDropDownPagination from "../../components/UserDropDownPagination.vue"
@@ -166,7 +166,7 @@
       this.toLoadRetry = this.initData
     },
     components: {
-      CalendarTime,
+      // CalendarTime,
       TransferItem,
       RetryField,
       PromptField,
