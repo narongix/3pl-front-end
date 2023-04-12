@@ -61,7 +61,7 @@ export default {
                 {
                     label: 'Products',
                     items: [
-                        {label: 'Products', faIcon: 'fa-box', to: '/products'},
+                        {label: 'Products', faIcon: 'fa-box', to: this.productListPage()},
                         {label: 'Product Categories', faIcon:'fa-table-cells-large', to: '/product-categories'},
                     ]
                 },
@@ -82,6 +82,14 @@ export default {
         }
     },
     methods: {
+        productListPage(){
+            const userRole = this.$store.getters["auth/getUserRole"];
+            if(userRole == roleGroupId.Admin){
+                return "/products_admin"
+            }
+            return '/products';
+        },
+
         myHome(){
             const userRole = this.$store.getters["auth/getUserRole"];
             if(userRole == roleGroupId.Admin){
