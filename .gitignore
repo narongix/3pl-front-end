@@ -31,7 +31,3 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
-
-# Temp
-src/pages/products/admin/AdminProductList.vue
-src/pages/products/components/ProductListTemplate.vue

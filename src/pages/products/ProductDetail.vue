@@ -400,7 +400,6 @@
                 }
             },
 
-
             goBackByOneMonth(){
                 const currentDate = this.fromDate || new Date();
                 currentDate.setMonth(currentDate.getMonth()-1)
