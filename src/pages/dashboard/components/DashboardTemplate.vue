@@ -109,51 +109,73 @@
 			</div>
 
 
-		<div class="grid">
-			<div class="col-12 md:col-6">
-				<div class="card">
-					<h5>RECENTLY COMPLETED RECEIPTS</h5>
-					<MyDataTable v-slot="mySlot" :initializeList="tempData1" :row="myRows1" :total="total1">
-						<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
-							:rowHover="true" responsiveLayout="scroll" @page="onPage1($event, mySlot.update)"
-							:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows1">		
-							
-							<template #empty>
-								Empty...
-							</template>
-							<Column header="Transfer ID" field="id"></Column>
-							<Column header="Customer" field="customer_name"></Column>
-							<Column header="Time Taken" field="order_cycle_time">
-								<template #body="{ data }">
-									<p>{{ (Number(data.order_cycle_time) || 0).toFixed(2) }}hr</p>
+			<div class="grid">
+				<div class="col-12 md:col-6">
+					<div class="card h-full">
+						<h5>RECENTLY COMPLETED RECEIPTS</h5>
+						<MyDataTable v-slot="mySlot" :initializeList="tempData1" :row="myRows1" :total="total1">
+							<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
+								:rowHover="true" responsiveLayout="scroll" @page="onPage1($event, mySlot.update)"
+								:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows1">		
+								
+								<template #empty>
+									Empty...
 								</template>
-							</Column>
-							<Column header="On Time" field="on_time"></Column>
-						</DataTable>
-					</MyDataTable>
+								<Column header="Transfer ID" field="id"></Column>
+								<Column header="Customer" field="customer_name"></Column>
+								<Column header="Time Taken" field="order_cycle_time">
+									<template #body="{ data }">
+										<p>{{ (Number(data.order_cycle_time) || 0).toFixed(2) }}hr</p>
+									</template>
+								</Column>
+								<Column header="On Time" field="on_time"></Column>
+							</DataTable>
+						</MyDataTable>
+					</div>
 				</div>
-			</div>
 
-			<div class="col-12 md:col-6">
-				<div class="card">
-					<h5>UNMEASURED PRODUCTS ({{ total3 }})</h5>
-					<MyDataTable v-slot="mySlot" :initializeList="tempData3" :row="myRows3" :total="total3">
-						<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
-							:rowHover="true" responsiveLayout="scroll" @page="onPage3($event, mySlot.update)"
-							:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows3">
-							
-							<template #empty>
-								Empty...
-							</template>
-							<Column header="Customer" field="customer_name"></Column>
-							<Column header="Count" field="count"></Column>
-						</DataTable>
-					</MyDataTable>
+				<div class="col-12 md:col-6">
+					<div class="card h-full">
+						<h5>RECENTLY COMPLETED DELIVERIES</h5>
+						<MyDataTable v-slot="mySlot" :initializeList="tempData2" :row="myRows2" :total="total2">
+							<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
+								:rowHover="true" responsiveLayout="scroll" @page="onPage2($event, mySlot.update)"
+								:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows2">
+								<template #empty>
+									Empty...
+								</template>
+								<Column header="Transfer ID" field="id"></Column>
+								<Column header="Customer" field="customer_name"></Column>
+								<Column header="Time Taken" field="order_cycle_time">
+									<template #body="{ data }">
+										<p>{{ (Number(data.order_cycle_time) || 0).toFixed(2) }}hr</p>
+									</template>
+								</Column>
+								<Column header="On Time" field="on_time"></Column>
+							</DataTable>
+						</MyDataTable>
+					</div>
+				</div>
+
+				<div class="col-12 md:col-6">
+					<div class="card">
+						<h5>UNMEASURED PRODUCTS ({{ total3 }})</h5>
+						<MyDataTable v-slot="mySlot" :initializeList="tempData3" :row="myRows3" :total="total3">
+							<DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" :dataKey="mySlot.tmpId"
+								:rowHover="true" responsiveLayout="scroll" @page="onPage3($event, mySlot.update)"
+								:rowsPerPageOptions="[10, 20, 30]" v-model:rows="myRows3">
+								
+								<template #empty>
+									Empty...
+								</template>
+								<Column header="Customer" field="customer_name"></Column>
+								<Column header="Count" field="count"></Column>
+							</DataTable>
+						</MyDataTable>
+					</div>
 				</div>
 			</div>
 		</div>
-		</div>
-
 		<RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToast"></RetryField>
 	</div>
 </template>
