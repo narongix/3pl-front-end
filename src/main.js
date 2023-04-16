@@ -108,12 +108,12 @@ import { FilterService, FilterMatchMode } from "primevue/api"
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 
-import { faSpinner, faCheck, faBox, faBoxesStacked, faTruck, faTableCellsLarge, faFileInvoice } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faCheck, faBox, faBoxesStacked, faTruck, faTableCellsLarge, faFileInvoice, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 // import {  } from '@fortawesome/free-regular-svg-icons';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faSpinner, faCheck, faTruck, faBox, faBoxesStacked, faTableCellsLarge, faFileInvoice);
+library.add(faSpinner, faCheck, faTruck, faBox, faBoxesStacked, faTableCellsLarge, faFileInvoice, faSort, faSortUp, faSortDown);
 
 router.beforeEach(function(to, from, next) {
     window.scrollTo(0, 0);

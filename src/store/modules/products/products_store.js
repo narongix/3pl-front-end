@@ -1,5 +1,6 @@
 import ApiService from "../../../service/ApiService.js";
 import TimeConvert from "../../../components/utils/TimeConvert.js";
+import { sortType } from "../../../domains/domain.js";
 
 export default {
     namespaced: true,
@@ -206,8 +207,9 @@ export default {
                 throw error;
             }
         },
-        async onFetchProducts({ commit }, { offset, productName, limit, searchKey, userId, productId, productReference}) {
-
+        async onFetchProducts({ commit }, { offset, productName, limit, searchKey, userId, productId, productReference, sortName, mySortType}) {
+            const mySort = mySortType!=null ? sortType[mySortType] : null;
+            
             const myProductReference = productReference?.map((e)=>e?.trim());
             const myProductId = productId?.map((e)=>e?.trim());
 
@@ -218,9 +220,10 @@ export default {
                 search_key: searchKey,
                 user_id: userId,
                 product_id: myProductId,
-                product_reference: myProductReference
+                product_reference: myProductReference,
+                sort_name: sortName,
+                sort_type: mySort
             }
-            
             const products = await ApiService.getProducts(params)
             commit("updateProductState", products)
 

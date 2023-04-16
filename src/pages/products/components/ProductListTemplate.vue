@@ -33,8 +33,7 @@
                             </div>
 
                             <div class="field col-12 md:col-4 lg:col-3">
-                                <label for="transferReference">Product Reference</label>
-                                <Chips id="transferReference" type="text" v-model="productReference" placeholder="Search By Reference"></Chips>
+                                <label for="productReference">Product Reference</label>
                             </div>
                         </div>
                     </template>
@@ -55,18 +54,37 @@
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.sku }}</p>
                         </template>
-                        <!-- <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
-                                @input="filterCallback()"/>
-                            <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
-                                class="p-column-filter mt-3" placeholder="Search By Internal Reference"/>
-                        </template> -->
+                        
+                        <template #filter>
+                            <Chips id="productReference" type="text" v-model="productReference" placeholder="Search By Reference"></Chips>
+                        </template>
+
+                        <template #filterclear>
+                            <Button type="button" label="Clear" @click="onClearProductRefernceFilter()" severity="secondary" outlined></Button>
+                        </template>
+                        <template #filterapply>
+                            <Button type="button" label="Apply" @click="onSearch()" severity="success"></Button>
+                        </template>
                     </Column>
-                    <Column field="product_name" header="Product Name" style="min-width:15rem" :sortable="false"
+                    <Column field="product_name" style="min-width:15rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.product_name }}</p>
                         </template>
+                         
+                        <template #header>
+                            <div class="flex formgrid grid grid-nogutter align-items-center justify-content-center" style="width:100%">
+                                <div class="col-11">
+                                    <p>&nbsp;Product Name</p>
+                                </div>
+                                <div class="col-1">
+                                    <SortButton v-model="mySort.product_name" name="product_name"
+                                    @onClick="onClickSortType"
+                                    ></SortButton>
+                                </div>
+                            </div>  
+                        </template>
+
                         <template #filter>
                             <!-- <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label"
                                 optionValue="value" @input="filterCallback()" /> -->
@@ -75,10 +93,10 @@
                         </template>
 
                         <template #filterclear>
-                            <Button type="button" label="Clear" @click="onClearProductNameFilter()" severity="secondary" outlined></Button>
+                            <Button type="button" label="Clear" @click="onClearProductNameFilter" severity="secondary" outlined></Button>
                         </template>
                         <template #filterapply>
-                            <Button type="button" label="Apply" @click="onApplyProductNameFilter()" severity="success"></Button>
+                            <Button type="button" label="Apply" @click="onSearch" severity="success"></Button>
                         </template>
                     </Column>
                     <Column field="upc" header="UPC" style="min-width:12rem" :sortable="false"
@@ -98,6 +116,7 @@
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.category_name }}</p>
                         </template>
+
                         <!-- <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.matchMode" :options="customFilter" optionLabel="label" optionValue="value" 
                                 @input="filterCallback()"/>
@@ -105,8 +124,21 @@
                                 class="p-column-filter mt-3" placeholder="Search By Product Category"/>
                         </template> -->
                     </Column>
-                    <Column field="on_hands" header="On Hands" style="width:10%" :sortable="false"
+                    <Column field="on_hands" style="min-width:9rem" :sortable="false"
                         :showFilterMatchModes="false">
+                        <template #header>
+                            <div class="flex formgrid grid grid-nogutter align-items-center justify-content-center" style="width:100%">
+                                <div class="col-10">
+                                    <p>&nbsp;On Hands</p>
+                                </div>
+                                <div class="col-2">
+                                    <SortButton v-model="mySort.on_hands" name="on_hands"
+                                    @onClick="onClickSortType"
+                                    ></SortButton>
+                                </div>
+                            </div>
+                        </template>
+
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.on_hands }}</p>
                         </template>
@@ -132,6 +164,7 @@
     import { mapGetters } from 'vuex';
     import LinkParagraph from '../../../components/LinkParagraph.vue';
     import { roleGroupId } from '../../../domains/domain';
+    import SortButton from '../../../components/sortButton.vue';
 
     export default {
         async created() {
@@ -140,6 +173,7 @@
         components: {
             RetryField,
             LinkParagraph,
+            SortButton
         },
         props:{
             onInit: Function,
@@ -152,6 +186,11 @@
             return {
                 myFilter:{
                     product_name: null,
+                },
+
+                mySort:{
+                    product_name: null,
+                    on_hands: null
                 },
                 // rows: 10,        
                 productV2: null,
@@ -215,6 +254,16 @@
             activateOrNot(product_name) {
                 return product_name == this.$route.query.name ?? false
             },
+            
+            onClickSortType({sortId, name}){
+                // if in the future we have multiple sorts, just removed this
+                this.mySort = {};
+                this.mySort[name] = sortId;
+
+                this.toLoadRetry = async () => {
+                    await this.SearchProduct(this.myPageTracker, null, name, sortId);
+                }
+            },
 
             goToNewProduct() {
                 const userRole = this.$store.getters["auth/getUserRole"];
@@ -230,12 +279,12 @@
                 await this.SearchProduct();
             },
 
-            async SearchProduct(pageNumber, myId){
+            async SearchProduct(pageNumber, myId, sortName, sortType){
                 await this.$store.dispatch("products/getProductLength",{
                     userId: myId ?? this.userId,
                     productId: this.productId,
                     productReference: this.productReference,
-                    productName: this.myFilter.product_name
+                    productName: this.myFilter.product_name,
                 });
                 this.initList();
 
@@ -245,7 +294,9 @@
                     userId: myId ?? this.userId,
                     productId: this.productId,
                     productReference: this.productReference,
-                    productName: this.myFilter.product_name
+                    productName: this.myFilter.product_name,
+                    sortName: sortName,
+                    mySortType: sortType
                 });
 
                 this.updateList({offset: pageNumber? pageNumber*this.rows : 0, row: this.rows, tempList: products});
@@ -300,18 +351,20 @@
                     await this.SearchProduct(this.myPageTracker);
                 };
             },
-            
+
+            onClearProductRefernceFilter(){
+                this.productReference = [];
+                this.toLoadRetry = async() =>{
+                    await this.SearchProduct(this.myPageTracker);
+                }
+            },
+
             onClearProductNameFilter(){
+                this.myFilter.product_name = null;
                 this.toLoadRetry = async() => {
                     await this.SearchProduct(this.myPageTracker);
                 };
             },
-
-            onApplyProductNameFilter(){
-                this.toLoadRetry = async() => {
-                    await this.SearchProduct(this.myPageTracker);
-                };
-            }
         },
 
         watch:{
