@@ -37,5 +37,10 @@ const roleGroupId = {
     User: 2
 }
 
-export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId };
+const sortType = {
+    1: "ASC",
+    2: "DESC",
+}
+
+export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType };
 
