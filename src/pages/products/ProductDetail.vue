@@ -309,7 +309,7 @@
                         id:0
                     },
                     {
-                        name: "Back Month",
+                        name: "Previous Month",
                         id:2
                     }
                 ];
