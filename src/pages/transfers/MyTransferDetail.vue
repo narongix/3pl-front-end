@@ -5,12 +5,22 @@
 	:data="oldData"
 	:myUserId="selectedUserId ?? myUserId"
 	:FieldNotActive="fieldNotActive"
-	:disabledField="disabledField" :popup="myPopUp"
+	:disabledField="disabledField" 
+	:popup="myPopUp"
 	:vanishField="vanishField"
 	:editMode="true"
+	:tabViewDisabled="tabViewDisabled"
 	>
 		<template #myTop="">
 			<RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
+		</template>
+
+		<template #additionButton="mySlot">
+			<div class="col-12 md:col-12 sm:col-12">
+				<Button v-if="!fieldNotActive" label="SAVE" class="p-button-success mr-2 mb-2" @click="mySlot.popUpProductDialog">
+					{{ baseData.buttonSubmit }}
+				</Button>
+			</div>
 		</template>
 
 		<template #myButton="mySlot">
@@ -52,7 +62,8 @@
 					transfer_type_id: true,
 					destination: true,
 					reference: false,
-					userSelector: true
+					userSelector: true,
+					product: false,
 				},
 				vanishField: {
 					scheduleDate: false,
@@ -110,6 +121,14 @@
 					severity: "error",
 					summary: "Error!",
 					detail: "Failed Editing Transfer"	
+				};
+			},
+
+			tabViewDisabled(){
+				return {
+					ordered: false,
+					operations: true,
+					extraCharge: true,
 				};
 			}
 		},

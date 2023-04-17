@@ -88,54 +88,93 @@
         </div>  
 
         <div class="card">
-            <div class="grid">
+            <div class="p-fluid formgrid grid flex-column">
+                <slot name="additional_button" :popUpProductDialog="changeStateDiaglog">
+
+                </slot>
+                
                 <div class="col-12 md:col-12 sm:col-12">
-                    <Button v-if="!FieldNotActive" label="SAVE" class="p-button-success mr-2 mb-2" @click='changeStateDiaglog'>
-                        {{ baseData.buttonSubmit }}
-                    </Button>
-                </div>
+                    <TabView>
+                        <TabPanel header="Ordered" :disabled="tabViewDisabled?.ordered">
+                            <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
+                            <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="disabledField?.product ? promptEditField : null"
+                            :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll"
+                            v-model:filters="filters"  filterDisplay="menu"
+                            >
+                                <template #empty>
+                                    <p :class="{'p-error': validationField1.transferProducts.value}">Please create transfer detail</p>
+                                </template>
 
-                <div class="col-12 md:col-12 sm:col-12">
-                    <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
-                    <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="promptEditField"
-                    :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll"
-                    v-model:filters="filters"  filterDisplay="menu"
-                    >
-                        <template #empty>
-                            <p :class="{'p-error': validationField1.transferProducts.value}">Please create transfer detail</p>
-                        </template>
+                                <Column field="product_name" header="Name" :sortable="false" style="min-width:12rem">
+                                    <template #body="{ data }">
+                                        <p :class="myHighLight">{{ data.product_name }}</p>
+                                    </template>
 
-                        <Column field="product_name" header="Name" :sortable="false" style="min-width:12rem">
-                            <template #body="{ data }">
-                                <p :class="{highlight: !FieldNotActive}">{{ data.product_name }}</p>
-                            </template>
+                                <!-- <template #filter="{filterModel, filterCallback}">
+                                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name"></InputText>
+                                </template> -->
+                                </Column>
+                                <Column field="sku" header="Internal Reference" style="min-width:12rem">
+                                    <template #body="{ data }">
+                                        <p :class="myHighLight">{{ data.sku }}</p>
+                                    </template>
+                                </Column>
+                                <Column field="barcode" header="Barcode" style="min-width:15rem">
+                                    <template #body="{ data }">
+                                        <p :class="myHighLight">{{ data.barcode }}</p>
+                                    </template>
+                                </Column>
+                                <Column field="demand" header="Demands" :sortable="false" style="min-width:12rem">
+                                    <template #body="{ data }">
+                                        <p :class="myHighLight">{{ data.demand }}</p>
+                                    </template>
 
-                        <!-- <template #filter="{filterModel, filterCallback}">
-                            <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by name"></InputText>
-                        </template> -->
-                        </Column>
-                        <Column field="sku" header="Internal Reference" style="min-width:12rem"></Column>
-                        <Column field="barcode" header="Barcode" style="min-width:15rem"></Column>
-                        <Column field="demand" header="Demands" :sortable="false" style="min-width:12rem">
-                            <template #body="{ data }">
-                                <p :class="{highlight: !FieldNotActive}">{{ data.demand }}</p>
-                            </template>
+                                    <!-- <template #filter="{ filterModel, filterCallback }">
+                                    <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by demands"></InputText>
+                                    </template> -->
+                                </Column>
+                                <Column v-if="!FieldNotActive && !disabledField?.product"  header="Actions" style="min-width:12rem">
+                                    <template #body="props">
+                                        <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="onPopUpDeletedPrompt(props)" />
+                                    </template>
+                                </Column>
+                            </DataTable>
+                        </TabPanel>
+                        <TabPanel header="Operations" :disabled="tabViewDisabled?.operations ?? true"></TabPanel>
+                        <TabPanel header="Extra Charges" :disabled="tabViewDisabled?.extraCharge ?? true">
+                            <slot name="extra_charge_panel">
+                            </slot>
+                            <DataTable :value="innerExtraCharge"
+                                :paginator="true" 
+                                class="p-datatable-sm" 
+                                :rows="innerExtraChargeRow" 
+                                dataKey="tmpId"
+                                :rowHover="true" 
+                                filterDisplay="menu" 
+                                responsiveLayout="scroll"
+                                :rowsPerPageOptions="[10, 20, 30]" 
+                                >
+                                <template #empty>
+                                    Empty...
+                                </template>
+                                    <Column field="item_code" header="Item Code"></Column>
+                                    <Column field="description" header="description"></Column>
 
-                            <!-- <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" @input="filterCallback()" placeholder="Search by demands"></InputText>
-                            </template> -->
-                        </Column>
-                        <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
-                            <template #body="props">
-                                <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="onPopUpDeletedPrompt(props)" />
-                            </template>
-                        </Column>
-                    </DataTable>
+                                    <Column field="amount" header="Amount"></Column>
+
+                                    <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
+                                        <template #body="props">
+                                            <Button v-if="props?.data?.draft" icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="onDeleteExtraCharge(props)" />
+                                        </template>
+                                    </Column>
+                                </DataTable>
+                        </TabPanel>
+                    </TabView>
                 </div>
             </div>
         </div>
 
-        <Dialog v-model:visible="promptCreateField" :style="{width: '450px'}" :header="popup.header ?? 'Select New Product'" :modal=true>
+        <Dialog v-model:visible="promptCreateField" :style="{width: '450px'}" :header="popup?.header ?? 'Select New Product'" :modal=true>
             <div class="p-fluid formgrid grid">
                 <div class="field col-12 md:col-12 sm:col-12">
                     <label for="product_id" :class="{'p-error': validationField2.product_id.value!=null}">Product</label>
@@ -153,7 +192,7 @@
                 </div>
 
                 <div class="field col-12 md:col-12 sm:col-12">
-                    <label for="demand" :class="{'p-error': validationField2.demand.value!=null}">{{ popup.productDemandDisplay ?? "Product Quantity" }}</label>
+                    <label for="demand" :class="{'p-error': validationField2.demand.value!=null}">{{ popup?.productDemandDisplay ?? "Product Quantity" }}</label>
                     <InputText :disabled="FieldNotActive" id="demand" type="text" v-model="demand" :class="{'p-invalid':validationField2.demand.value}"></InputText>
                     <small id="demand-help" class="p-error" v-if="validationField2.demand.value!=null">{{ validationField2.demand.value }}</small>
                 </div>
@@ -228,11 +267,26 @@
                 type: Boolean,
                 default: false
             },
+            
             popup: {
                 header: String,
                 productDemandDisplay: String
             },
+            
+            tabViewDisabled:{
+                type: Object,
+                default: ()=>({})
+            },
+
             vanishField: Object,
+            extraChargeRow:{
+                type: Number,
+                default: ()=>10
+            },
+            myExtraCharge:{
+                type: Array,
+                default: ()=>[]
+            }
             // validatedBeforeCreatingRecipient: {
             //     type: Function,
             //     default: ()=>{
@@ -242,7 +296,7 @@
             // }
         },
         
-        emits:["onClickSubmit"],
+        emits:["onClickSubmit", "update:extraChargeRow", "update:myExtraCharge"],
         components:{
             DropDownPagination,
             PromptField,
@@ -472,6 +526,38 @@
                 getRecipientLimit: "recipient/getLimit",
             }),
 
+            myHighLight(){
+                console.log(this.disabledField);
+                return {
+                    highlight: !this.FieldNotActive && !this.disabledField?.product
+                };
+            },
+
+            innerExtraChargeRow:{
+                get(){
+                    return this.extraChargeRow;
+                },
+
+                set(newValue){
+                    this.$emit("update:extraChargeRow", newValue);
+                }
+            },
+            innerExtraCharge:{
+                get(){
+                    return this.myExtraCharge;
+                },
+
+                set(newValue){
+                    this.$emit("update:myExtraCharge", newValue);
+                }
+            },
+
+            getExtraCharges(){
+                // TODO when we have extra charge here, let change the query
+                const data = this.$store.getters["extracharge/getExtraCharges"];
+                return data;
+            },
+
 
             getProductByUser(){
                 const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? this.myUserId));
@@ -479,7 +565,6 @@
             },
 
             getRecipientByUser(){
-                // TODO: Fix Dialog Select Recipient. Everytime Recipient Dialog is loaded, it would refresh the entire widget
                 const newRecipient = this.getRecipientsState.filter((e)=>e.user_id == (this.userSelector ?? this.myUserId))
 
                 return newRecipient;
@@ -507,7 +592,9 @@
         },
 
         methods:{
-            
+            onDeleteExtraCharge(prop){
+                this.innerExtraCharge.splice(prop.index, 1);
+            },
             showValueRecipient(value){
                 return value?.full_name ?? "Empty"
             },

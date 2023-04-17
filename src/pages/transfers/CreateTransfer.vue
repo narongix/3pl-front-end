@@ -6,6 +6,7 @@
     :disabledField="disabledField"
 	:myUserId="myUserId"
     :data="{}" :popup="myPopUp" :vanishField="vanishField"
+    :tabViewDisabled="tabViewDisabled"
     >
         <template #myTop>
             <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -89,7 +90,15 @@
                     header: "Product Quantity",
                     productDemandDisplay: "Quantity"
                 }
-            }
+            },
+            
+            tabViewDisabled(){
+				return {
+					ordered: false,
+					operations: true,
+					extraCharge: true,
+				};
+			}
         },
         
         methods:{

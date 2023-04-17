@@ -65,7 +65,33 @@ const adminRoutes = [
             return {name:"StockDetailReport"};
         }
     },
-    
+    {
+        path: "/admin_extra_charge",
+        name: "extraCharge",
+        component: ()=>import("./pages/extra_charge/ExtraChargeList.vue"),
+        meta:{role:roleGroupId.Admin},
+        beforeEnter:()=>{
+            if(store.getters["auth/getUserRole"] == roleGroupId.Admin){
+                return true;
+            }
+            return false;
+        }
+    },
+    {
+        path: "/admin_extra_charge/:id",
+        name: "extraChargeDetail",
+        component: ()=> import("./pages/extra_charge/ExtraChargeDetail.vue")
+    },
+    {
+        path: "/admin_extra_charge/create",
+        name: "extraChargeCreate",
+        component: ()=>import("./pages/extra_charge/ExtraChargeCreate.vue")
+    },
+    {
+        path: "/transfers_admin/:id",
+        name:"AdminTransferDetail",
+        component:()=>import("./pages/transfers/admin/AdminTransferDetail.vue")
+    }
 ];
 
 const routes = [
