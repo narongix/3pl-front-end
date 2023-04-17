@@ -76,7 +76,7 @@
                                 <small id="adminuserId-help" class="p-error" v-if="validationField1.userId.value">{{ validationField1.userId.value }}</small>
                             </div>
 
-                            <div class="field col-12 md:col-3 sm:col-12">
+                            <div class="field col-12 md:col-3">
                                 <label for="status">Status</label>
                                 <InputText :disabled="true" id="status" 
                                 type="text" v-model="myTransferStatus"></InputText>

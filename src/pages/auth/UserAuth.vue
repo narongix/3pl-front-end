@@ -47,8 +47,12 @@
 
 <script>
   import {mapState} from "vuex";
+  import EventBus from '../../AppEventBus';
 
   export default {
+    created(){
+      EventBus.emit('theme-change', { theme: "saga-green", dark: false });
+    },
     data() {
       return {
         form: {
