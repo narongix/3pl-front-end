@@ -140,14 +140,5 @@
                 }
             }
         },
-        watch:{
-            data:{
-                immediate: true,
-                handler (newValue) {
-                    this.myData = {...newValue};
-                    console.log("this.myData: "+JSON.stringify(this.myData));
-                }
-            }
-        }
     }
 </script>

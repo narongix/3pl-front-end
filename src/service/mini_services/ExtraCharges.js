@@ -20,5 +20,13 @@ export default {
             data: body
         });
         return resp.data;
+    },
+
+    async addExtraChargeToTransferId(body){
+        const resp = await ApiConfig.postMethods({
+            api: "/transfer_extra_charge",
+            data: body
+        });
+        return resp.data;
     }
 }

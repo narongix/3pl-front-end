@@ -12,11 +12,26 @@
             <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
         </template>    
 
+
+		<template #orderedButton="mySlot">
+			<div class="col-12 md:col-2 lg:col-2">
+				<Button v-if="!FieldNotActive" label="SAVE" class="p-button-success fixedWidthButton mr-2 mb-2" @click="mySlot.popUpProductDialog">
+					{{ baseData.buttonSubmit }}
+				</Button>
+			</div>
+		</template>
+
         <template #myButton="mySlot">
             <Button label="Create" class="p-button-success mr-2" @keyup.enter="mySlot.onClick" @click="mySlot.onClick"/>    
         </template>
     </BaseFieldForm>
 </template>
+
+<style scoped>
+    .fixedWidthButton{
+        width: 8rem;
+    }
+</style>
 
 <script>
     import BaseFieldForm from './components/BaseFormField.vue'

@@ -11,7 +11,7 @@
                         <p></p>
 
                         <div class="p-fluid formgrid grid">
-                            <div class="field col-12 md:col-4 sm:col-12">
+                            <div class="field col-12 md:col-4">
                                 <label for="scheduleDate" :class="{'p-error': validationField1.scheduledDate.value}">Schedule Date</label>
 
                                 <!-- A bug from the dev team, not from the code's fault -->
@@ -21,7 +21,7 @@
                                 <small id="scheduleDate-help" class="p-error" v-if="validationField1.scheduledDate.value">Cannot be Empty</small>
                             </div>
 
-                            <div class="field col-12 md:col-3 sm:col-12">
+                            <div class="field col-12 md:col-3">
                                 <label for="transfer_type_id" :class="{'p-error': validationField1.transfer_type_id.value}">Transfer Type</label>
 
                                 <Dropdown :disabled="FieldNotActive || disabledField['transfer_type_id']" 
@@ -89,13 +89,11 @@
 
         <div class="card">
             <div class="p-fluid formgrid grid flex-column">
-                <slot name="additional_button" :popUpProductDialog="changeStateDiaglog">
-
-                </slot>
-                
                 <div class="col-12 md:col-12 sm:col-12">
                     <TabView>
                         <TabPanel header="Ordered" :disabled="tabViewDisabled?.ordered">
+                            <slot name="orderedButton" :popUpProductDialog="changeStateDiaglog">
+                            </slot>
                             <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
                             <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="disabledField?.product ? promptEditField : null"
                             :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll"
@@ -162,11 +160,11 @@
 
                                     <Column field="amount" header="Amount"></Column>
 
-                                    <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
+                                    <!-- <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
                                         <template #body="props">
                                             <Button v-if="props?.data?.draft" icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="onDeleteExtraCharge(props)" />
                                         </template>
-                                    </Column>
+                                    </Column> -->
                                 </DataTable>
                         </TabPanel>
                     </TabView>
@@ -527,7 +525,6 @@
             }),
 
             myHighLight(){
-                console.log(this.disabledField);
                 return {
                     highlight: !this.FieldNotActive && !this.disabledField?.product
                 };

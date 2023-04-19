@@ -24,22 +24,38 @@
 
         <template #extra_charge_panel>
             <div v-if="!fieldNotActive" class="field col-12 md:col-4 lg:col-2">
-                <label class="mr-2">Extra Charge</label>
-                <Dropdown v-model="selectedExtraCharge" :options="getExtraCharge" 
-                placeholder="Select Extra Charge"
-                @change="onChange">
-                    <template #option="{ option }">
-                        {{ option.item_code }}
-                    </template>
-
-                    <template #value="option">
-                        {{ option.value?.item_code ?? option.placeholder }}
-                    </template>
-                </Dropdown>
+                <Button label="Add Extra Charge" class="p-button-success" @click="changeStateDialog"></Button>
             </div>
+
+            <Dialog v-model:visible="myDialog" header="Add Extra Charge" class="myDialogWidth">
+                <div class="p-fluid formgrid grid">
+                    <div class="field col-12">
+                        <label class="mr-2">Extra Charge</label>
+                        <Dropdown v-model="selectedExtraCharge" :options="getExtraCharge" 
+                        placeholder="Select Extra Charge">
+                            <template #option="{ option }">
+                                {{ option.item_code }}
+                            </template>
+
+                            <template #value="option">
+                                {{ option.value?.item_code ?? option.placeholder }}
+                            </template>
+                        </Dropdown>
+                    </div>    
+                    <div class="col-12">
+                        <Button label="Save" class="p-button-success mt-5" @click="onSavedExtraCharge"></Button>
+                    </div>
+                </div>
+            </Dialog>
         </template>
     </BaseFormField>
 </template>
+
+<style scoped>
+    .myDialogWidth{
+        width: 350px;
+    }
+</style>
 
 <script>
     import RetryField from '../../../components/prompt_field/RetryField.vue';
@@ -55,26 +71,25 @@
             return {
                 myData: null,
                 backUpData: null,
+                myDialog: false,
 
                 extraChargeRow: 10,
                 extraChargeList: [],
                 selectedExtraCharge: null,
                 toLoad: null,
                 fieldNotActive: true,
+
+                errorToast: {
+                    severity: "error",
+                    summary: "Error!",
+                    detail: "Failed to add Extra Charges",
+                    life: 2000
+                }
             };
         },
         computed:{
             getExtraCharge(){
                 return this.$store.getters["extraCharge/getExtraCharges"];
-            },
-
-            errorToast(){
-                return {
-                    severity: "error",
-                    summary: "Error!",
-                    detail: "Failed to Load Transfer",
-                    life: 2000
-                };
             },
 
             isCancelStatus(){
@@ -121,42 +136,35 @@
                     operations: true,
                     extraCharge:false
                 }
-            }
+            },
         },
         methods:{
             async initData(){
-                this.myData = await this.$store.dispatch("transfers/getTransferDetail", {
-					transferId: this.$route.params.id
-				});
-                // Cloning Object without reference
-                this.backUpData = JSON.parse(JSON.stringify(this.myData));
+                this.errorToast.summary="Error Loading!"
+                this.toLoad= async () => {
+                    this.myData = await this.$store.dispatch("transfers/getTransferDetail", {
+                        transferId: this.$route.params.id
+                    });
+                    // Cloning Object without reference
+                    this.backUpData = JSON.parse(JSON.stringify(this.myData));
 
-                await this.$store.dispatch("extraCharge/onFetchExtraCharges");
+                    await this.$store.dispatch("extraCharge/onFetchExtraCharges");
+                };
             },
 
-            validate(){
-                this.extraChargeList.forEach((e)=>{
-                    if(e.draft){
-                        return true;
-                    }
-                });
-                return false;
-            },
+            // validate(){
+            //     this.extraChargeList.forEach((e)=>{
+            //         if(e.draft){
+            //             return true;
+            //         }
+            //     });
+            //     return false;
+            // },
 
             onSaved(){
-                if(this.validate()){
-                    this.$store.dispatch();
-                }
+                // if(this.validate()){
+                // }
                 this.changeEditState();
-            },
-
-            onChange(event){
-                if(event.value){
-                    this.extraChargeList.unshift({
-                        ...event.value,
-                        draft: true,
-                    })
-                }
             },
 
             onCancelStatus(){
@@ -164,10 +172,30 @@
                 this.changeEditState();
             },
 
+            async onSavedExtraCharge(){
+                if(this.selectedExtraCharge){
+                    this.changeStateDialog();
+                    this.errorToast.summary="Error Adding Extra Charge!"
+                    this.toLoad = async () => {
+                        const msg = await this.$store.dispatch("extraCharge/onAddTransferDetailWithExtraCharge", {transferId: this.$route.params.id, extraChargeId: this.selectedExtraCharge.id});
+                        if(msg?.status=="success"){
+                            this.extraChargeList.unshift(this.selectedExtraCharge);
+                        }
+
+                        this.$toast.add({ severity: msg?.status ?? "success", summary: msg?.summary ?? "" , detail: msg?.message ?? "", life: 2000 });
+                        
+                        this.selectedExtraCharge=null;
+                    };
+                }
+            },
+
 			changeEditState(){
-                console.log('rise')
-				this.fieldNotActive=!this.fieldNotActive
-			}
+                this.fieldNotActive=!this.fieldNotActive
+			},
+
+            changeStateDialog(){
+                this.myDialog=!this.myDialog;
+            },
         }
     }
 </script>

@@ -42,6 +42,15 @@ export default{
             const data = await ApiService.createExtraCharge(newExtraCharge);
             commit("updateExtraChargeState", [data]);
             return data;
+        },
+
+        async onAddTransferDetailWithExtraCharge(context, {transferId, extraChargeId}){
+            const body = {
+                transfer_id: transferId,
+                extra_charge_id: extraChargeId
+            };
+            const data = await ApiService.addExtraChargeToTransferId(body);
+            return data;
         }
     }
 }

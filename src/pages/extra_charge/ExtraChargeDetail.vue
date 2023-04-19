@@ -36,7 +36,6 @@
             },
             onValidate(newlyUpdatedData){
                 this.toLoad = async ()=>{
-                    console.log(this.$router.params.id);
                     const newData = this.$store.dispatch("extraCharge/updateExtraCharge", {
                         id: this.$router.params.id,
                         ...newlyUpdatedData

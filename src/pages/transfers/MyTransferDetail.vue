@@ -15,7 +15,7 @@
 			<RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
 		</template>
 
-		<template #additionButton="mySlot">
+		<template #orderedButton="mySlot">
 			<div class="col-12 md:col-12 sm:col-12">
 				<Button v-if="!fieldNotActive" label="SAVE" class="p-button-success mr-2 mb-2" @click="mySlot.popUpProductDialog">
 					{{ baseData.buttonSubmit }}
