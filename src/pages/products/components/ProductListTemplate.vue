@@ -31,10 +31,6 @@
                                 <label for="productId">Product Id</label>
                                 <Chips id="productid" type="text" v-model="productId" placeholder="Search By Id"></Chips>
                             </div>
-
-                            <div class="field col-12 md:col-4 lg:col-3">
-                                <label for="productReference">Product Reference</label>
-                            </div>
                         </div>
                     </template>
                     <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="false"
