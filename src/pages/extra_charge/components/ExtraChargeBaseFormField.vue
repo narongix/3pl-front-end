@@ -1,6 +1,6 @@
 <template>
     <div class="grid">
-        <div class="col-12">
+        <div class="col-12 md:col-6 lg:col-4">
             <div class="card">
                 <h5>Extra Charge</h5>
                 <slot :onCreate="onCreate" :resetValidation="resetValidation">
@@ -9,7 +9,7 @@
                 <hr>
                 <p></p>
                 <div class="p-fluid formgrid grid">
-                    <div class="field col-12 md:col-4 lg:col-2">
+                    <div class="field col-12">
                         <label for="item_code" :class="{'p-error': validationField.item_code.value}">Item Code</label>
                         <InputText id="item_code" v-model="myData.item_code"
                         :class="{'p-invalid': validationField.item_code.value}"
@@ -20,7 +20,7 @@
                         </small>
                     </div>
 
-                    <div class="field col-12 md:col-4 lg:col-2">
+                    <div class="field col-12">
                         <label for="description" :class="{'p-error': validationField.description.value}">description</label>
                         <InputText id="description" v-model="myData.description"
                         :class="{'p-invalid': validationField.description.value}"
@@ -31,7 +31,7 @@
                         </small>
                     </div>
 
-                    <div class="field col-12 md:col-4 lg:col-2">
+                    <div class="field col-12">
                         <label for="amount" :class="{'p-error': validationField.amount.value}">Amount($)</label>
                         <InputText id="amount" v-model="myData.amount" type="number"
                         :class="{'p-invalid': validationField.amount.value}"
@@ -42,7 +42,7 @@
                         </small>
                     </div>
 
-                    <div class="field col-12 md:col-6 lg:col-4">
+                    <div class="field col-12">
                         <label for="longDesc">Long Description(optional)</label>
                         <InputText id="longDesc" v-model="myData.long_description" type="text"
                         :disabled="FieldNotActive"
