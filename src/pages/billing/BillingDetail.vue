@@ -78,7 +78,7 @@
                     </Column>
                     <Column field="charged_volume" header="Charged Volume">
                         <template #body="{ data }">
-                            {{ roundMyNumber(data.charged_volume ?? "") }}
+                            {{ round4Number(data.charged_volume ?? "") }}
                         </template>
                     </Column>
                     <Column field="rate" header="Rate">
