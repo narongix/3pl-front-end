@@ -152,7 +152,7 @@ export default {
             this.submitted = true;
             
             this.toLoad = async () =>{
-                const allSku = await this.$store.dispatch('products/getTotalSku', this.myUserId);
+                const allSku = await this.$store.dispatch('products/getTotalSku');
                 this.mySku = allSku.map((e)=>e.toLowerCase());
 
                 this.validateForm();
