@@ -4,8 +4,8 @@
 
 <script>
     import { Line } from 'vue-chartjs';
-    import { Chart as ChartJS, PointElement, LineElement } from 'chart.js'
-    ChartJS.register(PointElement, LineElement)
+    import { Chart as ChartJS, PointElement, LineElement, LinearScale, CategoryScale } from 'chart.js'
+    ChartJS.register(PointElement, LineElement, LinearScale, CategoryScale)
 
     export default{
         props:{
