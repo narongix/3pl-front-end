@@ -73,25 +73,48 @@ export default {
                     ]
                 },
 
-                this.isAdmin? {
-                    label: "Setting",
-                    items:[
-                        {label: "Extra charge", faIcon: "fa-gear", to: "/admin_extra_charge"}
-                    ]
-                }: null
+                ...this.adminPanel()
             ]
         }
     },
-    watch: {
-        $route() {
-            this.menuActive = false;
-            this.$toast.removeAllGroups();
+
+    computed: {
+        ...mapGetters({
+            getUserRole: "auth/getUserRole",    
+        }),
+
+        containerClass() {
+            return ['layout-wrapper', {
+                'layout-overlay': this.layoutMode === 'overlay',
+                'layout-static': this.layoutMode === 'static',
+                'layout-static-sidebar-inactive': this.staticMenuInactive && this.layoutMode === 'static',
+                'layout-overlay-sidebar-active': this.overlayMenuActive && this.layoutMode === 'overlay',
+                'layout-mobile-sidebar-active': this.mobileMenuActive,
+				'p-input-filled': this.$primevue.config.inputStyle === 'filled',
+				'p-ripple-disabled': this.$primevue.config.ripple === false
+            }];
+        },
+        logo() {
+            return (this.$appState.darkTheme) ? "images/logo-white.svg" : "images/logo.svg";
         }
     },
     methods: {
         isAdmin(){
             const userRole = this.$store.getters["auth/getUserRole"];
             return userRole == roleGroupId.Admin;
+        },
+        adminPanel(){
+            if(this.isAdmin()){
+                return [
+                    {
+                        label: "Setting",
+                        items:[
+                            {label: "Extra charge", faIcon: "fa-gear", to: "/admin_extra_charge"}
+                        ]
+                    } 
+                ]
+            }
+            return [];
         },
         productListPage(){
             const userRole = this.$store.getters["auth/getUserRole"];
@@ -193,25 +216,13 @@ export default {
             return true;
         }
     },
-    computed: {
-        ...mapGetters({
-            getUserRole: "auth/getUserRole",    
-        }),
-        containerClass() {
-            return ['layout-wrapper', {
-                'layout-overlay': this.layoutMode === 'overlay',
-                'layout-static': this.layoutMode === 'static',
-                'layout-static-sidebar-inactive': this.staticMenuInactive && this.layoutMode === 'static',
-                'layout-overlay-sidebar-active': this.overlayMenuActive && this.layoutMode === 'overlay',
-                'layout-mobile-sidebar-active': this.mobileMenuActive,
-				'p-input-filled': this.$primevue.config.inputStyle === 'filled',
-				'p-ripple-disabled': this.$primevue.config.ripple === false
-            }];
-        },
-        logo() {
-            return (this.$appState.darkTheme) ? "images/logo-white.svg" : "images/logo.svg";
+    watch: {
+        $route() {
+            this.menuActive = false;
+            this.$toast.removeAllGroups();
         }
     },
+
     beforeUpdate() {
         if (this.mobileMenuActive)
             this.addClass(document.body, 'body-overflow-hidden');
