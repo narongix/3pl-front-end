@@ -284,11 +284,8 @@ export default {
             }
         },
 
-        async getTotalSku(context, { userId }){
-            const params = {
-                user_id: userId
-            };
-            const data = await  ApiService.getTotalSku(params);
+        async getTotalSku(){
+            const data = await  ApiService.getTotalSku();
             return data;
         }
     },
