@@ -72,6 +72,13 @@ export default {
                         {label: 'Billing statement', faIcon: 'fa-file-invoice', to: this.billingPage()}
                     ]
                 },
+
+                this.isAdmin? {
+                    label: "Setting",
+                    items:[
+                        {label: "Extra charge", faIcon: "fa-gear", to: "/admin_extra_charge"}
+                    ]
+                }: null
             ]
         }
     },
@@ -82,6 +89,10 @@ export default {
         }
     },
     methods: {
+        isAdmin(){
+            const userRole = this.$store.getters["auth/getUserRole"];
+            return userRole == roleGroupId.Admin;
+        },
         productListPage(){
             const userRole = this.$store.getters["auth/getUserRole"];
             if(userRole == roleGroupId.Admin){

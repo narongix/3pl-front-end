@@ -8,6 +8,7 @@ import stockedDetailReportModule from './modules/stocked_detail_report/stocked_d
 import billing_store from './modules/billing/billing_store.js';
 import user_store from './modules/user/user_store.js';
 import dashboard_store from './modules/dashboard/dashboard_store.js';
+import extra_charge from './modules/extra_charge/extra_charge.js';
 
 const store = createStore({
     modules:{
@@ -20,6 +21,7 @@ const store = createStore({
         billing: billing_store,
         user: user_store,
         dashboard: dashboard_store,
+        extraCharge: extra_charge
     },
     actions:{
         clearAllStates({ commit }){

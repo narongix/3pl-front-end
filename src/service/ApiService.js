@@ -6,6 +6,7 @@ import StockDetailReportService from "./mini_services/StcokDetailReportService";
 import BillingServices from "./mini_services/BillingServices";
 import UserServices from "./mini_services/UserServices";
 import DashBoardServices from "./mini_services/DashBoardServices";
+import ExtraChagesApi from "./mini_services/ExtraCharges";
 
 export default {
     ...TransferServices,
@@ -15,5 +16,6 @@ export default {
     ...StockDetailReportService,
     ...BillingServices,
     ...UserServices,
-    ...DashBoardServices
+    ...DashBoardServices,
+    ...ExtraChagesApi
 }

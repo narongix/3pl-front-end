@@ -38,19 +38,19 @@
             errorToast: {
                 severity: {
                     type: String,
-                    default: "error"
+                    default: ()=>"error"
                 },
                 summary: {
                     type: String,
-                    default: "Error!"
+                    default: ()=>"Error!"
                 },
                 detail: {
                     type: String,
-                    default: "Failed Loading"
+                    default: ()=>"Failed Loading"
                 },
                 life: {
                     type: Number,
-                    default: 2000
+                    default: ()=>2000
                 }
             }
         },
