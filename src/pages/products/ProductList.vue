@@ -26,7 +26,7 @@
         },
         methods:{
             goToCreateProductPage(){
-                return this.$router.push({name: "productList"});
+                return this.$router.push({name: "createProduct"});
             }
         }
     }
