@@ -28,11 +28,11 @@
 						</div>
 					</div>
 
-					<div class="card">
+					<!-- <div class="card">
 						<div class="flex align-items-center justify-content-center myChart">
 							<ReceiptDoughnutChart :dailyMetric="dailyMetric"></ReceiptDoughnutChart>
 						</div>
-					</div>
+					</div> -->
 				</div>
 				<div class="col-12 md:col-6">
 					<div class="grid">
@@ -60,11 +60,11 @@
 						</div>
 					</div>
 
-					<div class="card">
+					<!-- <div class="card">
 						<div class="flex justify-content-center myChart">
 							<DeliveryDoughnutChart :dailyMetric="dailyMetric"></DeliveryDoughnutChart>
 						</div>
-					</div>
+					</div> -->
 				</div>
 			</div>
 
@@ -190,8 +190,8 @@
 </style>
 <script>
 	import EventBus from '@/AppEventBus';
-	import ReceiptDoughnutChart from './ReceiptDoughnutChart.vue';
-	import DeliveryDoughnutChart from './DeliveryDoughnutChart.vue';
+	// import ReceiptDoughnutChart from './ReceiptDoughnutChart.vue';
+	// import DeliveryDoughnutChart from './DeliveryDoughnutChart.vue';
 	import SpecialCard from './SpecialCard.vue';
 	import MyDataTable from '../../../components/MyDataTable.vue';
 	import RetryField from '../../../components/prompt_field/RetryField.vue';
@@ -224,7 +224,16 @@
 			EventBus.off("change-theme", this.themeChangeListener);
 		},
 		
-		components: { DeliveryDoughnutChart, SpecialCard, MyDataTable, RetryField, ReceiptDoughnutChart, DeliveryLineChart, ReceiptLineChart, MyDashBoardIcon },
+		components: { 
+			// DeliveryDoughnutChart, 
+			// ReceiptDoughnutChart, 
+			SpecialCard, 
+			MyDataTable, 
+			RetryField, 
+			DeliveryLineChart, 
+			ReceiptLineChart, 
+			MyDashBoardIcon 
+		},
 		props:{
 			completedTransferDelivery: Array,
 			completedTransferReceipt: Array,
