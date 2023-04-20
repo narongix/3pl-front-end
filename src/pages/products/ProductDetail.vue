@@ -83,7 +83,7 @@
                         <InputText id="height" type="text" v-model="product.height.newVal" :disabled=true />
                     </div>
                     <div class="field col-12 md:col-3">
-                        <label for="weight">Weight(cbm)</label>
+                        <label for="weight">Weight(kg)</label>
                         <InputText id="weight" type="text" v-model="product.weight.newVal" :disabled=true />
                     </div>
                     <div class="field col-12 md:col-3">
