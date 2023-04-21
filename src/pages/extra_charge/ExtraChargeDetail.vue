@@ -1,8 +1,8 @@
 <template>
-    <ExtraChargeBaseFormField v-slot="mySlot" :FieldNotActive="!onEditMode" :data="myData" @onCreate="onValidate">
+    <ExtraChargeBaseFormField v-slot="mySlot" :FieldNotActive="!onEditMode" v-model:data="myData" @onCreate="onValidate">
         <Button v-if="!onEditMode" @click="onEditMode=true" label="Edit"></Button>
         <Button v-if="onEditMode" @click="mySlot.onCreate()" label="Save"></Button>
-        <Button v-if="onEditMode" @click="onCancel(mySlot.resetValidation)" label="Cancel"></Button>
+        <Button v-if="onEditMode" @click="onCancel(mySlot.resetValidation)" label="Cancel" severity="secondary" class="ml-2"></Button>
     </ExtraChargeBaseFormField>
 
     <RetryField :toLoad="toLoad"></RetryField>
@@ -15,7 +15,6 @@
 
     export default{
         created() {
-            // this.toLoad = this.initData
             this.myData = JSON.parse(localStorage.getItem(LocalStorageKeys.tempExtraCharge));
         },
         unmounted(){
@@ -36,10 +35,11 @@
             },
             onValidate(newlyUpdatedData){
                 this.toLoad = async ()=>{
-                    const newData = this.$store.dispatch("extraCharge/updateExtraCharge", {
-                        id: this.$router.params.id,
+                    const newData = {
+                        id: this.$route.params.id,
                         ...newlyUpdatedData
-                    });
+                    };
+                    this.$store.dispatch("extraCharge/onUpdateExtraCharge", newData);
                     localStorage.setItem(LocalStorageKeys.tempExtraCharge, JSON.stringify(newData));
                     this.onEditMode=false;
                     this.$toast.add({severity:"success",summary:"Success", detail:"Extra Charge created successfully", life:2000})

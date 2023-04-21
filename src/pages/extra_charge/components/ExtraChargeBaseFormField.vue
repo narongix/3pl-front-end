@@ -70,20 +70,14 @@
                 default:()=>{}
             }
         },
-        emits:["onCreate"],
+        emits:["onCreate", "update:data"],
         data(){
             return {
-                myData:{
-                    item_code: null,
-                    description: null,
-                    amount: null,
-                    long_description: null,
-                },
                 validationField:{
                     item_code:{
                         value: null,
                         validate: ()=>{
-                            if(this.myData.item_code){
+                            if(this.myData?.item_code){
                                 return this.validationField.item_code.value=null;
                             }
                             return this.validationField.item_code.value = "Cannot Be Empty";
@@ -92,7 +86,7 @@
                     description:{
                         value: null,
                         validate: () => {
-                            if(this.myData.description){
+                            if(this.myData?.description){
                                 return this.validationField.description.value=null;
                             }
                             return this.validationField.description.value = "Cannot Be Empty";
@@ -101,13 +95,13 @@
                     amount:{
                         value: null,
                         validate: () => {
-                            if(!this.myData.amount){
+                            if(!this.myData?.amount){
                                 return this.validationField.amount.value = "Cannot be Empty";
                             }
-                            if(isNaN(Number(this.myData.amount.trim()))){
+                            if(isNaN(Number(this.myData?.amount?.trim()))){
                                 return this.validationField.amount.value="Must Contain Number Only";
                             }else{
-                                this.myData.amount=Number(this.myData.amount.trim());
+                                this.myData.amount = Number(this.myData?.amount?.trim() ?? 0);
                                 return this.validationField.amount.value=null;
                             }
                         }
@@ -116,6 +110,14 @@
             };
         },
         computed:{
+            myData:{
+                get(){
+                    return this.data;
+                },
+                set(newValue){
+                    return this.$emit("update:data", newValue);
+                }
+            }
         },
         methods:{
             onCreate(){
@@ -139,6 +141,6 @@
                     this.validationField[i].value=null;
                 }
             }
-        },
+        }
     }
 </script>

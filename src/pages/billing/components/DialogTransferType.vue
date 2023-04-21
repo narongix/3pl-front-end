@@ -12,14 +12,14 @@
                         </template>
                         <Column field="id" header="Id"></Column>
                         <Column field="reference" header="Reference"></Column>
-                        <Column field="charged_volume" header="Charged Volume">
-                            <template #body="{ data }">
-                                {{ round4Number(data.charged_volume) }}
-                            </template>
-                        </Column>
                         <Column field="volume" header="Volume">
                             <template #body="{ data }">
                                 {{ round4Number(data.volume) }}
+                            </template>
+                        </Column>
+                        <Column field="charged_volume" header="Charged Volume">
+                            <template #body="{ data }">
+                                {{ round4Number(data.charged_volume) }}
                             </template>
                         </Column>
                         <Column field="created_at" header="CreatedAt">

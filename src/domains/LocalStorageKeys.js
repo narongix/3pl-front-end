@@ -4,7 +4,8 @@ const LocalStorageKeys = {
     loggedInIndicatorKey: "isLoggedIn",
     userIdForAdmin: "userIdAdmin" ,
 
-    tempExtraCharge: "tempExtraCharge"
+    tempExtraCharge: "tempExtraCharge",
+    tempSelectedUser: "tempSelectedUser"
 };
 
 export default LocalStorageKeys

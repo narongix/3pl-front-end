@@ -33,9 +33,8 @@ export default{
         },
 
         async onUpdateExtraCharge({ commit }, newExtraCharge){
-            const data = await ApiService.updateExtraCharge(newExtraCharge)
-            commit("updateExtraChargeState", [data]);
-            return data;
+            await ApiService.updateExtraCharge(newExtraCharge)
+            commit("updateExtraChargeState", [newExtraCharge]);
         },
 
         async onAddExtraCharge({ commit }, newExtraCharge){
