@@ -18,7 +18,10 @@
 
         <template #myButton="">
             <Button v-if="fieldNotActive" label="Edit" :disabled="isCancelStatus" class="p-button-success mr-2" @click="changeEditState" />
-			<Button v-if="!fieldNotActive" label="Cancel" :disabled="isCancelStatus" @click="onCancelStatus" class="p-button-secondary noFocus mr-2"></Button>
+            <Button v-if="fieldNotActive" label="Submit" :disabled="!isDraftStatus || isCancelStatus" @click="onUpgradeStatus" class="mr-2"></Button>
+            <Button v-if="fieldNotActive" label="Cancel" :disabled="!isDraftStatus || isCancelStatus" @click="onCancelStatus" class="p-button-secondary noFocus"></Button>
+
+			<Button v-if="!fieldNotActive" label="Discard" :disabled="isCancelStatus" @click="onDiscardStatus" class="p-button-secondary noFocus mr-2"></Button>
 			<Button v-if="!fieldNotActive" label="Save" :disabled="isCancelStatus" class="p-button-success" type="submit" @click="onSaved"/>
 		</template>
 
@@ -96,6 +99,13 @@
                 return this.myData?.transfer_status == transferId.Canceled
             },
 
+            isDraftStatus(){
+                if(this.myData?.transfer_status_id == transferId.Draft){
+					return true;
+				}
+                return false;
+            },
+
             baseData(){
                 return {
                     titleForm: "Transfer Detail",
@@ -139,12 +149,53 @@
             },
         },
         methods:{
+            async onCancelStatus(){
+				this.toLoad= async()=>{
+					const created = []
+					const updated = []
+					const deleted = []
+
+					this.myData = await this.$store.dispatch("transfers/updateTransfer", {
+						recipient: this.myData.recipient,
+						reference: this.myData.reference,
+						transfer_status_id: transferId.Canceled,
+						id : this.myData.id,
+						created, 
+						updated, 
+						deleted,
+					})
+
+					this.$toast.add({severity:"success",summary:"Success", detail:"Transfer Edited Successfully", life:3000})
+				}
+            },
+
+            async onUpgradeStatus(){
+				this.toLoad= async()=>{
+					const created = []
+					const updated = []
+					const deleted = []
+
+					this.myData = await this.$store.dispatch("transfers/updateTransfer", {
+						recipient: this.myData.recipient,
+						reference: this.myData.reference,
+						transfer_status_id: transferId.Submitted,
+						id : this.myData.id,
+						created, 
+						updated, 
+						deleted,
+					})
+
+					this.$toast.add({severity:"success",summary:"Success", detail:"Transfer Edited Successfully", life:3000})
+				}
+			},
+
             async initData(){
                 this.errorToast.summary="Error Loading!"
                 this.toLoad= async () => {
                     this.myData = await this.$store.dispatch("transfers/getTransferDetail", {
                         transferId: this.$route.params.id
                     });
+
                     // Cloning Object without reference
                     this.backUpData = JSON.parse(JSON.stringify(this.myData));
 
@@ -167,7 +218,7 @@
                 this.changeEditState();
             },
 
-            onCancelStatus(){
+            onDiscardStatus(){
                 this.extraChargeList = [];
                 this.changeEditState();
             },

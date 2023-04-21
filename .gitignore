@@ -34,3 +34,5 @@ yarn-error.log*
 
 # File for testing
 rise.js
+
+src/store/modules/admin/
