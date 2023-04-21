@@ -1,5 +1,5 @@
 <template>
-    <ExtraChargeBaseFormField labelCreateButton="Create" @on-create="onCreate">
+    <ExtraChargeBaseFormField labelCreateButton="Create" v-model:data="myData" @on-create="onCreate">
 
     </ExtraChargeBaseFormField>
     <RetryField :toLoad="toLoad" :errorToast="errorToast"></RetryField>
@@ -16,6 +16,7 @@ import ExtraChargeBaseFormField from './components/ExtraChargeBaseFormField.vue'
     data() {
         return {
             toLoad: null,
+            myData:{}
         };
     },
     computed: {
