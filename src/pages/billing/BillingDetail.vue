@@ -64,19 +64,19 @@
                         <p>Empty...</p>
                     </template>
 
-                    <Column field="transfer_type_name" header="Transfer Type">
+                    <Column field="transfer_type_name" header="Transfer Type" style="width:15rem;">
                         <template #body="{ data }">
                             <u style="color:blue">{{ capitalizeWord(data.transfer_type_name) }}</u>
                         </template>
                     </Column>
-                    <Column field="qty" header="QTY"></Column>
-                    <Column field="volume" header="Volume(m³)">
+                    <Column field="qty" header="QTY" style="width: 15rem"></Column>
+                    <Column field="volume" header="Volume(m³)" style="width: 15rem">
                         <template #body="{ data }">
                             {{ round4Number(data.volume) }}
                         </template>
                         
                     </Column>
-                    <Column field="charged_volume" header="Charged Volume">
+                    <Column field="charged_volume" header="Charged Volume" style="width: 15rem;">
                         <template #body="{ data }">
                             {{ round4Number(data.charged_volume ?? "") }}
                         </template>
@@ -114,18 +114,18 @@
                             <template #empty>
                                 Empty...
                             </template>
-                            <Column field="created_at" header="Created At" style="min-width: 3rem;">
+                            <Column field="created_at" header="Created At" style="width: 15rem;">
                                 <template #body="{ data }">
                                     <LinkParagraph :data="formatDateTime(data.created_at)" @pushing="onClickToVolume(data.created_at)"></LinkParagraph>
                                 </template>
                             </Column>
                             
-                            <Column field="total_volume" header="Total Volume(m³)" style="min-width: 3rem;">
+                            <Column field="total_volume" header="Total Volume(m³)" style="width: 15rem;">
                                 <template #body="{ data }">
                                     {{ round4Number(data.total_volume) }}
                                 </template>
                             </Column>
-                            <Column field="rate" header="Rate"></Column>
+                            <Column field="rate" header="Rate" style="width: 15rem;"></Column>
                             <Column field="total_volume_fee" header="Subtotal($)">
                                 <template #body="{ data }">
                                     {{ roundMyNumber(data.total_volume_fee) }}
