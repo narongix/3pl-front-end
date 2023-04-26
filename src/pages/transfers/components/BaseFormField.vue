@@ -138,34 +138,13 @@
                                 </Column>
                             </DataTable>
                         </TabPanel>
-                        <TabPanel header="Operations" :disabled="tabViewDisabled?.operations ?? true"></TabPanel>
+                        <TabPanel header="Operations" :disabled="tabViewDisabled?.operations ?? true">
+                            <OperationPanel v-model="transferData.operation"></OperationPanel>
+                        </TabPanel>
                         <TabPanel header="Extra Charges" :disabled="tabViewDisabled?.extraCharge ?? true">
                             <slot name="extra_charge_panel">
                             </slot>
-                            <DataTable :value="innerExtraCharge"
-                                :paginator="true" 
-                                class="p-datatable-sm" 
-                                :rows="innerExtraChargeRow" 
-                                dataKey="tmpId"
-                                :rowHover="true" 
-                                filterDisplay="menu" 
-                                responsiveLayout="scroll"
-                                :rowsPerPageOptions="[10, 20, 30]" 
-                                >
-                                <template #empty>
-                                    Empty...
-                                </template>
-                                    <Column field="item_code" header="Item Code"></Column>
-                                    <Column field="description" header="description"></Column>
-
-                                    <Column field="amount" header="Amount"></Column>
-
-                                    <!-- <Column v-if="!FieldNotActive" header="Actions" style="min-width:12rem">
-                                        <template #body="props">
-                                            <Button v-if="props?.data?.draft" icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="onDeleteExtraCharge(props)" />
-                                        </template>
-                                    </Column> -->
-                                </DataTable>
+                            <ExtraChargePanel v-model="innerExtraCharge"></ExtraChargePanel>
                         </TabPanel>
                     </TabView>
                 </div>
@@ -202,27 +181,10 @@
                 <Button v-else :disabled="productLoading" label="Create" class="p-button-text" @click="createTransferProduct"></Button>
             </template>
         </Dialog>
-
-        <Dialog v-model:visible="promptFindRecipient" header="Choose from template" :style="{width: '350px'}">
-            <div class="grid">
-                <div class="col-12 md:col-12 sm:col-12">
-                    <DropDownPagination v-model="myContact" :options="getRecipientByUser"
-                    :disabled="FieldNotActive || disabledField['recipient']" id="recipient" placeholder="Please select a recipient"
-                    :validation="validationField1.recipient.value"
-                    :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
-                    :maxLength="getRecipientLength"
-                    :showOption="option=>option.full_name"
-                    :showValue="showValueRecipient" :offset="offset ?? 0"
-                    >
-                    </DropDownPagination>
-                </div>
-            </div>
-
-            <template #footer>
-                <Button label="Discard" @click="changeRecipientState"></Button>
-                <Button label="Select" @click="onConfirmSelectRecipientState"></Button>
-            </template>
-        </Dialog>
+        <PromptFindRecipient v-model="transferData.recipient" :userSelector="userSelector ?? myUserId"
+        v-model:findRecipientState="promptFindRecipient" :validation="validationField1.recipient.value!=null"
+        :disabled="FieldNotActive || disabledField['recipient']" :offset="offset"
+        ></PromptFindRecipient>
 
         <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="changeDeletedStateDialog" :message="messageDeletePrompt"/>
         <RecipientField v-model="transferData.recipient" v-model:state="state" :userId="userSelector ?? myUserId"></RecipientField>
@@ -251,7 +213,9 @@
     import RetryField from '../../../components/prompt_field/RetryField.vue';
     import { roleGroupId } from '../../../domains/domain';
     import UserDropDownPagination from '../../../components/UserDropDownPagination.vue';
-
+    import ExtraChargePanel from './tabs/ExtraChargePanel.vue';
+    import OperationPanel from './tabs/OperationPanel.vue';
+    import PromptFindRecipient from './dialogs/PromptFindRecipient.vue';
 
     export default{
         props:{
@@ -277,10 +241,6 @@
             },
 
             vanishField: Object,
-            extraChargeRow:{
-                type: Number,
-                default: ()=>10
-            },
             myExtraCharge:{
                 type: Array,
                 default: ()=>[]
@@ -294,19 +254,20 @@
             // }
         },
         
-        emits:["onClickSubmit", "update:extraChargeRow", "update:myExtraCharge"],
+        emits:["onClickSubmit", "update:myExtraCharge"],
         components:{
             DropDownPagination,
             PromptField,
             RecipientField,
             RetryField,
-            UserDropDownPagination
+            UserDropDownPagination,
+            ExtraChargePanel,
+            OperationPanel,
+            PromptFindRecipient
         },
 
         data(){
             return {
-                myContact: null,
-
                 state:false,
 
                 filters:{
@@ -479,7 +440,6 @@
 
                 productLoading: false,
                 transferLoading: false,
-                recipientLoading:false,
 
                 filterValue: null, 
                 countdown: 2,
@@ -514,30 +474,18 @@
         computed:{
             ...mapGetters({
                 getProducts: "products/getProductState",
-                getRecipientsState: "recipient/getRecipientsState",
                 transfer_type: "transferType/getTansferType",
                 user: "auth/user",
                 userId: "auth/getUserId",
                 getUserRole: "auth/getUserRole",
                 // Limit offset
                 getProductLimit: "products/limit",
-                getRecipientLimit: "recipient/getLimit",
             }),
 
             myHighLight(){
                 return {
                     highlight: !this.FieldNotActive && !this.disabledField?.product
                 };
-            },
-
-            innerExtraChargeRow:{
-                get(){
-                    return this.extraChargeRow;
-                },
-
-                set(newValue){
-                    this.$emit("update:extraChargeRow", newValue);
-                }
             },
             innerExtraCharge:{
                 get(){
@@ -549,30 +497,13 @@
                 }
             },
 
-            getExtraCharges(){
-                // TODO when we have extra charge here, let change the query
-                const data = this.$store.getters["extracharge/getExtraCharges"];
-                return data;
-            },
-
-
             getProductByUser(){
                 const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? this.myUserId));
                 return newProduct;
             },
 
-            getRecipientByUser(){
-                const newRecipient = this.getRecipientsState.filter((e)=>e.user_id == (this.userSelector ?? this.myUserId))
-
-                return newRecipient;
-            },
-
             getProductLength(){
                 return this.getProductByUser?.length ?? 0
-            },
-
-            getRecipientLength(){
-                return this.getRecipientsState.length
             },
 
             getDisplayTranser(){
@@ -589,12 +520,9 @@
         },
 
         methods:{
-            onDeleteExtraCharge(prop){
-                this.innerExtraCharge.splice(prop.index, 1);
-            },
-            showValueRecipient(value){
-                return value?.full_name ?? "Empty"
-            },
+            // showValueRecipient(value){
+            //     return value?.full_name ?? "Empty"
+            // },
             
             createRecipientTemplateNow(){
                 if(this.validatedBeforeCreatingRecipient()){
@@ -653,7 +581,7 @@
             initializeData(){
                 this.transferData={
                     id: this.data?.id,
-                    scheduledDate: TimeConvert.formatUTCToDate(this.data?.created_at),
+                    scheduledDate: TimeConvert.formatUTCToDate(this.data?.scheduled_time),
                     recipient: this.data?.recipient ?? null,
                     transfer_type_id: this.data?.transfer_type_id,
                     transferProducts: this.data?.transfer_products? [...this.data.transfer_products] : [],
@@ -836,21 +764,8 @@
                 return products.length
             },
 
-            async onloadRecipientV2(offset){
-                const recipients = await this.$store.dispatch("recipient/getRecipients",{
-                    offset: offset,
-                    userId: this.userSelector ?? this.myUserId
-                })
-                return recipients.length
-            },
-
-
             stopLoadingProduct(){
                 this.productLoading=false
-            },
-
-            stopLoadingRecipient(){
-                this.recipientLoading=false
             },
 
             async findProduct(filterValue){ 
@@ -863,14 +778,6 @@
                     userId: this.userSelector
                 })
             },
-
-            async findRecipient(filterValue){
-                await this.$store.dispatch("recipient/getRecipients", {
-                    offset: 0,
-                    searchString: filterValue,
-                    user_id: this.userSelector ?? this.myUserId
-                })
-            },
             
             changeRecipientState(){
                 this.promptFindRecipient = !this.promptFindRecipient
@@ -879,11 +786,6 @@
             onConfirmSelectRecipientState(){
                 this.transferData.recipient = this.getRecipientValue();
                 this.changeRecipientState()
-            },
-
-            getRecipientValue(){
-                const myAddress = this.myContact.street_address? " - "+this.myContact.street_address : "";
-                return this.myContact.full_name + myAddress;
             },
 
             validatedBeforeCreatingRecipient(){
@@ -937,28 +839,7 @@
                 }else{
                     this.showRecipientField = true
                 }
-            },
-
-            promptFindRecipient:{
-                immediate:true,
-                handler(newValue){
-                    if(newValue){
-                        // Doing this to ensure that whenever 
-                        // a new user in admin is loaded, 
-                        // it wouldn't take a contact of the old selected user
-                        this.myContact=null
-
-                        try{
-                            // TODO: Fix this, everytime the dialog is tap, 
-                            // it shoudl have loaded this,
-                            // Temp Fix
-                            this.onloadRecipientV2(0);
-                        }catch(e){
-                            console.log(e);
-                        }
-                    }
-                }
-            },  
+            }
         }
     }
 </script>

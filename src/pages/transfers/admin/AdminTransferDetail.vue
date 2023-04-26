@@ -8,7 +8,6 @@
 	:editMode="true"
 	:data="backUpData"
     :tabViewDisabled="tabViewDisabled"
-    v-model:extraChargeRow="extraChargeRow"
     v-model:myExtraCharge="extraChargeList"
     @onClickSubmit="onSaved"
     >
@@ -76,7 +75,6 @@
                 backUpData: null,
                 myDialog: false,
 
-                extraChargeRow: 10,
                 extraChargeList: [],
                 selectedExtraCharge: null,
                 toLoad: null,
@@ -195,7 +193,6 @@
                     this.myData = await this.$store.dispatch("transfers/getTransferDetail", {
                         transferId: this.$route.params.id
                     });
-
                     // Cloning Object without reference
                     this.backUpData = JSON.parse(JSON.stringify(this.myData));
 

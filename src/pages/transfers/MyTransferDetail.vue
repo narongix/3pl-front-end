@@ -99,10 +99,6 @@
 				myUserId: "auth/getUserId"
 			}),
 
-			getDataState(){
-				return  this.$store.getters["transfers/findTransferDetail"](this.$route.params.id)
-			},
-
 			myPopUp(){
                 return {
                     header: "Product Quantity",
@@ -128,7 +124,7 @@
 				return {
 					ordered: false,
 					operations: true,
-					extraCharge: true,
+					extraCharge: false,
 				};
 			}
 		},
