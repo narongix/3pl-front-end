@@ -164,15 +164,10 @@
         <DataTable :value="errorProductList" :paginator="true" class="p-datatable-sm" dataKey="id"
         v-model:rows="myErrorRow" responsiveLayout="scroll" :rowsPerPageOptions="[10,20,30]"
         >
-            <Column field="name" header="Product Name">
-            </Column>
+            <Column field="name" header="Product Name"></Column>
             <Column field="category_name" header="Category"></Column>
             <Column field="sku" header="Product Reference"></Column>
-            <Column field="reason" header="Reason">
-                <template #body="{ data }">
-                    <p>{{ data.reason }}{{ data.undefined ? `, got ${data.undefined}`: "" }}</p>
-                </template>
-            </Column>
+            <Column field="reason" header="Reason"></Column>
         </DataTable>
     </Dialog>
 
@@ -423,7 +418,7 @@
                     const haveCategory = this.getProductCategories.findIndex((e)=>{
                         return (e?.category_name ?? "").toLowerCase().trim() == (categoryName ?? "").toLowerCase().trim();
                     });
-                    
+
                     if(haveCategory<0){
                         const addProdCat = {
                             category_name: categoryName,
@@ -448,9 +443,12 @@
             },  
 
             skuNotExist(product){
+                // TODO: Rather than finding the sku by the browser, use the api
+                // there's more than 5000 sku in the database
                 const index = this.getAllSkus.findIndex((e)=>{
-                    return e.toLowerCase() == product?.sku.toLowerCase();
+                    return (e ?? "").toLowerCase() == (product?.sku ?? "").toLowerCase();
                 });
+                    
                 const skuNotDuplicate = index<0;
 
                 if(skuNotDuplicate){
