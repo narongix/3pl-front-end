@@ -42,5 +42,11 @@ const sortType = {
     2: "DESC",
 }
 
-export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType };
+const sheetId = {
+    A: "name",
+    B: "category_name",
+    C: "sku",
+}
+
+export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType, sheetId };
 

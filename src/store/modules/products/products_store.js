@@ -9,11 +9,17 @@ export default {
             products: [],
             maxProductLength: 0,
             prodCategories: [],
+
+            totalSkus: [],
         }
     },
     getters: {
         getProductLength(state){
             return state.maxProductLength
+        },
+
+        getAllSkus(state){
+            return state.totalSkus;
         },
 
         getProductState(state) {
@@ -30,6 +36,9 @@ export default {
         }
     },
     mutations: {
+        addSku(state, sku){
+            state.totalSkus.push(...sku);
+        },
         setProductLength(state, productLength){
             state.maxProductLength = productLength
         },
@@ -89,7 +98,7 @@ export default {
                 } else {
                     state.prodCategories[index] = element;
                 }
-            })
+            });
         },
         updateProductCategoryState(state, productState) {
             productState.forEach((element) => {
@@ -170,7 +179,9 @@ export default {
                     user_id: userId
                 }
                 const newProduct = await ApiService.addOnProduct(data)
+                
                 context.commit('onAddProduct', [newProduct]);
+                context.commit("addSku", [newlyCreatedProduct.sku]);
                 return newProduct
             } catch (e) {
                 const error = new Error(e || 'Cannot add product!');
@@ -229,10 +240,12 @@ export default {
 
             return products
         },
-        async getProdCategories({ commit }, {userId}) {
+        async getProdCategories({ commit }, {userId, offset, limit}) {
             try {
                 const params = {
-                    user_id: userId
+                    user_id: userId,
+                    offset: offset,
+                    limit: limit
                 }
 
                 const categories = await ApiService.getProdCategories(params);
@@ -245,10 +258,15 @@ export default {
         },
         async addProductCategory(context, payload) {
             try {
-                const categories = await ApiService.addOnProductCategory(payload)
+                const param = {
+                    category_name: payload.category_name,
+                    user_id: payload.user_id
+                }
+                const categories = await ApiService.addOnProductCategory(param)
                 const newProdCat = {
                     category_name: payload.category_name,
-                    id: categories.id.id
+                    id: categories.id,
+                    user_id: payload.user_id
                 }
                 context.commit('onAddProductCategory', [newProdCat]);
                 return newProdCat
@@ -284,9 +302,10 @@ export default {
             }
         },
 
-        async getTotalSku(){
+        async getTotalSku({ commit }){
             const data = await  ApiService.getTotalSku();
+            commit("addSku", data);
             return data;
-        }
+        },
     },
 }

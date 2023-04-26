@@ -2,7 +2,8 @@ module.exports = {
 	transpileDependencies: [
 		"primevue",
 		"chart.js",
-		"vue-chartjs"
+		"vue-chartjs",
+		"read-excel-file"
 	],
 	devServer:{
 		host: 'localhost'

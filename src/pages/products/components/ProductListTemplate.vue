@@ -3,7 +3,17 @@
         <div class="col-12">
             <div class="card">
                 <h5>Products</h5>
-                <Button label="Create" class="p-button-success mr-2" @click="goToCreateProduct" />
+                <div class="flex flex-column md:flex-row gap-1">
+                    <Button label="Create" class="p-button-success mr-2 fixedWidthButton" @click="goToCreateProduct"/>
+                    <label for="myImport" class="mr-2 myFileImport">
+                        <span>Import File</span>
+                    </label>
+                    <input id="myImport" type="File" accept=".xlsl, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" title=" " @change="onPickFile">
+                    <a href="/files/product_template.xlsx" download="product_template.xlsx">
+                        <Button class="mr-2" label="Download Template" severity="help">Download Template</Button>
+                    </a> 
+                    <Button v-if="errorProductList.length>0" severity="danger" @click="onSwitchErrorDialog" label="Show Error Products"></Button>
+                </div>
                 <p></p>
                 <DataTable 
                     :value="dataList" 
@@ -149,18 +159,65 @@
             </div>
         </div>
     </div>
-    <template>
-        <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingProduct"></RetryField>
-    </template>
+
+    <Dialog v-model:visible="errorDialog" header="Unsuccessful Products" modal :closable="true" style="width: 75vh;">
+        <DataTable :value="errorProductList" :paginator="true" class="p-datatable-sm" dataKey="id"
+        v-model:rows="myErrorRow" responsiveLayout="scroll" :rowsPerPageOptions="[10,20,30]"
+        >
+            <Column field="name" header="Product Name">
+            </Column>
+            <Column field="category_name" header="Category"></Column>
+            <Column field="sku" header="Product Reference"></Column>
+            <Column field="reason" header="Reason">
+                <template #body="{ data }">
+                    <p>{{ data.reason }}{{ data.undefined ? `, got ${data.undefined}`: "" }}</p>
+                </template>
+            </Column>
+        </DataTable>
+    </Dialog>
+
+    <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingProduct"></RetryField>
+    <slot name="additionalWidget" :onMassCreateProducts="onMassCreateProducts"></slot>
 </template>
+<style scoped>
+     .fixedWidthButton{
+        width: 8rem;
+    }
+
+    input[type="file"]{
+        display: none;
+    }
+
+    .myFileImport{
+        display: inline-block;
+        cursor: pointer;
+        width: 8rem;
+        border: 1px solid grey;
+        text-align: center;
+        align-items: center;
+        border-radius: 3px;
+        padding: 7px 14px;
+        background-color: grey;
+    }
+
+    .myFileImport span{
+        display: inline-block;
+        vertical-align: top;
+        color: white;
+        font-weight: normal;
+        font-size: -apple--system , BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+</style>
 <script>
     import router from '../../../router';
     import RetryField from "../../../components/prompt_field/RetryField.vue"
     import { FilterMatchMode } from "primevue/api";
     import { mapGetters } from 'vuex';
     import LinkParagraph from '../../../components/LinkParagraph.vue';
-    import { roleGroupId } from '../../../domains/domain';
+    import { roleGroupId, sheetId } from '../../../domains/domain';
     import SortButton from '../../../components/sortButton.vue';
+    import { read } from 'xlsx';
+
 
     export default {
         async created() {
@@ -175,9 +232,10 @@
             onInit: Function,
             userId: String || null,
             goToCreateProduct: Function,
-            myRows: Number
+            myRows: Number,
+            createMassProductUserId: String || null,
         },
-        emits:["update:myRows"],
+        emits:["update:myRows", "onPickedFile"],
         data() {
             return {
                 myFilter:{
@@ -188,7 +246,8 @@
                     product_name: null,
                     on_hands: null
                 },
-                // rows: 10,        
+                myErrorRow: 10,
+
                 productV2: null,
                 productDialog: false,
                 disabled: false,
@@ -222,14 +281,23 @@
 
                 productId: [],
                 productReference: [],
+                errorProductList: [],
 
-                archivedProduct: 0
+                archivedProduct: 0,
+
+                errorDialog: false,
             }
         },
         computed: {
             ...mapGetters({
                 getProductLength: "products/getProductLength",
+                getAllSkus: "products/getAllSkus"
             }),
+
+            getProductCategories(){
+                const prodCategories = this.$store.getters["products/prodCategories"].filter((e)=>e.user_id == (this.userId ?? e.user_id));
+                return prodCategories;
+            },
 
             products() {
                 return this.$store.getters['products/getProductState'];
@@ -247,6 +315,156 @@
         },
         
         methods: {
+            async onPickFile(event){
+                if(event.target.files[0]){
+                    const file = event.target.files[0];
+                    const data = await file.arrayBuffer();
+                    const rows = read(data);
+                    // SheetNames: ["rise"]
+                    // Sheets: {
+                        // rise: {
+                            // margin:
+                            // A1: 
+                            // A2:
+                        // }    
+                    // }
+                    const sheetData = rows?.Sheets[rows.SheetNames?.[0] ?? 0];
+                    delete sheetData["!margins"];
+                    delete sheetData["!ref"];
+
+                    // Look for the start of the header
+                    // A1, B1, C1, etc. is only effective if the letter 
+                    // is only one digit. 
+                    // TODO: If it has two digit we need to refactor this.
+                    // possibly ^\w{1,2}1$
+                    const headerRegex = new RegExp(`^.1$`);
+
+                    // This algorithm depends on the fact that there's
+                    // a header per column
+                    const result = [];
+                    // The position of the list, -1 because we ignore header
+                    // otherwise, we will skip the first element
+                    let index=-1;
+
+                    // Start from 2 because the header is in column 1;
+                    let oldIndicator = 0;
+                    for(let columnCharacter in sheetData){
+                        let indicator = columnCharacter?.substring(1, columnCharacter.length);
+                        let characterColumn = columnCharacter[0];
+
+                        // Skip the header or the row with 1 number
+                        if(headerRegex.test(columnCharacter)){
+                            oldIndicator = indicator;
+                            continue;
+                        }                   
+
+                        // If the old indicator isn't equal to the new one
+                        // It means that we're moving into a new row
+                        // which mean a different product
+                        if(oldIndicator!=indicator){
+                            oldIndicator=indicator;
+                            result.push({});
+                            index++;
+                        }
+                        // Convert the characterColumn to their designated
+                        // product field or product jsonKey
+                        const productFieldKey = sheetId[characterColumn];
+
+                        result[index][productFieldKey] = sheetData?.[columnCharacter]?.h?.trim?.() ?? sheetData?.[columnCharacter]?.v?.trim?.();
+                    }
+                    
+                    this.$emit("onPickedFile", result, this.onMassCreateProducts);
+                }
+            },
+
+            onMassCreateProducts(myMassProducts){
+                this.toLoadRetry = async () => {
+                    await this.$store.dispatch("products/getProdCategories",{
+                        userId: this.createMassProductUserId,
+                        offset: 0,
+                        limit: 1000000,
+                    });
+                    this.$store.dispatch("products/getTotalSku");
+
+                    for(let i=0; i<myMassProducts.length-1; i++){
+                        try{
+                            myMassProducts[i].categoryId = await this.categoryExist(myMassProducts[i]?.category_name);
+                            const skuNotExist = this.skuNotExist(myMassProducts[i]);
+                            const validated = this.validateProduct(myMassProducts[i]);
+
+                            if(skuNotExist && validated){
+                                await this.$store.dispatch("products/addProduct", {
+                                    newlyCreatedProduct: myMassProducts[i],
+                                    userId: this.createMassProductUserId,
+                                });
+                            }
+                        }catch(e){
+                            console.log(e);
+                            this.errorProductList.push({...myMassProducts[i], reason: "Unknown"});
+                        }
+                    }
+
+                    if(this.errorProductList.length){
+                        this.$toast.add({severity: "error", summary: "Failed", detail:"Some Products Failed to create", life: 2000});
+                        this.onSwitchErrorDialog();
+                    }
+
+                    this.clearValueImport();
+                };
+            },
+
+            clearValueImport(){
+                // Clear value of importing, otherwise it won't react to the same previous file
+                document.getElementById('myImport').value = ''
+            },
+
+            async categoryExist(categoryName){
+                if(categoryName){
+                    const haveCategory = this.getProductCategories.findIndex((e)=>{
+                        return (e?.category_name ?? "").toLowerCase().trim() == (categoryName ?? "").toLowerCase().trim();
+                    });
+                    
+                    if(haveCategory<0){
+                        const addProdCat = {
+                            category_name: categoryName,
+                            user_id: this.createMassProductUserId
+                        };
+                        const newCat = await this.$store.dispatch("products/addProductCategory", addProdCat);
+                        return newCat.id;
+                    }
+
+                    return this.getProductCategories[haveCategory].id;
+                }
+                return null;
+            },
+
+            validateProduct(product){
+                const productNameValid = product.name && product.name?.trim?.() != "";
+                if(!productNameValid){
+                    this.errorProductList.push({...product, reason: "Product Name Cannot Be Empty"});
+                }
+
+                return productNameValid;
+            },  
+
+            skuNotExist(product){
+                const index = this.getAllSkus.findIndex((e)=>{
+                    return e.toLowerCase() == product?.sku.toLowerCase();
+                });
+                const skuNotDuplicate = index<0;
+
+                if(skuNotDuplicate){
+                    this.errorProductList.push({...product, reason: "SKU/Internal Reference Already Exists"});
+                }
+
+                // If there's no sku here
+                return skuNotDuplicate;
+            },
+
+            onSwitchErrorDialog(){
+                this.errorDialog = !this.errorDialog;
+            },
+
             activateOrNot(product_name) {
                 return product_name == this.$route.query.name ?? false
             },
@@ -361,22 +579,6 @@
                     await this.SearchProduct(this.myPageTracker);
                 };
             },
-        },
-
-        watch:{
-            userSelector:{
-                immediate:true,
-                handler(newValue){
-                    if(newValue){
-                        this.toLoadRetry = async () => {
-                            await this.SearchProduct(this.myPageTracker);
-                        }
-                    }
-                    this.toLoadRetry = async() => {
-                        await this.SearchProduct(this.myPageTracker);
-                    }
-                }
-            }
         }
     }
 </script>

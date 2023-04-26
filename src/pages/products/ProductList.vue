@@ -2,7 +2,9 @@
     <ProductListTemplate
     v-model:myRows="rows"
     :userId="getUserId"
+    :createMassProductUserId="getUserId"
     :goToCreateProduct="goToCreateProductPage"
+    @onPickedFile="onPickedFile"
     >
 
     </ProductListTemplate>
@@ -25,6 +27,10 @@
             })
         },
         methods:{
+            async onPickedFile(products, createMass){
+                await createMass(products);
+            },
+
             goToCreateProductPage(){
                 return this.$router.push({name: "createProduct"});
             }
