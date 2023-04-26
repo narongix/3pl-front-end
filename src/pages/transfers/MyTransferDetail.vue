@@ -10,6 +10,7 @@
 	:vanishField="vanishField"
 	:editMode="true"
 	:tabViewDisabled="tabViewDisabled"
+    :myExtraCharge="myExtraChargeList"
 	>
 		<template #myTop="">
 			<RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -30,6 +31,8 @@
 			<Button v-if="!fieldNotActive" label="Save" :disabled="isCancelStatus" class="p-button-success mr-2" type="submit" />
 			<Button v-if="!fieldNotActive" label="Discard" :disabled="isCancelStatus" class="p-button-secondary mr-2" @click="revertBack(mySlot.myDiscardField)" />
 		</template>
+
+
 	</BaseFieldForm>
 </template>
 
@@ -90,7 +93,9 @@
 
 				selectedUserId: null,
 
-				toLoad:null
+				toLoad:null,
+
+				myExtraChargeList: []
 			}
 		},
 		computed:{
@@ -98,6 +103,10 @@
 				userRole: "auth/getUserRole",
 				myUserId: "auth/getUserId"
 			}),
+
+			getExtraChargeTransfer(){
+                return this.$store.getters["transfers/getTransfersDetail"](this.$route.params.id).extra_charges;
+            },
 
 			myPopUp(){
                 return {
@@ -179,6 +188,8 @@
 				})
 
 				await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
+
+				this.myExtraChargeList = this.getExtraChargeTransfer;
 
 				if(this.transferDetail.transfer_status_id == transferId.Draft){
 					this.isDraftStatus=true

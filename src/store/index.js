@@ -8,7 +8,7 @@ import stockedDetailReportModule from './modules/stocked_detail_report/stocked_d
 import billing_store from './modules/billing/billing_store.js';
 import user_store from './modules/user/user_store.js';
 import dashboard_store from './modules/dashboard/dashboard_store.js';
-import extra_charge from './modules/extra_charge/extra_charge.js';
+import extra_charge from './modules/extra_charge/extra_charge_store.js';
 
 const store = createStore({
     modules:{

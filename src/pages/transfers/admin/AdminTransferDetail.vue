@@ -8,7 +8,7 @@
 	:editMode="true"
 	:data="backUpData"
     :tabViewDisabled="tabViewDisabled"
-    v-model:myExtraCharge="extraChargeList"
+    :myExtraCharge="extraChargeList"
     @onClickSubmit="onSaved"
     >
         <template #myTop>
@@ -24,33 +24,53 @@
 			<Button v-if="!fieldNotActive" label="Save" :disabled="isCancelStatus" class="p-button-success" type="submit" @click="onSaved"/>
 		</template>
 
+        <template #extra_charge_panel_column>
+            <Column v-if="!fieldNotActive" header="Actions">
+                <template #body="props">
+                    <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="onDeleteExtraCharge(props.data)" />
+                </template>
+            </Column>
+        </template>
+
         <template #extra_charge_panel>
             <div v-if="!fieldNotActive" class="field col-12 md:col-4 lg:col-2">
                 <Button label="Add Extra Charge" class="p-button-success" @click="changeStateDialog"></Button>
             </div>
-
-            <Dialog v-model:visible="myDialog" header="Add Extra Charge" class="myDialogWidth">
-                <div class="p-fluid formgrid grid">
-                    <div class="field col-12">
-                        <label class="mr-2">Extra Charge</label>
-                        <Dropdown v-model="selectedExtraCharge" :options="getExtraCharge" 
-                        placeholder="Select Extra Charge">
-                            <template #option="{ option }">
-                                {{ option.item_code }}
-                            </template>
-
-                            <template #value="option">
-                                {{ option.value?.item_code ?? option.placeholder }}
-                            </template>
-                        </Dropdown>
-                    </div>    
-                    <div class="col-12">
-                        <Button label="Save" class="p-button-success mt-5" @click="onSavedExtraCharge"></Button>
-                    </div>
-                </div>
-            </Dialog>
         </template>
     </BaseFormField>
+
+        <Dialog v-model:visible="myDialog" header="Add Extra Charge" class="myDialogWidth">
+            <div class="p-fluid formgrid grid">
+                <div class="field col-12">
+                    <label class="mr-2">Extra Charge</label>
+                    <Dropdown v-model="selectedExtraCharge" :options="getExtraCharge" 
+                    placeholder="Select Extra Charge">
+                        <template #option="{ option }">
+                            {{ option.item_code }}
+                        </template>
+
+                        <template #value="option">
+                            {{ option.value?.item_code ?? option.placeholder }}
+                        </template>
+                    </Dropdown>
+                </div>    
+                <div class="col-12">
+                    <Button label="Save" class="p-button-success mt-5" @click="onSavedExtraCharge"></Button>
+                </div>
+            </div>
+        </Dialog>
+        <Dialog v-model:visible="extraChargeDeleteDialog" :style="{ width: '450px' }" header="Confirm"
+            :modal="true">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+                <span>Are you sure you want to delete <b>{{ extraChargeDelete.item_code }}</b>?</span>
+            </div>
+            <template #footer>
+                <Button label="No" icon="pi pi-times" class="p-button-text"
+                    @click="onDiscardDelete" />
+                <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="onConfirmDelete" />
+            </template>
+        </Dialog>
 </template>
 
 <style scoped>
@@ -71,6 +91,9 @@
         components:{ BaseFormField, RetryField },
         data(){
             return {
+                extraChargeDelete:null,
+                extraChargeDeleteDialog:false,
+
                 myData: null,
                 backUpData: null,
                 myDialog: false,
@@ -89,6 +112,10 @@
             };
         },
         computed:{
+            getDetailTransfer(){
+                return this.$store.getters["transfers/getTransfersDetail"](this.$route.params.id);
+            },
+
             getExtraCharge(){
                 return this.$store.getters["extraCharge/getExtraCharges"];
             },
@@ -147,6 +174,28 @@
             },
         },
         methods:{
+            onDeleteExtraCharge(data){
+                this.extraChargeDelete = data;
+                this.extraChargeDeleteDialog = true;
+            },
+
+            onConfirmDelete(){
+                const body ={
+                    transferId: this.$route.params.id,
+                    extraChargeId: this.extraChargeDelete.id
+                }
+                const resp = this.$store.dispatch("transfers/onDeleteExtraChargeFromTransfer", body);
+
+                this.$toast.add({ severity: resp?.status ?? "success", summary: resp?.summary ?? "" , detail: resp?.message ?? "", life: 2000 });
+
+                this.extraChargeDeleteDialog=false;
+            },
+
+            onDiscardDelete(){
+                this.extraChargeDeleteDialog = false;
+                this.extraChargeDelete = null;
+            },
+
             async onCancelStatus(){
 				this.toLoad= async()=>{
 					const created = []
@@ -190,11 +239,15 @@
             async initData(){
                 this.errorToast.summary="Error Loading!"
                 this.toLoad= async () => {
-                    this.myData = await this.$store.dispatch("transfers/getTransferDetail", {
+                    await this.$store.dispatch("transfers/getTransferDetail", {
                         transferId: this.$route.params.id
                     });
+                    this.myData = this.getDetailTransfer
+                    this.extraChargeList = this.getDetailTransfer.extra_charges;
+                    
                     // Cloning Object without reference
                     this.backUpData = JSON.parse(JSON.stringify(this.myData));
+                    
 
                     await this.$store.dispatch("extraCharge/onFetchExtraCharges");
                 };
@@ -216,7 +269,6 @@
             },
 
             onDiscardStatus(){
-                this.extraChargeList = [];
                 this.changeEditState();
             },
 
@@ -225,16 +277,12 @@
                     this.changeStateDialog();
                     this.errorToast.summary="Error Adding Extra Charge!"
                     this.toLoad = async () => {
-                        const msg = await this.$store.dispatch("extraCharge/onAddTransferDetailWithExtraCharge", {transferId: this.$route.params.id, extraChargeId: this.selectedExtraCharge.id});
-                        if(msg?.status=="success"){
-                            this.extraChargeList.unshift(this.selectedExtraCharge);
-                        }
-
-                        this.$toast.add({ severity: msg?.status ?? "success", summary: msg?.summary ?? "" , detail: msg?.message ?? "", life: 2000 });
+                        const resp = await this.$store.dispatch("transfers/onAddTransferDetailWithExtraCharge", {transferId: this.$route.params.id, extraCharge: this.selectedExtraCharge});
+                        this.$toast.add({ severity: resp?.status ?? "success", summary: resp?.summary ?? "" , detail: resp?.message ?? "", life: 2000 });
                         
                         this.selectedExtraCharge=null;
                     };
-                }
+                } 
             },
 
 			changeEditState(){

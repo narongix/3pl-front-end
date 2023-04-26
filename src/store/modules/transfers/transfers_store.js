@@ -22,7 +22,7 @@ export default{
             return state.transfers && state.transfers.length>0
         },
         
-        findTransferDetail: (state) => (id) => {
+        getTransfersDetail: (state) => (id) => {
             const transfer = state.transfers.find(element=>element.id==id)
             return transfer
         }   
@@ -38,6 +38,23 @@ export default{
                     state.transfers[index] = element
                 }
             });
+        },
+
+        addExtraChargeWithTransfer(state, {transferId, extraCharge}){
+            const index = state.transfers.findIndex((e)=>e.id == transferId);
+            if(index>=0){
+                state.transfers[index].extra_charges.unshift(extraCharge);
+            }
+        },
+
+        deleteExtraChargeFromTransfer(state, {transferId, extraChargeId}){
+            const index = state.transfers.findIndex((e)=>e.id == transferId);
+            if(index>=0){
+                const extraChargeIndex = state.transfers[index].extra_charges.findIndex((e)=>e.id==extraChargeId);
+                if(extraChargeIndex>=0){
+                    state.transfers[index].extra_charges.splice(extraChargeIndex, 1);
+                }
+            }
         },
 
         addTransferState(state, newTransfers){
@@ -86,6 +103,38 @@ export default{
             commit("updateTransferState", data)
             return data
         },
+
+
+        async onAddTransferDetailWithExtraCharge({ commit }, {transferId, extraCharge}){
+            const body = {
+                transfer_id: transferId,
+                extra_charge_id: extraCharge.id
+            };
+            const resp = await ApiService.addExtraChargeToTransferId(body);
+            
+            if(resp?.status=="success"){
+                const payload = {
+                    transferId,
+                    extraCharge
+                };
+                commit("addExtraChargeWithTransfer", payload);
+            }            
+            return resp;
+        },
+
+        async onDeleteExtraChargeFromTransfer({ commit }, {transferId, extraChargeId}){
+            const body = {
+                transfer_id: transferId,
+                extra_charge_id: extraChargeId
+            };
+
+            const resp = await ApiService.deleteExtraChargeFromTransfer(body);
+            if(resp?.status=="success"){
+                commit("deleteExtraChargeFromTransfer", {transferId, extraChargeId});
+            }
+            return resp;
+        },
+
         
         async getTransferDetail({ commit }, { transferId }){
             const newTransfer = await ApiService.getTransferDetails(transferId)

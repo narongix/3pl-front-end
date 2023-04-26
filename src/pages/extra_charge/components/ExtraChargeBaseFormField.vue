@@ -73,11 +73,14 @@
         emits:["onCreate", "update:data"],
         data(){
             return {
+                myData:{},
+
                 validationField:{
                     item_code:{
                         value: null,
                         validate: ()=>{
-                            if(this.myData?.item_code){
+                            if(this.myData?.item_code && this.myData?.item_code?.trim() != ""){
+                                this.myData.item_code = this.myData.item_code.trim();
                                 return this.validationField.item_code.value=null;
                             }
                             return this.validationField.item_code.value = "Cannot Be Empty";
@@ -86,7 +89,8 @@
                     description:{
                         value: null,
                         validate: () => {
-                            if(this.myData?.description){
+                            if(this.myData?.description && this.myData?.description?.trim() != ""){
+                                this.myData.description = this.myData.description.trim()
                                 return this.validationField.description.value=null;
                             }
                             return this.validationField.description.value = "Cannot Be Empty";
@@ -98,31 +102,55 @@
                             if(!this.myData?.amount){
                                 return this.validationField.amount.value = "Cannot be Empty";
                             }
-                            if(isNaN(Number(this.myData?.amount?.trim()))){
+                            const number = typeof this.myData?.amount == "number" ? this.myData?.amount : Number(this.myData?.amount?.trim() ?? 0)
+                            if(isNaN(number)){
                                 return this.validationField.amount.value="Must Contain Number Only";
                             }else{
-                                this.myData.amount = Number(this.myData?.amount?.trim() ?? 0);
+                                this.myData.amount = number;
                                 return this.validationField.amount.value=null;
                             }
                         }
+                    },
+                    long_description:{
+                        value:null,
+                        validate: () => {
+                            if(this.myData.long_description && this.myData?.long_description?.trim() != '')
+                            this.myData.long_description = this.myData.long_description.trim();
+                            return null;
+                        }
                     }
-                }
+                },
+
+                originalData: null,
             };
         },
         computed:{
-            myData:{
-                get(){
-                    return this.data;
-                },
-                set(newValue){
-                    return this.$emit("update:data", newValue);
-                }
+            myKey(){
+                return {
+                    item_code: "item_code",
+                    description: "description",
+                    amount: "amount",
+                    long_description: "long_description"
+                };
             }
         },
         methods:{
+            copyData(data){
+                this.originalData = JSON.parse(JSON.stringify(data));
+                this.myData = JSON.parse(JSON.stringify(data));
+                delete this.originalData["created_at"];
+                delete this.originalData["updated_at"];
+            },
+
             onCreate(){
                 if(this.validate()){
-                    this.$emit("onCreate", this.myData);
+                    const newData = {};
+                    for(let i in this.myKey){
+                        if(this.originalData[i] != this.myData[i]){
+                            newData[i] = this.myData[i];
+                        }
+                    }
+                    this.$emit("onCreate", newData);
                 }
             },
 
@@ -139,6 +167,14 @@
             resetValidation(){
                 for(let i in this.validationField){
                     this.validationField[i].value=null;
+                }
+            }
+        },
+        watch:{
+            data:{
+                immediate: true,
+                handler(newValue){
+                    this.copyData(newValue);
                 }
             }
         }
