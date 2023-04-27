@@ -22,11 +22,28 @@ export default {
         return resp.data;
     },
 
+    async deletedExtraCharge(body){
+        const resp = await ApiConfig.deleteMethods({
+            api: "/extra_charge",
+            data: body
+        })
+        return resp.data;
+    },
+
     async addExtraChargeToTransferId(body){
         const resp = await ApiConfig.postMethods({
             api: "/transfer_extra_charge",
             data: body
         });
+        return resp.data;
+    },
+
+    async deleteExtraChargeFromTransfer(body){
+        const resp = await ApiConfig.deleteMethods({
+            api: "/transfer_extra_charge",
+            data: body
+        });
+
         return resp.data;
     }
 }

@@ -23,6 +23,12 @@ export default{
                     state.extraChages[index] = element;
                 }
             });
+        },
+        deleteExtraChargeState(state, id){
+            const index = state.extraChages.findIndex((e)=>e.id == id);
+            if(index>=0){
+                state.extraChages.splice(index, 1);
+            }
         }
     },
     actions:{
@@ -33,22 +39,28 @@ export default{
         },
 
         async onUpdateExtraCharge({ commit }, newExtraCharge){
-            await ApiService.updateExtraCharge(newExtraCharge)
-            commit("updateExtraChargeState", [newExtraCharge]);
+            const data = {
+                id: newExtraCharge.id,
+                item_code: newExtraCharge.item_code,
+                amount: newExtraCharge.amount,
+                description: newExtraCharge.description
+            };
+
+            await ApiService.updateExtraCharge(data);
+            commit("updateExtraChargeState", [data]);
+        },
+
+        async onDeleteExtraCharge({ commit }, id){
+            const body = {
+                id: id
+            };
+            await ApiService.deletedExtraCharge(body);
+            commit("deleteExtraChargeState", id);
         },
 
         async onAddExtraCharge({ commit }, newExtraCharge){
             const data = await ApiService.createExtraCharge(newExtraCharge);
             commit("updateExtraChargeState", [data]);
-            return data;
-        },
-
-        async onAddTransferDetailWithExtraCharge(context, {transferId, extraChargeId}){
-            const body = {
-                transfer_id: transferId,
-                extra_charge_id: extraChargeId
-            };
-            const data = await ApiService.addExtraChargeToTransferId(body);
             return data;
         }
     }

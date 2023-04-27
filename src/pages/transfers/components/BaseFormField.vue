@@ -144,7 +144,11 @@
                         <TabPanel header="Extra Charges" :disabled="tabViewDisabled?.extraCharge ?? true">
                             <slot name="extra_charge_panel">
                             </slot>
-                            <ExtraChargePanel v-model="innerExtraCharge"></ExtraChargePanel>
+                            <ExtraChargePanel :myExtraChargeData="myExtraCharge">
+                                <slot name="extra_charge_panel_column">
+
+                                </slot>
+                            </ExtraChargePanel>
                         </TabPanel>
                     </TabView>
                 </div>
@@ -254,7 +258,7 @@
             // }
         },
         
-        emits:["onClickSubmit", "update:myExtraCharge"],
+        emits:["onClickSubmit"],
         components:{
             DropDownPagination,
             PromptField,
@@ -486,15 +490,6 @@
                 return {
                     highlight: !this.FieldNotActive && !this.disabledField?.product
                 };
-            },
-            innerExtraCharge:{
-                get(){
-                    return this.myExtraCharge;
-                },
-
-                set(newValue){
-                    this.$emit("update:myExtraCharge", newValue);
-                }
             },
 
             getProductByUser(){

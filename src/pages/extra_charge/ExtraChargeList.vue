@@ -24,11 +24,29 @@
                         </template>
                     </Column>
                     
+                    <Column header="Action">
+                        <template #body="slotProps">
+                            <Button v-if="slotProps.data.id" icon="pi pi-trash" class="p-button-rounded p-button-warning ma-0"
+                                @click="onPromptDelete(slotProps.data)" />
+                        </template>
+                    </Column>
                 </DataTable>
             </div>
         </div>
     </div>
 
+    <Dialog v-model:visible="extraChargeDeleteDialog" :style="{ width: '450px' }" header="Confirm"
+        :modal="true">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+            <span>Are you sure you want to delete <b>{{ extraChargeDelete.item_code }}</b>?</span>
+        </div>
+        <template #footer>
+            <Button label="No" icon="pi pi-times" class="p-button-text"
+                @click="extraChargeDeleteDialog = false" />
+            <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="onConfirmDelete" />
+        </template>
+    </Dialog>
     <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
 </template>
 
@@ -36,7 +54,7 @@
     import LinkParagraph from '../../components/LinkParagraph.vue';
     import RetryField from '../../components/prompt_field/RetryField.vue';
     import TimeConvert from '../../components/utils/TimeConvert';
-import LocalStorageKeys from '../../domains/LocalStorageKeys';
+    import LocalStorageKeys from '../../domains/LocalStorageKeys';
 
     export default{
         created(){
@@ -47,6 +65,9 @@ import LocalStorageKeys from '../../domains/LocalStorageKeys';
             return {
                 rows: 10,
                 dataList: [],
+
+                extraChargeDelete: null,
+                extraChargeDeleteDialog:false,
 
                 toLoad: null
             };
@@ -68,6 +89,20 @@ import LocalStorageKeys from '../../domains/LocalStorageKeys';
             },
         },
         methods: {
+            onPromptDelete(extraCharge){
+                this.extraChargeDelete = extraCharge;
+                this.extraChargeDeleteDialog = true;
+            },
+
+            onConfirmDelete(){
+                this.toLoad = async ()=>{
+                    this.extraChargeDeleteDialog=false;
+                    await this.$store.dispatch("extraCharge/onDeleteExtraCharge", this.extraChargeDelete.id);
+                    this.extraChargeDelete=null;
+                    this.dataList = this.$store.getters["extraCharge/getExtraCharges"];
+                };
+            },
+
             createExtraCharge(){
                 this.$router.push({name: "extraChargeCreate"})
             },
@@ -110,7 +145,6 @@ import LocalStorageKeys from '../../domains/LocalStorageKeys';
             converDate(date) {
                 return TimeConvert.formatUTCToDate(date);
             }
-        },
-        watch: {},
+        }
     }
 </script>
