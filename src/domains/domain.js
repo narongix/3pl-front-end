@@ -48,5 +48,11 @@ const sheetId = {
     C: "sku",
 }
 
-export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType, sheetId };
+const movementType = {
+    1: "In",
+    2: "Out",
+    3: "Inventory Adjustment"
+};
+
+export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType, sheetId, movementType };
 

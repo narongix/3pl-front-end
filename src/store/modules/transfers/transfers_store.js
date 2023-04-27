@@ -22,10 +22,10 @@ export default{
             return state.transfers && state.transfers.length>0
         },
         
-        getTransfersDetail: (state) => (id) => {
+        getTransferDetail: (state) => (id) => {
             const transfer = state.transfers.find(element=>element.id==id)
             return transfer
-        }   
+        }
     },
     mutations:{
         updateTransferState(state, newTransfer){
@@ -40,9 +40,19 @@ export default{
             });
         },
 
+        addOperationTransfer(state, {transferId, operations}){
+            const index = state.transfers.findIndex((e)=>e.id==transferId);
+            if(index>=0){
+                state.transfers[index].operations=operations;
+            }
+        },
+
         addExtraChargeWithTransfer(state, {transferId, extraCharge}){
             const index = state.transfers.findIndex((e)=>e.id == transferId);
             if(index>=0){
+                if(!state.transfers[index]["extra_charges"]){
+                    state.transfers[index]["extra_charges"]=[];    
+                }
                 state.transfers[index].extra_charges.unshift(extraCharge);
             }
         },
@@ -102,6 +112,14 @@ export default{
 
             commit("updateTransferState", data)
             return data
+        },
+
+        async getOperationTransfers({ commit }, {transferId}){
+            const param = {
+                transfer_id: transferId
+            };
+            const res = await ApiService.getOperationTransfer(param);
+            commit("addOperationTransfer", {transferId, operations: res});
         },
 
 
