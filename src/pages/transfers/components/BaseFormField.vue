@@ -139,7 +139,7 @@
                             </DataTable>
                         </TabPanel>
                         <TabPanel header="Operations" :disabled="tabViewDisabled?.operations ?? true">
-                            <OperationPanel v-model="transferData.operation"></OperationPanel>
+                            <OperationPanel :myOperationData="operations"></OperationPanel>
                         </TabPanel>
                         <TabPanel header="Extra Charges" :disabled="tabViewDisabled?.extraCharge ?? true">
                             <slot name="extra_charge_panel">
@@ -228,6 +228,7 @@
             data: Object,
             disabledField: Object,
             offset: Number,
+            operations: Array,
             myUserId: null,
             editMode: {
                 type: Boolean,

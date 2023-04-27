@@ -10,7 +10,8 @@
 	:vanishField="vanishField"
 	:editMode="true"
 	:tabViewDisabled="tabViewDisabled"
-    :myExtraCharge="myExtraChargeList"
+    :myExtraCharge="getExtraChargeTransfer"
+	:operations="getOperationTransfer"
 	>
 		<template #myTop="">
 			<RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -94,8 +95,6 @@
 				selectedUserId: null,
 
 				toLoad:null,
-
-				myExtraChargeList: []
 			}
 		},
 		computed:{
@@ -105,8 +104,12 @@
 			}),
 
 			getExtraChargeTransfer(){
-                return this.$store.getters["transfers/getTransfersDetail"](this.$route.params.id).extra_charges;
+                return this.$store.getters["transfers/getTransferDetail"](this.$route.params.id)?.extra_charges ?? [];
             },
+
+			getOperationTransfer(){
+				return this.$store.getters["transfers/getTransferDetail"](this.$route.params.id)?.operatios ?? [];
+			},
 
 			myPopUp(){
                 return {
@@ -132,7 +135,7 @@
 			tabViewDisabled(){
 				return {
 					ordered: false,
-					operations: true,
+					operations: false,
 					extraCharge: false,
 				};
 			}
@@ -186,10 +189,10 @@
 					offset: 0,
 					userId: this.selectedUserId ?? this.myUserId
 				})
+				
+				await this.$store.dispatch("transfers/getOperationTransfers", {transferId: this.$route.params.id});
 
 				await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
-
-				this.myExtraChargeList = this.getExtraChargeTransfer;
 
 				if(this.transferDetail.transfer_status_id == transferId.Draft){
 					this.isDraftStatus=true

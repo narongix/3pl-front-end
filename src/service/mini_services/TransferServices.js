@@ -29,6 +29,15 @@ export default{
         return res.data;
     }, 
 
+    async getOperationTransfer(param){
+        const res = await ApiConfig.getMethods({
+            api: "/transfer/operations",
+            params: param
+        });
+
+        return res.data;
+    },
+
     async updateTransfer(data, id, params){
         const res = await ApiConfig.patchMethods({
             api: `/transfer/${ id }`,

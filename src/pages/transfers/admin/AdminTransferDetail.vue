@@ -8,7 +8,8 @@
 	:editMode="true"
 	:data="backUpData"
     :tabViewDisabled="tabViewDisabled"
-    :myExtraCharge="extraChargeList"
+    :myExtraCharge="getTransferExtraCharges"
+    :operations="getTransferOperation"
     @onClickSubmit="onSaved"
     >
         <template #myTop>
@@ -98,7 +99,6 @@
                 backUpData: null,
                 myDialog: false,
 
-                extraChargeList: [],
                 selectedExtraCharge: null,
                 toLoad: null,
                 fieldNotActive: true,
@@ -113,12 +113,22 @@
         },
         computed:{
             getDetailTransfer(){
-                return this.$store.getters["transfers/getTransfersDetail"](this.$route.params.id);
+                const data = this.$store.getters["transfers/getTransferDetail"](this.$route.params.id);
+                return data;
             },
 
             getExtraCharge(){
                 return this.$store.getters["extraCharge/getExtraCharges"];
             },
+            
+            getTransferExtraCharges(){
+                return this.getDetailTransfer?.extra_charges ?? [];
+            },
+
+            getTransferOperation(){
+                return this.getDetailTransfer?.operations ?? [];
+            },
+
 
             isCancelStatus(){
                 return this.myData?.transfer_status == transferId.Canceled
@@ -168,12 +178,13 @@
             tabViewDisabled(){
                 return {
                     ordered: false,
-                    operations: true,
+                    operations: false,
                     extraCharge:false
                 }
             },
         },
         methods:{
+  
             onDeleteExtraCharge(data){
                 this.extraChargeDelete = data;
                 this.extraChargeDeleteDialog = true;
@@ -242,14 +253,14 @@
                     await this.$store.dispatch("transfers/getTransferDetail", {
                         transferId: this.$route.params.id
                     });
+
+                    await this.$store.dispatch("transfers/getOperationTransfers", {transferId: this.$route.params.id});
+                    await this.$store.dispatch("extraCharge/onFetchExtraCharges");
+                    console.log()
                     this.myData = this.getDetailTransfer
-                    this.extraChargeList = this.getDetailTransfer.extra_charges;
                     
                     // Cloning Object without reference
                     this.backUpData = JSON.parse(JSON.stringify(this.myData));
-                    
-
-                    await this.$store.dispatch("extraCharge/onFetchExtraCharges");
                 };
             },
 
