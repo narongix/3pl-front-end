@@ -11,7 +11,6 @@
 	:editMode="true"
 	:tabViewDisabled="tabViewDisabled"
     :myExtraCharge="getExtraChargeTransfer"
-	:operations="getOperationTransfer"
 	>
 		<template #myTop="">
 			<RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -33,7 +32,9 @@
 			<Button v-if="!fieldNotActive" label="Discard" :disabled="isCancelStatus" class="p-button-secondary mr-2" @click="revertBack(mySlot.myDiscardField)" />
 		</template>
 
-
+		<template #operationTab>
+			<OperationPanel :myOperationData="operationData" :rowTotal="operationTotal"></OperationPanel>
+		</template>
 	</BaseFieldForm>
 </template>
 
@@ -48,6 +49,7 @@
 	import RetryField from '../../components/prompt_field/RetryField.vue';
 	import { transferId } from '../../domains/domain';
 	import { mapGetters } from 'vuex';
+	import OperationPanel from './components/tabs/OperationPanel.vue';
 
 	export default{
 		async created(){
@@ -55,7 +57,8 @@
 		},
 		components:{
 			BaseFieldForm,
-			RetryField
+			RetryField,
+			OperationPanel
 		},
 		data(){
 			return {
@@ -95,6 +98,9 @@
 				selectedUserId: null,
 
 				toLoad:null,
+
+				operationData: [],
+				operationTotal: 0
 			}
 		},
 		computed:{
@@ -106,11 +112,6 @@
 			getExtraChargeTransfer(){
                 return this.$store.getters["transfers/getTransferDetail"](this.$route.params.id)?.extra_charges ?? [];
             },
-
-			getOperationTransfer(){
-				return this.$store.getters["transfers/getTransferDetail"](this.$route.params.id)?.operatios ?? [];
-			},
-
 			myPopUp(){
                 return {
                     header: "Product Quantity",
@@ -190,7 +191,9 @@
 					userId: this.selectedUserId ?? this.myUserId
 				})
 				
-				await this.$store.dispatch("transfers/getOperationTransfers", {transferId: this.$route.params.id});
+				const data = await this.$store.dispatch("transfers/getOperationTransfers", {transferId: this.$route.params.id, offset:0, limit:10});
+				this.operationTotal = data.rows_total;
+				this.operationData = data.rows;
 
 				await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
 

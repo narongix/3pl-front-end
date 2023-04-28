@@ -15,6 +15,14 @@ export default {
         return ""
     },
 
+    formatUTCToDateNoTime(date){
+        if(date){
+            const time = moment(date).format("DD/MM/YYYY");
+            return time
+        }
+        return ""
+    },
+
     convertToMs(date){
         const milliSecond = moment(date).valueOf()
         return milliSecond

@@ -187,6 +187,13 @@
     import { convertToTwoDecimal, convertToFourDecimal } from '../../components/utils/MyNumber';
 
     export default{
+        components: { 
+            RetryField,
+            DialogTransferType, 
+            VolumeProductDate,
+            LinkParagraph 
+        },
+
         created() {
             this.toLoadRetry= this.initData
         },
@@ -249,7 +256,7 @@
             },
 
             formatDateTime(time){
-                return TimeConvert.formatUTCToDate(time);
+                return TimeConvert.formatUTCToDateNoTime(time);
             },
 
             capitalizeWord(word){
@@ -271,7 +278,6 @@
                 this.myVolumeDetailState = true;
             }
         },
-        components: { RetryField, DialogTransferType, VolumeProductDate, LinkParagraph },
 
         watch:{
             mySelected(newValue){

@@ -114,12 +114,15 @@ export default{
             return data
         },
 
-        async getOperationTransfers({ commit }, {transferId}){
+        async getOperationTransfers({ commit }, {transferId, offset, limit}){
             const param = {
-                transfer_id: transferId
+                transfer_id: transferId,
+                limit,
+                offset
             };
             const res = await ApiService.getOperationTransfer(param);
-            commit("addOperationTransfer", {transferId, operations: res});
+            commit("addOperationTransfer", {transferId, operations: res.rows});
+            return res;
         },
 
 

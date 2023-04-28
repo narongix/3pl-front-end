@@ -1,5 +1,5 @@
 <template>
-    <DataTable :value="myOperationData"
+    <DataTable :value="dataList"
     :paginator="true" 
     class="p-datatable-sm" 
     :rows="myRows" 
@@ -7,7 +7,8 @@
     :rowHover="true" 
     filterDisplay="menu" 
     responsiveLayout="scroll"
-    :rowsPerPageOptions="[10, 20, 30]" 
+    :rowsPerPageOptions="[10, 20, 30]"
+    @page="onPage"
     >
     <template #empty>
         Empty...
@@ -30,28 +31,69 @@
             </template>
         </Column>
     </DataTable>
+    <RetryField :toLoad="toLoad" :errorToast="errorToast"></RetryField>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import TimeConvert from '../../../../components/utils/TimeConvert';
-import { movementType } from '../../../../domains/domain';
+    import { defineComponent } from 'vue';
+    import TimeConvert from '../../../../components/utils/TimeConvert';
+    import { movementType } from '../../../../domains/domain';
+    import myMixin from '../../../../domains/mixin';
+    import RetryField from '../../../../components/prompt_field/RetryField.vue';
 
     export default defineComponent({
-        props:{
-            myOperationData: Array,
+        mixins: [myMixin.myDataTable],
+        components: { 
+            RetryField 
         },
-        data(){
+        props: {
+            myOperationData: Array,
+            rowTotal: Number
+        },
+        data() {
             return {
                 myRows: 10,
+                toLoad: null,
+            };
+        },
+        computed:{
+            errorToast(){
+                return {
+                    severity: "error",
+                    summary: "Error!",
+                    detail: "Failed Loading!",
+                    life: 1000
+                };
             }
         },
-        methods:{
-            convertUTCToNormal(date){
+        methods: {
+            convertUTCToNormal(date) {
                 return TimeConvert.formatUTCToDate(date);
             },
-            convertMovementType(id){
+            convertMovementType(id) {
                 return movementType[id];
+            },
+            onPage(event) {
+                this.toLoad = async () => {
+                    const offset = event.first;
+                    const limitForList = event.rows;
+
+                    const data = await this.$store.dispatch("transfers/getOperationTransfers", {
+                        transferId: this.$route.params.id,
+                        offset: offset, 
+                        limit: this.row,
+                    });
+
+                    this.updateList({offset: offset, row: limitForList, tempList: data.rows});
+                };
+            }
+        },
+        watch:{
+            myOperationData:{
+                handler(newValue){
+                    this.initList(this.rowTotal);
+                    this.updateList({offset: 0, row: this.myRows, tempList: newValue});
+                }
             }
         }
     })

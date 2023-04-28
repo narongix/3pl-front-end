@@ -9,12 +9,11 @@
 	:data="backUpData"
     :tabViewDisabled="tabViewDisabled"
     :myExtraCharge="getTransferExtraCharges"
-    :operations="getTransferOperation"
     @onClickSubmit="onSaved"
     >
         <template #myTop>
             <RetryField :toLoad="toLoad" :errorToast="errorToast"></RetryField>
-        </template>
+        </template> 
 
         <template #myButton="">
             <Button v-if="fieldNotActive" label="Edit" :disabled="isCancelStatus" class="p-button-success mr-2" @click="changeEditState" />
@@ -33,6 +32,9 @@
             </Column>
         </template>
 
+        <template #operationTab>
+            <OperationPanel :myOperationData="operationData" :rowTotal="operationTotal"></OperationPanel>
+        </template>
         <template #extra_charge_panel>
             <div v-if="!fieldNotActive" class="field col-12 md:col-4 lg:col-2">
                 <Button label="Add Extra Charge" class="p-button-success" @click="changeStateDialog"></Button>
@@ -84,12 +86,15 @@
     import RetryField from '../../../components/prompt_field/RetryField.vue';
     import { transferId } from '../../../domains/domain';
     import BaseFormField from '../components/BaseFormField.vue';
+    import OperationPanel from '../components/tabs/OperationPanel.vue';
 
     export default{
         created(){
             this.toLoad = this.initData;
         },
-        components:{ BaseFormField, RetryField },
+        components:{ BaseFormField, RetryField, 
+            OperationPanel 
+        },
         data(){
             return {
                 extraChargeDelete:null,
@@ -108,7 +113,10 @@
                     summary: "Error!",
                     detail: "Failed to add Extra Charges",
                     life: 2000
-                }
+                },
+
+                operationData: [],
+                operationTotal: 0
             };
         },
         computed:{
@@ -124,11 +132,6 @@
             getTransferExtraCharges(){
                 return this.getDetailTransfer?.extra_charges ?? [];
             },
-
-            getTransferOperation(){
-                return this.getDetailTransfer?.operations ?? [];
-            },
-
 
             isCancelStatus(){
                 return this.myData?.transfer_status == transferId.Canceled
@@ -254,9 +257,12 @@
                         transferId: this.$route.params.id
                     });
 
-                    await this.$store.dispatch("transfers/getOperationTransfers", {transferId: this.$route.params.id});
+                    const data = await this.$store.dispatch("transfers/getOperationTransfers", {transferId: this.$route.params.id, offset:0, limit: 10});
+                    this.operationTotal = data.rows_total;
+                    this.operationData = data.rows;
+                    
+
                     await this.$store.dispatch("extraCharge/onFetchExtraCharges");
-                    console.log()
                     this.myData = this.getDetailTransfer
                     
                     // Cloning Object without reference
