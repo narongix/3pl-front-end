@@ -139,7 +139,7 @@
                             </DataTable>
                         </TabPanel>
                         <TabPanel header="Operations" :disabled="tabViewDisabled?.operations ?? true">
-                            <OperationPanel :myOperationData="operations"></OperationPanel>
+                            <slot name="operationTab"></slot>
                         </TabPanel>
                         <TabPanel header="Extra Charges" :disabled="tabViewDisabled?.extraCharge ?? true">
                             <slot name="extra_charge_panel">
@@ -218,7 +218,6 @@
     import { roleGroupId } from '../../../domains/domain';
     import UserDropDownPagination from '../../../components/UserDropDownPagination.vue';
     import ExtraChargePanel from './tabs/ExtraChargePanel.vue';
-    import OperationPanel from './tabs/OperationPanel.vue';
     import PromptFindRecipient from './dialogs/PromptFindRecipient.vue';
 
     export default{
@@ -228,7 +227,6 @@
             data: Object,
             disabledField: Object,
             offset: Number,
-            operations: Array,
             myUserId: null,
             editMode: {
                 type: Boolean,
@@ -267,7 +265,6 @@
             RetryField,
             UserDropDownPagination,
             ExtraChargePanel,
-            OperationPanel,
             PromptFindRecipient
         },
 
