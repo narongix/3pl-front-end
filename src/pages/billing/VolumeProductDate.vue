@@ -1,5 +1,5 @@
 <template>
-    <Dialog header="Volumes" v-model:visible="myStatus" maximizable modal :style="{ width: '75vw' }">
+    <Dialog header="Volumes" v-model:visible="myStatus" maximizable modal :style="{ 'min-width': '85vh' }">
         <div class="card">
             <p></p>
             <DataTable scrollable scrollHeight="flex" :value="dataList" :paginator="true" class="p-datatable-sm" :dataKey="tmpId"
@@ -24,7 +24,7 @@
                             {{ round4Number(data.total_volume) }}
                         </template>
                     </Column>
-                    <Column field="rate" header="Rate" style="min-width:12rem"></Column>
+                    <Column field="rate" header="Rate" style="min-width:10rem"></Column>
                     <Column field="volume_fee" header="Volume Fee" style="min-width:12rem">
                         <template #body="{ data }">
                             {{ round4Number(data.volume_fee) }}
