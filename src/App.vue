@@ -69,7 +69,7 @@ export default {
                     label: 'Reports',
                     items:[
                         {label: "Stock", faIcon: 'fa-boxes-stacked',  to: this.stockDetailPage()},
-                        {label: 'Billing statement', faIcon: 'fa-file-invoice', to: this.billingPage()}
+                        {label: 'Billing Statement', faIcon: 'fa-file-invoice', to: this.billingPage()}
                     ]
                 },
 
@@ -109,7 +109,7 @@ export default {
                     {
                         label: "Setting",
                         items:[
-                            {label: "Extra charge", faIcon: "fa-gear", to: "/admin_extra_charge"}
+                            {label: "Extra Charge", faIcon: "fa-gear", to: "/admin_extra_charge"}
                         ]
                     } 
                 ]
