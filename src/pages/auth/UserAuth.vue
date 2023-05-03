@@ -107,7 +107,7 @@
             this.$router.replace({name:"dashboard"})
           }catch(e){
             console.log(e);
-            this.validation.password.value = e.errorMessage
+            this.validation.password.value = e.message
             this.stopShowed=true
             // Since we're not displaying the email msg,
             // We still have to do insert values since our validation

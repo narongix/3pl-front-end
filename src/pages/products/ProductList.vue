@@ -4,7 +4,7 @@
     :userId="getUserId"
     :createMassProductUserId="getUserId"
     :goToCreateProduct="goToCreateProductPage"
-    @onPickedFile="onPickedFile"
+    @massCreateNavigation="goToImportTemplate"
     >
 
     </ProductListTemplate>
@@ -13,6 +13,7 @@
 <script>
     import { mapGetters } from 'vuex';
     import ProductListTemplate from './components/ProductListTemplate.vue';
+    import RouteName from '../../domains/Routename';
 
     export default{
         data(){
@@ -32,7 +33,10 @@
             },
 
             goToCreateProductPage(){
-                return this.$router.push({name: "createProduct"});
+                return this.$router.push({name: RouteName.createProductPage});
+            },
+            goToImportTemplate(){
+                this.$router.push({name: RouteName.massCreatePage})
             }
         }
     }

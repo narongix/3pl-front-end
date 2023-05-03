@@ -25,6 +25,7 @@ export default {
             }
         })).catch((e)=>{
             const error = Exception.authException(e)
+            console.log(e);
             throw error
         })
         return res

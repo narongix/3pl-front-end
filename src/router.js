@@ -3,11 +3,12 @@ import App from './App.vue';
 import store from "@/store";
 
 import { roleGroupId } from './domains/domain';
+import RouteName from './domains/Routename';
 
 const adminRoutes = [
     {
         path: "/products_admin",
-        name: "productListAdmin",
+        name: RouteName.adminProductListPage,
         component: ()=>import('./pages/products/admin/AdminProductList.vue'),
         meta:{role: roleGroupId.Admin},
         beforeEnter:()=>{
@@ -19,7 +20,7 @@ const adminRoutes = [
     },
     {
         path: "/admin", 
-        name: "admin",
+        name: RouteName.adminDashBoardPage,
         component: () => import("./pages/dashboard/admin/DashboardAdmin.vue"),
         meta:{role:roleGroupId.Admin},
         beforeEnter:()=>{
@@ -31,7 +32,7 @@ const adminRoutes = [
     },
     {
         path: "/billing_admin",
-        name: "adminBilling",
+        name: RouteName.adminBillingPage,
         component: () => import("./pages/billing/admin/AdminBillingList.vue"),
         meta: {requireAuth: true, role: roleGroupId.Admin},
         beforeEnter: ()=>{
@@ -43,7 +44,7 @@ const adminRoutes = [
     },
     {
         path: "/products/new_admin",
-        name: "createProductAdmin",
+        name: RouteName.adminCreateProductPage,
         component: () => import("./pages/products/admin/AdminCreateProduct.vue"),
         meta: {requireAuth: true, role: roleGroupId.Admin},
         beforeEnter: ()=>{
@@ -54,8 +55,20 @@ const adminRoutes = [
         }
     },
     {
+        path: "/products/admin_import",
+        name: RouteName.adminMassCreatePage,
+        component: ()=> import("./pages/products/admin/AdminProductMassCreate.vue"),
+        meta: {role: roleGroupId.Admin},
+        beforeEnter: ()=>{
+            if(store.getters["auth/getUserRole"] == roleGroupId.Admin){
+                return true;
+            }
+            return {name: RouteName.massCreatePage};
+        }
+    },
+    {
         path: "/stockDetailreport_admin",
-        name: "StockDetailReportAdmin",
+        name: RouteName.adminStockDetailReportPage,
         component: ()=> import("./pages/stocked_detail_report/admin/AdminStockDetailReportPage.vue"),
         meta: {role:roleGroupId.Admin},
         beforeEnter:()=>{
@@ -67,7 +80,7 @@ const adminRoutes = [
     },
     {
         path: "/admin_extra_charge",
-        name: "extraCharge",
+        name: RouteName.adminExtraChargePage,
         component: ()=>import("./pages/extra_charge/ExtraChargeList.vue"),
         meta:{role:roleGroupId.Admin},
         beforeEnter:()=>{
@@ -79,17 +92,17 @@ const adminRoutes = [
     },
     {
         path: "/admin_extra_charge/:id",
-        name: "extraChargeDetail",
+        name: RouteName.adminExtraChargeDetailPage,
         component: ()=> import("./pages/extra_charge/ExtraChargeDetail.vue")
     },
     {
         path: "/admin_extra_charge/create",
-        name: "extraChargeCreate",
+        name: RouteName.adminExtraChargeCreatePage,
         component: ()=>import("./pages/extra_charge/ExtraChargeCreate.vue")
     },
     {
         path: "/transfers_admin/:id",
-        name:"AdminTransferDetail",
+        name: RouteName.adminTransferDetailPage,
         component:()=>import("./pages/transfers/admin/AdminTransferDetail.vue")
     }
 ];
@@ -97,7 +110,7 @@ const adminRoutes = [
 const routes = [
     {
         path: '/auth',
-        name: 'auth',
+        name: RouteName.authPage,
         component: () => import('./pages/auth/UserAuth.vue')
     },
     {
@@ -118,84 +131,91 @@ const routes = [
             },
             {
                 path: '/transfers',
-                name: "TransferList",   
+                name: RouteName.transferListPage,   
                 component: ()=> import("./pages/transfers/TransferList.vue"),
             },
             {
                 path:"/transfers/create",
-                name: "TransferCreate",
+                name: RouteName.transferCreatePage,
                 component: ()=>import("./pages/transfers/CreateTransfer.vue"),
             },
             {
                 path: "/transfers/:id",
-                name: "TransferDetail",
+                name: RouteName.transferDetailPage,
                 component: ()=>import("./pages/transfers/MyTransferDetail.vue"),
             },
             {
                 path: "/transfers/:id/edit",
-                name: "TransferEdit",
+                name: RouteName.transferEditPage,
                 component: ()=> import("./pages/transfers/MyTransferDetail.vue"),
             },
             {
                 path: "/stockDetailreport",
-                name: "StockDetailReport",
+                name: RouteName.stockDetailReportPage,
                 component: ()=> import("./pages/stocked_detail_report/StockDetailReportPage.vue")
             },
             {
                 path: '/products',
-                name: "productList",
+                name: RouteName.productListPage,
                 component: ()=>import('./pages/products/ProductList.vue'),
                 meta:{role: roleGroupId.User}
             },
             {
                 path: '/products/product_detail/:id',
-                name: 'productDetail',
+                name: RouteName.productDetailPage,
                 component: ()=>import('./pages/products/ProductDetail.vue')
             },
             {
                 path: '/products/new/',
-                name: "createProduct",
+                name: RouteName.createProductPage,
                 component: ()=>import('./pages/products/CreateProductPage.vue'),
             },
             {
+                path: "/products/import",
+                name: RouteName.massCreatePage,
+                component: ()=>import('./pages/products/ProductMassCreate.vue')
+            },
+            {
                 path: '/product-categories',
-                name: "productCategoriesList",
+                name: RouteName.productCategoriesListPage,
                 component: ()=>import('./pages/products/ProductCategory.vue'),
             },
             {
                 path: '/product-categories/new/',
+                name: RouteName.productCategoriesCreatePage,
                 component: ()=>import('./pages/products/NewProductCategory.vue'),
     
             },
             {
                 path: '/product-categories/:id',
+                name: RouteName.productCategoriesDetailPage,
                 component: ()=>import('./pages/products/ProductCategoryDetail.vue')
             },
 
             {
                 path: '/empty',
-                name: 'empty',
+                name: RouteName.emptyPage,
                 component: () => import('./components/EmptyPage.vue')
             },
 
             {
                 path: "/billing",
-                name:"billing",
+                name: RouteName.billingPage,
                 component: ()=>import("./pages/billing/BillingList.vue"),
             },
             {
                 path:"/billing/detail",
-                name: "billingDetail",
+                name: RouteName.billingDetailPage,
                 component: ()=>import("./pages/billing/BillingDetail.vue"),            
             },
             {
                 path:"/billing/detail/volume",
-                name: "volumeList",
+                name: RouteName.volumeListpage,
                 component: ()=>import("./pages/billing/VolumeList.vue"),
             },
             {
                 path:"/billing/detail/volume/productDetail",
-                name: "volumeProductDetail",
+                name: RouteName.volumeProductDetailPage,
                 component: ()=>import("./pages/billing/VolumeProductDate.vue"),
             },
 
@@ -204,17 +224,17 @@ const routes = [
     },
     {
         path: '/login',
-        name: 'login',
+        name: RouteName.loginPage,
         component: () => import('./pages/auth/UserAuth.vue')
     },
     {
         path: '/error',
-        name: 'error',
+        name: RouteName.errorPage,
         component: () => import('./pages/Error.vue')
     },
     {
         path: '/notfound',
-        name: 'notfound',
+        name: RouteName.notFoundPage,
         component: () => import('./pages/NotFound.vue')
     },
     {

@@ -43,6 +43,14 @@ export default {
         return res.data
     },
 
+    async addMassProducts(products){
+        const res = await ApiConfig.postMethods({
+            api: "/product/add_batch",
+            data: products
+        });
+        return res.data;
+    },
+
     async updateOnProduct(product, id) {
         const res = await ApiConfig.patchMethods({
             api: `/product/${id}`,
