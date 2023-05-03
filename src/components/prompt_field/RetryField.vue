@@ -4,8 +4,8 @@
         <p v-else>{{ textLoading }}</p>
         <template #footer>
             <div v-if="textLoading">
-                <Button :label="message.noButton" class="p-button-secondary p-button-text" @click="noRetry"></Button>
-                <Button :label="message.yesButton" class="p-button-text p-button-sucess" @click="retryLoading" @mousedown="unFocus"></Button>
+                <Button :label="message?.noButton ?? 'No'" class="p-button-secondary p-button-text" @click="noRetry"></Button>
+                <Button :label="message?.yesButton ?? 'Yes'" class="p-button-text p-button-sucess" @click="retryLoading" @mousedown="unFocus"></Button>
                 
             </div>
         </template>
@@ -24,15 +24,15 @@
             message: {
               failed: {
                 type: String,
-                default: "failed"
+                default: ()=>"failed"
               },
               yesButton: {
                 type: String,
-                default: "Yes"
+                default: ()=>"Yes"
               },
               noButton: {
                 type: String,
-                default: "No"
+                default: ()=>"No"
               }
             },
             errorToast: {
@@ -75,7 +75,7 @@
                     this.loading=false
                 }catch(e){
                     console.log(e)
-                    this.textLoading = e.errorMessage ?? this.message.failed
+                    this.textLoading = e.message ?? this.message.failed
 
                     this.$toast.add(this.toast ?? {
                         severity: "error",

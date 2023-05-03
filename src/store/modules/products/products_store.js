@@ -1,6 +1,7 @@
 import ApiService from "../../../service/ApiService.js";
 import TimeConvert from "../../../components/utils/TimeConvert.js";
 import { sortType } from "../../../domains/domain.js";
+import JsonObject from "../../../components/utils/JsonObject.js";
 
 export default {
     namespaced: true,
@@ -184,10 +185,21 @@ export default {
                 context.commit("addSku", [newlyCreatedProduct.sku]);
                 return newProduct
             } catch (e) {
-                const error = new Error(e || 'Cannot add product!');
+                const error = await e;
                 throw error;
             }
         },
+        
+        async addMassProduct({ commit }, {products, userId}){
+            const data ={
+                products,
+                user_id: userId
+            };
+            const newlyCreatedProduct = await ApiService.addMassProducts(data);
+            commit("updateProductState", newlyCreatedProduct.data.products);
+            return newlyCreatedProduct.data;
+        },
+
         async updateProduct(context, payload) {
             const data = {
                 'product_name': payload.name,
@@ -220,7 +232,6 @@ export default {
         },
         async onFetchProducts({ commit }, { offset, productName, limit, searchKey, userId, productId, productReference, sortName, mySortType}) {
             const mySort = mySortType!=null ? sortType[mySortType] : null;
-            
             const myProductReference = productReference?.map((e)=>e?.trim());
             const myProductId = productId?.map((e)=>e?.trim());
 
@@ -232,9 +243,11 @@ export default {
                 user_id: userId,
                 product_id: myProductId,
                 product_reference: myProductReference,
-                sort_name: sortName,
+                sort_name: sortName ?? null,
                 sort_type: mySort
             }
+
+            JsonObject.removeNullValue(params);
             const products = await ApiService.getProducts(params)
             commit("updateProductState", products)
 
@@ -303,9 +316,9 @@ export default {
         },
 
         async getTotalSku({ commit }){
-            const data = await  ApiService.getTotalSku();
+            const data = await ApiService.getTotalSku();
             commit("addSku", data);
             return data;
-        },
+        }
     },
 }

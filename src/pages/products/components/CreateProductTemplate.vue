@@ -13,7 +13,6 @@
                             <InputText id="productname" type="text" v-model.trim="productName.val"
                                 :class="{ 'p-invalid': submitted && !productName.val }" />
                             <small class="p-error" v-if="submitted && !productName.val">Product is required.</small>
-                            <!-- <text>&emsp;Contact data</text> -->
                         </div>
                         
                         <div class="field col-12 md:col-12">
@@ -71,7 +70,7 @@ export default {
     },
     components: {
         RetryField,
-        PromptField
+        PromptField,
     },
     emits:["onSubmit"],
     data() {

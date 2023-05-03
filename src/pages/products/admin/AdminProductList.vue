@@ -2,29 +2,14 @@
     <ProductListTemplate 
     :onInit="myFunction" v-model:myRows="rows"
     :userId="userSelecter" :goToCreateProduct="goToCreateProductAdmin"
-    @onPickedFile="onPickedFile" :createMassProductUserId="userFieldForCreate"
+    :createMassProductUserId="userFieldForCreate"
+    @massCreateNavigation="goToAdminImportTemplate"
     >
         <template #filter="mySlot">
             <div class="field col-12 md:col-4 lg:col-3">
                 <label>User</label>
                 <UserDropDownPagination v-model="userSelecter" @change="onChange(mySlot.searchProduct)"></UserDropDownPagination>
             </div>
-        </template>
-
-        <template #additionalWidget="mySlot">
-            <Dialog v-model:visible="myFilePopUp" header="Mass Create Products" modal :closable="true" @update:visible="clearValueImport()">
-                <div class="formgrid grid">
-                    <div class="field col-12">
-                        <label :class="{'p-error': validationField.userFieldForCreate.value!=null}">Select User</label>
-                        <UserDropDownPagination v-model="userFieldForCreate" :validation="validationField.userFieldForCreate.value!=null"></UserDropDownPagination>
-                        <small class="p-error" v-if="validationField.userFieldForCreate.value">{{ validationField.userFieldForCreate.value }}</small>
-                    </div>
-                </div>
-                <template #footer>
-                    <Button severity="danger" label="Cancel" @click="onCancelCreateProduct"></Button>
-                    <Button severity="success" label="Confirm" @click="$event=>onConfirmCreateProduct(mySlot.onMassCreateProducts)"></Button>
-                </template>
-            </Dialog>
         </template>
     </ProductListTemplate>
 </template>
@@ -33,6 +18,7 @@
     import ProductListTemplate from '../components/ProductListTemplate.vue';
     import { mapGetters } from 'vuex';
     import UserDropDownPagination from '../../../components/UserDropDownPagination.vue';
+    import RouteName from '../../../domains/Routename';
     
     export default{
         created(){
@@ -82,6 +68,9 @@
             }
         },
         methods:{
+            async goToAdminImportTemplate(){
+                this.$router.push({name: RouteName.adminMassCreatePage});
+            },
             async onConfirmCreateProduct(onMassCreateProducts){
                 if(this.validate()){
                     await onMassCreateProducts(this.myMassProducts);
@@ -103,16 +92,6 @@
             goToCreateProductAdmin(){
                 this.$router.push({name:"createProductAdmin"})
             },
-
-            onPickedFile(products){
-                this.myMassProducts=products;
-                this.onSwitchStateDialog();
-            },
-
-            onSwitchStateDialog(){
-                this.myFilePopUp = !this.myFilePopUp;
-            },
-
 
             validate(){
                 const list = [];

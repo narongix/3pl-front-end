@@ -8,7 +8,7 @@ export default{
             if(e.response.data){    
                 const data = {
                     status:e.response.status,
-                    errorMessage: e.response.data.errorMessage
+                    message: e.response.data.message
                 }
                 throw data
             }

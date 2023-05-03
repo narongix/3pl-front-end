@@ -6,7 +6,7 @@ async function authException(exception){
     if(exception?.response?.data){    
         const data = {
             status: exception?.response?.status ?? 400,
-            errorMessage: exception?.response?.data?.errorMessage
+            message: exception?.response?.data?.errorMessage ?? exception?.response?.data?.message
         };
 
         // If Unauthenticated
