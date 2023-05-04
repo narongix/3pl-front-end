@@ -39,7 +39,7 @@
                             </tr>
                             <tr>
                                 <th>Payment Date</th>
-                                <td></td>
+                                <td>{{ getPaymentDate(data?.billsummary?.created_at) }}</td>
                             </tr>
                             <tr>
                                 <th>Status</th>
@@ -231,6 +231,13 @@
             })
         },
         methods:{
+            getPaymentDate(myDate){
+                const date = new Date(myDate);
+                const newDate = new Date(date.getFullYear(),date.getMonth()+1,0);
+                const finalDate = TimeConvert.formatUTCToDateNoTime(newDate)
+                return finalDate;
+            },
+
             round4Number(data){
                 const num = convertToFourDecimal(data);
                 return num;
