@@ -49,7 +49,8 @@
                     <Dropdown v-model="selectedExtraCharge" :options="getExtraCharge" 
                     placeholder="Select Extra Charge">
                         <template #option="{ option }">
-                            {{ option.item_code }}
+                            <p class="mb-0 title">{{ option.item_code }}</p>
+                            <p class="mb-0 subtitle">{{ option.description }}</p>
                         </template>
 
                         <template #value="option">
@@ -76,9 +77,11 @@
         </Dialog>
 </template>
 
+<style src="../../../assets/styles/style.css"></style>
+
 <style scoped>
     .myDialogWidth{
-        width: 350px;
+        width: 350px;  
     }
 </style>
 

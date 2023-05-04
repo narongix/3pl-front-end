@@ -32,7 +32,7 @@
                         </template>
                         <Column header="File Column">
                             <template #body="{ data }">
-                                <p class="mb-0">{{ data.field }}</p>
+                                <p class="mb-0 title">{{ data.field }}</p>
                                 <p class="mb-0 subtitle">{{ data.data }}</p>
                             </template>
                         </Column>
@@ -83,19 +83,13 @@
     </div>
 </template>
 
+<style src="../../../../src/assets/styles/style.css"></style>
 <style scoped>
     .p-datatable-header{
         background-color: transparent;
     }
     .p-dropdown{
         min-width: 12rem;
-    }
-
-    .subtitle{
-        font-weight: 400;
-        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-        font-size: 0.8rem;
-        color: rgba(162, 162, 162, 0.881);
     }
 
     .myFileImport{
