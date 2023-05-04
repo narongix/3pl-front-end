@@ -75,7 +75,7 @@
                     this.loading=false
                 }catch(e){
                     console.log(e)
-                    this.textLoading = e.message ?? this.message.failed
+                    this.textLoading = e?.message ?? this.message?.failed ?? this.errorToast?.detail ?? "Something went wrong.";
 
                     this.$toast.add(this.toast ?? {
                         severity: "error",

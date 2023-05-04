@@ -18,6 +18,7 @@
     import MyToast from "../../../components/utils/MyToast";
     import CreateProductTemplate from '../components/CreateProductTemplate.vue';
     import UserDropDownPagination from '../../../components/UserDropDownPagination.vue';
+import RouteName from '../../../domains/Routename';
 
     export default{
         components: { CreateProductTemplate, UserDropDownPagination },
@@ -82,7 +83,7 @@
                 const newProduct = await this.$store.dispatch('products/addProduct', {newlyCreatedProduct: newlyCreatedProduct, userId: this.userSelecter});
                 // TODO: Refactor this to push to admin product list instead
                 this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                await this.$router.push({ name: "productList", query: { id: newProduct.product_id, name: newProduct.product_name } });
+                await this.$router.push({name: RouteName.adminProductListPage, query: { id: newProduct.product_id, name: newProduct.product_name }});
             },
 
             async onValidate(){
