@@ -246,7 +246,7 @@
                     month: this.$route.query.month, 
                     year: this.$route.query.year,
                 });
-                this.dataList = this.data.transfer_trx_summary.lines;
+                this.dataList = this.data.transfer_trx_summary?.lines;
 
                 this.volumeSummary = this.data.volume_trx_summary.volume_transactions;
             },
