@@ -37,7 +37,7 @@
                             </div>
                         </div>
                     </template>
-                    <Column field="barcode" header="Barcode" style="min-width:15rem" :sortable="false"
+                    <Column field="barcode" header="Barcode" style="min-width:8rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <LinkParagraph :data="data.barcode" @pushing="navigateToDetail(data.product_id)" :myClass="{ shake: activateOrNot(data.product_name) }"></LinkParagraph>
@@ -99,7 +99,7 @@
                             <Button type="button" label="Apply" @click="onSearch" severity="success"></Button>
                         </template>
                     </Column>
-                    <Column field="upc" header="UPC" style="min-width:12rem" :sortable="false"
+                    <Column field="upc" header="UPC" style="min-width:4rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.upc }}</p>
@@ -111,7 +111,7 @@
                                 class="p-column-filter mt-3" placeholder="Search By UPC"/>
                         </template> -->
                     </Column>
-                    <Column field="category_name" header="Product Category" style="min-width:12rem" :sortable="false"
+                    <Column field="category_name" header="Product Category" style="min-width:8rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #body="{ data }">
                             <p :class="{ shake: activateOrNot(data.product_name) }">{{ data.category_name }}</p>
@@ -124,19 +124,19 @@
                                 class="p-column-filter mt-3" placeholder="Search By Product Category"/>
                         </template> -->
                     </Column>
-                    <Column field="on_hands" style="min-width:9rem" :sortable="false"
+                    <Column field="volume" header="Volume">
+                        <template #body="{ data }">
+                            {{ convertToFourDecimal(data.volume) }}
+                        </template>
+                    </Column>
+                    <Column field="on_hands" style="min-width:8rem" :sortable="false"
                         :showFilterMatchModes="false">
                         <template #header>
-                            <div class="flex formgrid grid grid-nogutter align-items-center justify-content-center" style="width:100%">
-                                <div class="col-10">
-                                    <p>&nbsp;On Hands</p>
-                                </div>
-                                <div class="col-2">
-                                    <SortButton v-model="mySort.on_hands" name="on_hands"
-                                    @onClick="onClickSortType"
-                                    ></SortButton>
-                                </div>
-                            </div>
+                            <MyHeader header="On Hands">
+                                <SortButton v-model="mySort.on_hands" name="on_hands"
+                                @onClick="onClickSortType"
+                                ></SortButton>
+                            </MyHeader>
                         </template>
 
                         <template #body="{ data }">
@@ -148,6 +148,27 @@
                             <InputText type="text" v-model="filterModel.value" @input="filterCallback()"
                                 class="p-column-filter mt-3" placeholder="Search By On Hands"/>
                         </template> -->
+                    </Column>
+                    <Column field="total_volume" header="">
+                        <template #header>
+                            <MyHeader header="Total Volumes">
+                                <SortButton v-model="mySort.total_volume" name="total_volume" @onClick="onClickSortType"></SortButton>
+                            </MyHeader>
+                        </template>
+                        <template #body="{ data }">
+                            {{ convertToFourDecimal(data.total_volume) }}
+                        </template>
+                    </Column>
+                    <Column field="est_charge_per_day" header="" style="min-width:8rem;">
+                        <template #header>
+                            <MyHeader header="Charge Per Day">
+                                <SortButton v-model="mySort.est_charge_per_day" name="est_charge_per_day" @onClick="onClickSortType"></SortButton>
+                            </MyHeader>
+                        </template>
+
+                        <template #body="{ data }">
+                            {{ convertToTwoDecimal(data.est_charge_per_day) }}$
+                        </template>
                     </Column>
                 </DataTable>
             </div>
@@ -225,6 +246,8 @@
     import { roleGroupId } from '../../../domains/domain';
     import SortButton from '../../../components/sortButton.vue';
     import MySpecialImportDialog from './MySpecialImportDialog.vue';
+    import MyHeader from '../../../components/MyHeader.vue';
+    import MyNumber from '../../../components/utils/MyNumber';
 
     export default {
         async created() {
@@ -238,7 +261,8 @@
             RetryField,
             LinkParagraph,
             SortButton,
-            MySpecialImportDialog
+            MySpecialImportDialog,
+            MyHeader
         },
         props:{
             onInit: Function,
@@ -256,7 +280,8 @@
 
                 mySort:{
                     product_name: null,
-                    on_hands: null
+                    on_hands: null,
+                    total_volume: 2,
                 },
 
                 productV2: null,
@@ -338,6 +363,14 @@
         },
         
         methods: {
+            convertToFourDecimal(data){
+                return MyNumber.convertToFourDecimal(data);
+            },
+
+            convertToTwoDecimal(data){
+                return MyNumber.convertToTwoDecimal(data);
+            },
+
             onSwitchErrorDialog(){
                 this.errorDialog = !this.errorDialog;
             },
@@ -369,7 +402,7 @@
 
             async initData() {
                 this.onInit?.();
-                await this.SearchProduct();
+                await this.SearchProduct(null, null, "total_volume", 2);
             },
 
             async SearchProduct(pageNumber, myId, sortName, sortType){
@@ -380,7 +413,7 @@
                     productName: this.myFilter.product_name,
                 });
                 this.initList();
-
+                
                 const products = await this.$store.dispatch("products/onFetchProducts", {
                     offset: (pageNumber || 0) * this.rows,
                     limit: this.rows,
