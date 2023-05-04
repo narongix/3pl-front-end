@@ -1,4 +1,4 @@
-var myDataTable = {
+const myDataTable = {
     data(){
         return {
             dataList: [],

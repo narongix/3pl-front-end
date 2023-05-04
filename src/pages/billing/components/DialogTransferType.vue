@@ -2,9 +2,8 @@
     <div>
         <Dialog header="Transfer Volumes" v-model:visible="myStatus" :modal="true" maximizable :style="{ width: '75vw' }">
             <div class="card">
-                <MyDataTable v-slot="mySlot" :initializeList="tempData" :row="row">
-                    <DataTable :value="mySlot.value" :paginator="true" class="p-datatable-sm" dataKey="id"
-                    :rowHover="true" responsiveLayout="scroll" @page="$event=> onPage($event, mySlot.update)" :rowsPerPageOptions="[10,20,30]"
+                <DataTable :value="dataList" :paginator="true" class="p-datatable-sm" :data-key="tmpId"
+                    :rowHover="true" responsiveLayout="scroll" @page="onPage" :rowsPerPageOptions="[10,20,30]"
                     v-model:rows="row" 
                     >
                         <template #empty>
@@ -22,13 +21,18 @@
                                 {{ round4Number(data.charged_volume) }}
                             </template>
                         </Column>
+                        <Column field="rate" header="Rate"></Column>
+                        <Column field="volume_fee" header="Subtotal($)">
+                            <template #body="{ data }">
+                                {{ round2Number(data.volume_fee) }}
+                            </template>
+                        </Column>
                         <Column field="created_at" header="CreatedAt">
                             <template #body="{ data }">
                                 <p>{{ convertUTCToTimeFormat(data.created_at) }}</p>
                             </template>
                         </Column>
                     </DataTable>
-                </MyDataTable>
             </div>
         </Dialog>
         <RetryField :toLoad="toLoadRetry" :message="messages"></RetryField>
@@ -43,11 +47,12 @@
 
 <script>
     import RetryField from '../../../components/prompt_field/RetryField.vue'
-    import MyDataTable from '../../../components/MyDataTable.vue';
     import TimeConvert from '../../../components/utils/TimeConvert';
-    import { convertToFourDecimal } from '../../../components/utils/MyNumber';
+    import { convertToFourDecimal, convertToTwoDecimal } from '../../../components/utils/MyNumber';
+    import myMixin from '../../../domains/mixin'
 
     export default{
+        mixins:[myMixin.myDataTable],
         props:{
             type: String,
             status: Boolean,
@@ -58,12 +63,10 @@
             "onExitDialog"
         ],
         components:{
-            MyDataTable,
             RetryField
         },
         data(){
             return {
-                tempData: [],
                 toLoadRetry: null,
                 row: 10,
                 mySelected: null,
@@ -104,6 +107,10 @@
                 return convertToFourDecimal(data);
             },
 
+            round2Number(data){
+                return convertToTwoDecimal(data);
+            },
+
             async initData(){
                 const data = await this.$store.dispatch("billing/onFetchTransferTrx", {
                     offset: 0,
@@ -113,11 +120,11 @@
                     transferType: this.type
                 });
 
-                this.tempData = data.rows;
-                return data.row_totals;
+                this.initList(data.rows_total);
+                this.updateList({offset:0, row: this.row, tempList: data.rows});
             },
 
-            async onPage(event, updateList){
+            async onPage(event){
                 this.toLoadRetry = async ()=>{
                     const data = await this.$store.dispatch("billing/onFetchTransferTrx",{
                         offset: event.first,
@@ -130,7 +137,7 @@
                     const offset = event.first;
                     const limit = event.rows;
 
-                    updateList({offset: offset, row: limit, tempList: data.rows});
+                    this.updateList({offset: offset, row: limit, tempList: data.rows});
                 } 
             },
 
@@ -144,7 +151,6 @@
                    return this.toLoadRetry = this.initData
                 }
                 this.toLoadRetry=null;
-                this.tempData.length=0
             }
         }
     }
