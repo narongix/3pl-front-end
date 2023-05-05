@@ -84,7 +84,7 @@
         </div>
     </div>
 
-    <ProductDialogMoveLines v-model="showProductMoveLine" :productId="productId" :userId="userId"></ProductDialogMoveLines>
+    <ProductDialogMoveLines v-model="showProductMoveLine" :productId="productId" :userId="userId" :fromDate="fromDate" :toDate="toDate"></ProductDialogMoveLines>
     <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToast"></RetryField>
     <HiddenRetryField :toLoad="toLoadHidden" :message="messageHidden" :errorToast="errorToastHidden"></HiddenRetryField>
 </template>

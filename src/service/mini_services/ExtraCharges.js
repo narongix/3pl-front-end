@@ -1,8 +1,11 @@
 import ApiConfig from "../ApiConfig";
 
 export default {
-    async fetchExtraCharges(){
-        const resp = await ApiConfig.getMethods({api: "/extra_charge"});
+    async fetchExtraCharges(param){
+        const resp = await ApiConfig.getMethods({
+            api: "/extra_charge",
+            params: param
+        });
         return resp.data;
     },
 

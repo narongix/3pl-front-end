@@ -28,6 +28,13 @@ const myDataTable = {
               this.dataList.push({tmpId: i});
             }
         },
+
+        deleteElement({key, id}){
+            const index = this.dataList.findIndex((e)=>e[key] == id);
+            if(index>=0){
+                this.dataList.splice(index, 1);
+            }
+        }
     }
 }
 
