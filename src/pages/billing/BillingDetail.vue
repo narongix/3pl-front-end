@@ -52,14 +52,12 @@
                 <div class="wastedSpace"></div>
                 <h5>Billing Details</h5>
                 <p></p>
+                
+                <h6>Number of Transfers Performed During The Period</h6>
                 <DataTable scrollable :value="dataList" responsiveLayout="scroll" class="p-datatable-sm"
                 selectionMode="single" :metaKeySelection="false"
                 v-model:selection="mySelected"
                 >
-                    <template #header>
-                        <h6>Number of Transfers Performed During The Period</h6>
-                    </template>
-
                     <template #empty>
                         <p>Empty...</p>
                     </template>
