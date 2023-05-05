@@ -2,7 +2,7 @@
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <h5>Product Details/{{ $route.params.id }}</h5>
+                <h5>Product Details</h5>
                 <Button :label="buttonLabel" class="p-button-success mr-2" @click="changeEditMode" />
                 <Button v-if="!editDisabled" label="Discard" class="p-button-secondary mr-2" @click="discard"></Button>
                 <Button :disabled="false" severity="danger" label="Archive" @click="confirmDeleteProduct"></Button>
