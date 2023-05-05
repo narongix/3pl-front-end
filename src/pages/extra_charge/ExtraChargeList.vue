@@ -8,7 +8,7 @@
                 <p></p>
                 <DataTable :value="dataList" :paginator="true" class="p-datatable-sm" dataKey="tmpId"
                 :rowHover="true" filterDisplay="menu" responsiveLayout="scroll"
-                @page="onPage($event)" v-model:rows="rows"
+                @page="onPage" v-model:rows="rows"
                 :rowsPerPageOptions="[10,20,30]">
                     <Column field="item_code" header="Item Code">
                         <template #body="{ data }">
@@ -55,8 +55,10 @@
     import RetryField from '../../components/prompt_field/RetryField.vue';
     import TimeConvert from '../../components/utils/TimeConvert';
     import LocalStorageKeys from '../../domains/LocalStorageKeys';
+    import myMixin from '../../domains/mixin';
 
     export default{
+        mixins:[myMixin.myDataTable],
         created(){
             this.toLoad = this.initData;
         },
@@ -64,7 +66,6 @@
         data() {
             return {
                 rows: 10,
-                dataList: [],
 
                 extraChargeDelete: null,
                 extraChargeDeleteDialog:false,
@@ -98,8 +99,9 @@
                 this.toLoad = async ()=>{
                     this.extraChargeDeleteDialog=false;
                     await this.$store.dispatch("extraCharge/onDeleteExtraCharge", this.extraChargeDelete.id);
+                    this.deleteElement({key: "id", id: this.extraChargeDelete.id});
                     this.extraChargeDelete=null;
-                    this.dataList = this.$store.getters["extraCharge/getExtraCharges"];
+                    
                 };
             },
 
@@ -113,35 +115,28 @@
             },
 
             async initData() {
-                const extraCharge = await this.$store.dispatch("extraCharge/onFetchExtraCharges");
-                
-                this.dataList = extraCharge;
-                
-                // this.initList();
-                // this.updateList({offset: pageNumber? pageNumber*this.rows : 0, row: this.rows, tempList: products});
+                const extraCharge = await this.$store.dispatch("extraCharge/onFetchExtraCharges",{
+                    limit: this.rows,
+                    offset: 0
+                });
+                this.initList(extraCharge.rows_total);
+                this.updateList({offset: 0, row: this.rows, tempList: extraCharge.rows});
             },
 
             onPage(event){
-                event
-            },
-            initList(){
-                this.dataList.length=0;
-                for(let i=0; i<this.getTotalRecords; i++){
-                    this.dataList.push({tmpId: i});
-                }
+                this.toLoad = async ()=>{
+                    const data = await this.$store.dispatch("extraCharge/onFetchExtraCharges", {
+                        limit: this.rows,
+                        offset: event.first
+                    });
+
+                    const offset= event.first;
+                    const limit = event.rows;  
+
+                    this.updateList({offset: offset, row:limit, tempList: data.rows});
+                };
             },
 
-            updateList({ offset, row, tempList }) {
-                let index = 0;
-                for (let i = offset; i < row + offset; i++) {
-                    if (!(tempList?.[index])) {
-                        break;
-                    }
-                    const myId = this.dataList[i]?.tmpId;
-                    this.dataList[i] = { tmpId: myId, ...tempList[index] };
-                    index++;
-                }
-            },
             converDate(date) {
                 return TimeConvert.formatUTCToDate(date);
             }

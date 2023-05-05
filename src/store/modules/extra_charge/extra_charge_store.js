@@ -32,9 +32,13 @@ export default{
         }
     },
     actions:{
-        async onFetchExtraCharges({ commit }){
-            const extraCharges = await ApiService.fetchExtraCharges();
-            commit("updateExtraChargeState", extraCharges);
+        async onFetchExtraCharges({ commit }, {offset, limit}){
+            const param = {
+                limit,
+                offset
+            }
+            const extraCharges = await ApiService.fetchExtraCharges(param);
+            commit("updateExtraChargeState", extraCharges.rows);
             return extraCharges;
         },
 
