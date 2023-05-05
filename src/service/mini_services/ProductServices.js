@@ -25,6 +25,14 @@ export default {
         return res.data
     },
 
+    async getAllProductMovement(params){
+        const res = await ApiConfig.getMethods({
+            api: "/product/all_product_movement",
+            params: params
+        });
+        return res.data;
+    },
+
     async getProductMoves(params){
         const res = await ApiConfig.getMethods({
             api: "/product/product_move",

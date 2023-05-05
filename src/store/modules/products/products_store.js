@@ -152,6 +152,19 @@ export default {
             return response;
         },
 
+        async getAllProductMovement(context, {userId, fromDate, toDate}){
+            const newFromDate = TimeConvert.formatDateToStockFormat(fromDate);
+            const newToDate = TimeConvert.formatDateToStockFormat(toDate);
+            const params = {
+                user_id: userId,
+                from_date: newFromDate,
+                to_date: newToDate
+            }
+
+            const response = await ApiService.getAllProductMovement(params);
+            return response;
+        },
+
         async getDetailProduct({commit}, {productId}) {
             const data = {
                 product_id: productId
