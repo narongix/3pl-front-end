@@ -1,11 +1,11 @@
 <template>
     <div>
         <Dialog header="Product Moves Lines History" v-model:visible="myState" maximizable modal :style="{ width: '75vw' }">
-            <DataTable :value="dataList" scrollable :paginator="true" v-model:rows="row"
+            <DataTable ref="myDt" :value="dataList" scrollable :paginator="true" v-model:rows="row"
                 :rowHover="true" filterDisplay="menu" responsiveLayout="scroll"
                 :rowsPerPageOptions="[10,20,30]" sortField="created_at" :sortOrder="-1" 
                 class="p-datatable-sm" dataKey="id" v-model:filters="filters" @page="onPage($event)" 
-                style="height: 100vh; width:100%;"
+                style="height: 100vh; width:100%;" :exportFilename="exportName()"
                 >
                 <template #empty>
                     No product history found.
@@ -62,11 +62,13 @@
         userId: String,
         fromDate: null,
         toDate: null,
+        onExport: Boolean
     },
-    emits: ["update:modelValue"],
+    emits: ["update:modelValue", "update:onExport"],
     data() {
         return {
             row: 10,
+            blah: true,
 
             toLoadRetry: null,
             filters: {
@@ -122,6 +124,12 @@
         }
     },
     methods: {
+        exportName(){
+            const newFromDate = TimeConvert.formatDateToStockFormat(this.fromDate);
+            const newToDate = TimeConvert.formatDateToStockFormat(this.toDate);
+            return `Product_Movement(${newFromDate} - ${newToDate})`;
+        },
+
         convert(data) {
             return TimeConvert.formatUTCToDate(data);
         },
@@ -169,6 +177,32 @@
         productId(newValue) {
             if (newValue) {
                 this.initData();
+            }
+        },
+        onExport:{
+            immediate: true,
+            handler(newValue){
+                if(newValue){
+                    this.toLoadRetry = async () =>{
+                        const data = await this.$store.dispatch("products/getAllProductMovement", { 
+                            userId: this.userId,
+                            fromDate: this.fromDate,
+                            toDate: this.toDate
+                        });
+
+                        const newData = data.rows.map((e)=>{
+                            return {
+                                ...e,
+                                created_at: this.convert(e.created_at)
+                            }
+                        })
+                        this.updateList({offset: 0, row:data.rows_total, tempList: newData});
+                        
+                        this.$refs.myDt.exportCSV();
+                        this.$emit("update:onExport", false);
+                        this.myState=false;
+                    }
+                }
             }
         }
     }

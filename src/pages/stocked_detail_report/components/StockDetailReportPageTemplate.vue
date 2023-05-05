@@ -26,7 +26,7 @@
                 <DataTable :value="dataList" ref="dt" class="p-datatable-sm" dataKey="tmpId"
                     :rowHover="true" fiterDisplay="menu" responsiveLayout="scroll" v-model:rows="rows"
                     :rowsPerPageOptions="[10, 20, 30]" v-model:selection="mySelected" :paginator="true"
-                    @page="onPage($event)" selectionMode="single" :metaKeySelection="false">
+                    @page="onPage($event)" selectionMode="single" :metaKeySelection="false" :exportFilename="exportName()">
                     <template #header>
                         <div class="p-fluid formgrid grid">
                             <div class="field col-2 xl:col-1 smallerButton">
@@ -84,7 +84,7 @@
         </div>
     </div>
 
-    <ProductDialogMoveLines v-model="showProductMoveLine" :productId="productId" :userId="userId" :fromDate="fromDate" :toDate="toDate"></ProductDialogMoveLines>
+    <ProductDialogMoveLines v-model="showProductMoveLine" v-model:onExport="onExportProductMovement" :productId="productId" :userId="userId" :fromDate="fromDate" :toDate="toDate"></ProductDialogMoveLines>
     <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToast"></RetryField>
     <HiddenRetryField :toLoad="toLoadHidden" :message="messageHidden" :errorToast="errorToastHidden"></HiddenRetryField>
 </template>
@@ -194,7 +194,8 @@
 
                 productFilter: 0,
                 productMaxLength: 0,
-                myPageTracker: 0
+                myPageTracker: 0,
+                onExportProductMovement: false,
             }
         },
         computed:{
@@ -231,6 +232,12 @@
             }
         },
         methods:{
+            exportName(){
+                const newFromDate = TimeConvert.formatDateToStockFormat(this.fromDate);
+                const newToDate = TimeConvert.formatDateToStockFormat(this.toDate);
+                return `Stock_Report(${newFromDate} - ${newToDate})`
+            },
+
             async whenSearchProduct(filterValue){
                 const products = await this.$store.dispatch("products/onFetchProducts",{
                     offset: 0,
@@ -313,8 +320,10 @@
                 if(this.validate()){
                     this.toLoadRetry = async () => {
                         await this.onSelectDate({limit: 100000000000000, addtionalCommand: ()=>{
-                            this.$refs.dt.exportCSV();
+                            this.$refs.dt.exportCSV();                            
                         }});
+                        this.showProductMoveLine=true;
+                        this.onExportProductMovement = true;
                     };
                 }
             },
@@ -443,7 +452,7 @@
                         await this.searchStockReport(this.myPageTracker);
                     }
                 }
-            }
+            },
         }
     }
 </script>
