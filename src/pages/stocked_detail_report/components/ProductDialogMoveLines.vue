@@ -1,12 +1,12 @@
 <template>
     <div>
-        <Dialog header="Product Moves Lines History" v-model:visible="myState" maximizable modal :style="{ width: '75vw' }">
+        <Dialog header="Product Moves Lines History" v-model:visible="myState" maximizable modal :style="{ width: '75vw'}">
             <DataTable ref="myDt" :value="dataList" scrollable :paginator="true" v-model:rows="row"
-                :rowHover="true" filterDisplay="menu" responsiveLayout="scroll"
-                :rowsPerPageOptions="[10,20,30]" sortField="created_at" :sortOrder="-1" 
-                class="p-datatable-sm" dataKey="id" v-model:filters="filters" @page="onPage($event)" 
-                style="height: 100vh; width:100%;" :exportFilename="exportName()"
-                >
+            :rowHover="true" filterDisplay="menu" responsiveLayout="scroll"
+            :rowsPerPageOptions="[10,20,30]" sortField="created_at" :sortOrder="-1" 
+            class="p-datatable-sm" dataKey="id" v-model:filters="filters" @page="onPage($event)" 
+            style="height: 100vh; width:100%;" :exportFilename="exportName()"
+            >
                 <template #empty>
                     No product history found.
                 </template>

@@ -120,7 +120,7 @@
 <script>
     import { mapGetters } from 'vuex';
     import RetryField from '../../../components/prompt_field/RetryField.vue';
-    import { read, writeFile } from 'xlsx';
+    import { read } from 'xlsx';
     
     export default{
         props: {
