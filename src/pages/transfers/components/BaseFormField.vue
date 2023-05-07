@@ -94,7 +94,7 @@
                             <slot name="orderedButton" :popUpProductDialog="changeStateDiaglog">
                             </slot>
                             <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
-                            <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="disabledField?.product ? promptEditField : null"
+                            <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="allowActivateRow"
                             :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll"
                             v-model:filters="filters"  filterDisplay="menu"
                             >
@@ -508,14 +508,18 @@
 
             getFormatCalendar(){
                 return TimeConvert.getCalendarFormat()
+            },
+
+            allowActivateRow(){
+                if(this.disabledField?.product){
+                    return null;    
+                }
+                return this.promptEditField;
+                
             }
         },
 
         methods:{
-            // showValueRecipient(value){
-            //     return value?.full_name ?? "Empty"
-            // },
-            
             createRecipientTemplateNow(){
                 if(this.validatedBeforeCreatingRecipient()){
                     this.toLoad = async ()=>{                        
@@ -696,7 +700,7 @@
                 e.preventDefault();
             },
 
-            promptEditField(data){
+            promptEditField(data){  
                if(!this.FieldNotActive) {
                     this.editedIndex = data.index
                     this.product_id = this.data.product_id
