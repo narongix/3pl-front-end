@@ -18,7 +18,7 @@
 
 		<template #orderedButton="mySlot">
 			<div class="col-12 md:col-12 sm:col-12">
-				<Button v-if="!fieldNotActive" label="SAVE" class="p-button-success mr-2 mb-2" @click="mySlot.popUpProductDialog">
+				<Button v-if="!fieldNotActive" label="SAVE" class="p-button-success mr-2 mb-2" @click="mySlot.popUpProductDialog" style="max-width: 8rem;">
 					{{ baseData.buttonSubmit }}
 				</Button>
 			</div>
@@ -69,7 +69,7 @@
 					transfer_type_id: true,
 					destination: true,
 					reference: false,
-					userSelector: true,
+					userSelector: false,
 					product: false,
 				},
 				vanishField: {
