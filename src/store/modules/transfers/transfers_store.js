@@ -1,4 +1,5 @@
 import ApiService from "../../../service/ApiService";
+import { connectionStatus } from "../../../domains/domain";
 
 export default{
     namespaced:true,
@@ -133,7 +134,7 @@ export default{
             };
             const resp = await ApiService.addExtraChargeToTransferId(body);
             
-            if(resp?.status=="success"){
+            if(resp?.status == connectionStatus.success){
                 const payload = {
                     transferId,
                     extraCharge

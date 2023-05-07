@@ -1,27 +1,31 @@
 <template>
-  <CountDown v-slot="myCountDown" @countDownTime="countDownMessage" @activateAPI="searchName">
     <Dropdown :options="dataList" :optionLabel="optionLabel" v-model="selectedData" :optionValue="optionValue"
               :disabled="disabled"
               :id="id"
               :class="{'p-invalid': validation}"
               :placeholder="placeholder"
               :filter="true"
+              :filterFields="filterFields"
               :selectOnFocus="selectOnFocus ?? true"
               @filter="onFilter($event)" @blur="stopLoading"
               :virtualScrollerOptions="{lazy:true, onLazyLoad: onload, showLoader:true, loading: loading, itemSize:38}"
               :inputId="inputId" :showClear="showClear" @change="$emit('change', $event)"
     >
       <template #value="slotProps">
-        <p v-if="showValue">{{ showValue?.(slotProps.value) }}</p>
+        <slot name="value" :mySlot="slotProps">
+          <p v-if="showValue">{{ showValue?.(slotProps.value) }}</p>
+        </slot>
       </template>
 
       <template #option="slotProps">
-        <p v-if="showOption" :onload="myCountDown.stopCountDown()">{{ showOption?.(slotProps.option) }}</p>
-        <p else :onload="myCountDown.stopCountDown()"> {{ slotProps.option }}</p>
+        <slot name="option" :mySlot="slotProps" :stopCountDown="stopCountDown">
+          <p v-if="showOption" :onload="stopCountDown()">{{ showOption?.(slotProps.option) }}</p>
+          <p else :onload="stopCountDown()"> {{ slotProps.option }}</p>
+        </slot>
       </template>
 
       <template #emptyfilter>
-          <p :onload="findData(myCountDown.startCountdown)">{{ emptyMessage }}</p>
+          <p :onload="findData()">{{ emptyMessage }}</p>
       </template>
 
       <template #empty>
@@ -34,20 +38,20 @@
         </div>
       </template>
     </Dropdown>  
-  </CountDown>
 </template>
 
 <script>
-  import CountDown from "@/components/CountDown.vue";
+  import mixin from "../domains/mixin";
+
   export default {
+    mixins:[mixin.myTimeCountDown],
     created(){
       this.myOffset = this.maxLength ?? 0
-    },
-    components:{
-      CountDown
+      this.activateApi = this.searchName;
     },
     emits:["update:modelValue", "change"],
     props: {
+      filterFields: Array,
       inputId: String,
       modelValue: null,
       disabled: Boolean,
@@ -116,16 +120,11 @@
         this.loading = false;
       },
 
-      findData(startCountDown) {
+      findData() {
         if (this.lastType != this.filterValue) {
           this.lastType = this.filterValue;
-          const initialTImer = startCountDown()
-          this.countDownMessage(initialTImer)
+          this.startCountdown()
         }
-      },
-
-      countDownMessage(timer){
-        this.emptyMessage = `Loading in ${timer}`
       },
 
       async searchName() {

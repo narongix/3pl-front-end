@@ -54,5 +54,10 @@ const movementType = {
     3: "Inventory Adjustment"
 };
 
-export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType, sheetId, movementType };
+const connectionStatus = {
+    success: "success",
+    failed: "failed"
+}
+
+export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType, sheetId, movementType, connectionStatus };
 
