@@ -38,4 +38,56 @@ const myDataTable = {
     }
 }
 
-export default { myDataTable };
+const myTimeCountDown = {
+    data(){
+        return {
+            countdown: null,
+            countdownTracker: null,
+            emptyMessage: null,
+            activateApi: null
+        }
+    },
+    methods:{
+        async startCountdown(){
+            this.countdown=3
+            this.countdown=2
+            this.changeMessage(this.countdown);
+        },
+
+        stopCountDown(){
+          clearTimeout(this.countdownTracker)
+        },
+
+        changeMessage(time){
+            this.emptyMessage = `Loading in ${time}`;
+        }
+    },  
+    watch:{
+        countdown: {
+            immediate: true,
+            deep: true,
+            handler: async function (newValue) {
+                // To prevent in case it fires oncreate and value is null
+                if (newValue == null || newValue == undefined){
+                    return
+                }
+
+                this.changeMessage(this.countdown)
+                if (newValue > 0) {
+                    return this.countdownTracker = setTimeout(() => {
+                        this.countdown -= 1;
+                        this.emptyMessage = `Loading in ${this.countdown}`
+                        this.changeMessage(this.countdown);
+                    }, 1000);
+                }
+                this.activateApi();
+            }
+        },
+
+        countdownTracker(newValue, oldValue) {
+            clearTimeout(oldValue);
+        },
+    }
+}
+
+export default { myDataTable, myTimeCountDown };

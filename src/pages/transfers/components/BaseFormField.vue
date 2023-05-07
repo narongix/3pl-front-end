@@ -23,7 +23,6 @@
 
                             <div class="field col-12 md:col-3">
                                 <label for="transfer_type_id" :class="{'p-error': validationField1.transfer_type_id.value}">Transfer Type</label>
-
                                 <Dropdown :disabled="FieldNotActive || disabledField['transfer_type_id']" 
                                 id="transfer_type_id" v-model="transferData.transfer_type_id"
                                 :options="transfer_type" :optionLabel="getTransferTypeName"

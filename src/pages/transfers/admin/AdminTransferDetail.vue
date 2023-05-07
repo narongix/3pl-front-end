@@ -41,22 +41,28 @@
             </div>
         </template>
     </BaseFormField>
-
         <Dialog v-model:visible="myDialog" header="Add Extra Charge" class="myDialogWidth">
             <div class="p-fluid formgrid grid">
                 <div class="field col-12">
                     <label class="mr-2">Extra Charge</label>
-                    <Dropdown v-model="selectedExtraCharge" :options="getExtraCharge" 
-                    placeholder="Select Extra Charge">
-                        <template #option="{ option }">
-                            <p class="mb-0 title">{{ option.item_code }}</p>
-                            <p class="mb-0 subtitle">{{ option.description }}</p>
-                        </template>
+                    <DropDownPagination v-model="selectedExtraCharge" :options="getExtraCharge"
+                    :whenLoad="onLoadExtraCharge" :limit="getExtraChargeLimit" :whenSearch="findExtraCharge"
+                    :maxLength="getExtraChargeLength" :messageLoad="messageLoadExtraCharge"
+                    :errorToastLoading="errorToastLoadingExtraCharge" 
+                    placeholder="Select Extra Charge" :filterFields="['item_code', 'description','long_description']"
+                    >
 
-                        <template #value="option">
-                            {{ option.value?.item_code ?? option.placeholder }}
-                        </template>
-                    </Dropdown>
+                    <template #value="parent">
+                        <p>{{ parent?.mySlot.value?.item_code ?? parent.mySlot?.placeholder }}</p>
+                    </template>
+
+                    <template #option="parent">
+                        <div :onload="parent.stopCountDown?.()">
+                            <p class="mb-0 title">{{ parent.mySlot?.option.item_code }}</p>
+                            <p class="mb-0 subtitle">{{ parent.mySlot?.option.description }}</p>
+                        </div>
+                    </template>
+                    </DropDownPagination>
                 </div>    
                 <div class="col-12">
                     <Button label="Save" class="p-button-success mt-5" @click="onSavedExtraCharge"></Button>
@@ -86,6 +92,7 @@
 </style>
 
 <script>
+    import DropDownPagination from '../../../components/DropDownPagination.vue';
     import RetryField from '../../../components/prompt_field/RetryField.vue';
     import { transferId } from '../../../domains/domain';
     import BaseFormField from '../components/BaseFormField.vue';
@@ -93,11 +100,9 @@
 
     export default{
         created(){
-            this.toLoad = this.initData;
+            this.initData();
         },
-        components:{ BaseFormField, RetryField, 
-            OperationPanel 
-        },
+        components:{ BaseFormField, RetryField, OperationPanel, DropDownPagination },
         data(){
             return {
                 extraChargeDelete:null,
@@ -123,6 +128,25 @@
             };
         },
         computed:{
+            messageLoadExtraCharge(){
+                return {
+                    failed: "Error loading Extra Charge, retry?",
+                    yesButton: "Yes",
+                    noButton: "No",
+                };
+            },
+
+            errorToastLoadingExtraCharge(){
+                return {
+                    severity:"error",
+                    summary: "Error!",
+                    detail: "Failed Loading Extra Charge!"
+                };
+            },
+            getExtraChargeLimit(){
+                return this.getExtraCharge?.length ?? 0;
+            },
+            
             getDetailTransfer(){
                 const data = this.$store.getters["transfers/getTransferDetail"](this.$route.params.id);
                 return data;
@@ -188,21 +212,41 @@
                     extraCharge:false
                 }
             },
+
+            getExtraChargeLength(){
+                return this.getExtraCharge.length;
+            }
         },
         methods:{
+            async onLoadExtraCharge(offset){
+                const extraCharge = await this.$store.dispatch('extraCharge/onFetchExtraCharges',{
+                    limit: 10,
+                    offset: offset
+                });
+
+                return extraCharge.rows_total;
+            },
+
+            async findExtraCharge(filterValue){
+                const extraCharge = await this.$store.dispatch("extraCharge/onFetchExtraCharges", {
+                    offset: 0,
+                    limit: 30,
+                    name: filterValue,
+                })
+                return extraCharge.length;
+            },
   
             onDeleteExtraCharge(data){
                 this.extraChargeDelete = data;
                 this.extraChargeDeleteDialog = true;
             },
 
-            onConfirmDelete(){
+            async onConfirmDelete(){
                 const body ={
                     transferId: this.$route.params.id,
                     extraChargeId: this.extraChargeDelete.id
                 }
-                const resp = this.$store.dispatch("transfers/onDeleteExtraChargeFromTransfer", body);
-
+                const resp = await this.$store.dispatch("transfers/onDeleteExtraChargeFromTransfer", body);
                 this.$toast.add({ severity: resp?.status ?? "success", summary: resp?.summary ?? "" , detail: resp?.message ?? "", life: 2000 });
 
                 this.extraChargeDeleteDialog=false;
@@ -263,9 +307,11 @@
                     const data = await this.$store.dispatch("transfers/getOperationTransfers", {transferId: this.$route.params.id, offset:0, limit: 10});
                     this.operationTotal = data.rows_total;
                     this.operationData = data.rows;
-                    
 
-                    await this.$store.dispatch("extraCharge/onFetchExtraCharges");
+                    await this.$store.dispatch("extraCharge/onFetchExtraCharges",{
+                        offset: 0,
+                        limit: 10,
+                    });
                     this.myData = this.getDetailTransfer
                     
                     // Cloning Object without reference
@@ -273,18 +319,7 @@
                 };
             },
 
-            // validate(){
-            //     this.extraChargeList.forEach((e)=>{
-            //         if(e.draft){
-            //             return true;
-            //         }
-            //     });
-            //     return false;
-            // },
-
             onSaved(){
-                // if(this.validate()){
-                // }
                 this.changeEditState();
             },
 
@@ -299,7 +334,6 @@
                     this.toLoad = async () => {
                         const resp = await this.$store.dispatch("transfers/onAddTransferDetailWithExtraCharge", {transferId: this.$route.params.id, extraCharge: this.selectedExtraCharge});
                         this.$toast.add({ severity: resp?.status ?? "success", summary: resp?.summary ?? "" , detail: resp?.message ?? "", life: 2000 });
-                        
                         this.selectedExtraCharge=null;
                     };
                 } 
