@@ -139,7 +139,6 @@ export default {
 ::v-deep(.p-datatable-frozen-tbody) {
     font-weight: bold;
 }
-
 ::v-deep(.p-datatable-scrollable .p-frozen-column) {
     font-weight: bold;
 }
