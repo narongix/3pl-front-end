@@ -6,13 +6,10 @@
                 :disabled="disabled" id="recipient" placeholder="Please select a recipient"
                 :validation="validation"
                 :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
-                :maxLength="getRecipientLength"
                 :showOption="option=>option.full_name"
-                :showValue="showValueRecipient" :offset="offset ?? 0"
+                :showValue="showValueRecipient" :offset="offset ?? 0" :user="userSelector"
                 >
                 </DropDownPagination>
-
-                
             </div>
         </div>
 
@@ -51,9 +48,6 @@
         getRecipientByUser() {
             const newRecipient = this.getRecipientsState.filter((e) => e.user_id == (this.userSelector));
             return newRecipient;
-        },
-        getRecipientLength() {
-            return this.getRecipientsState.length;
         },
         promptFindRecipient: {
             get() {

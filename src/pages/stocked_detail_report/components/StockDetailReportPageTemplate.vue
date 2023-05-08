@@ -54,7 +54,6 @@
                                     placeholder="Filter by sku or name"
                                     :whenLoad="whenLoadProduct"
                                     :whenSearch="whenSearchProduct"
-                                    :maxLength="getProductCurrentLength"
                                     :displayOption ="myOption=>myOption.search_key"
                                     v-model:offset="myFilterOffset" 
                                     :limit="10"
@@ -218,10 +217,6 @@
 
             getCalendarFormat(){
                 return TimeConvert.getCalendarFormat();
-            },
-
-            getProductCurrentLength(){
-                return this.getProducts.length;
             },
 
             ProductListFilter(){

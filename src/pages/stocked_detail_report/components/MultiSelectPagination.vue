@@ -35,7 +35,6 @@
             countdown: null,   
             filterValue: null,
             lastType: null,
-            outOfFetch: 3,
         }
     },
     components: { CountDown },
@@ -50,7 +49,6 @@
         limit: Number,
         whenLoad: Function,
         whenSearch: Function,
-        maxLength: Number,
         display: String,
         placeholder: String,
         optionLabel: String,
@@ -84,15 +82,13 @@
 
         async onload(event){
             try{
-                if (event.last == this.maxLength && this.outOfFetch > 0) {
+                if (event.last == this.options?.length ?? 0) {
                     this.loading = true;
                     this.myOffset = this.myOffset + this.limit;
-                    const fetchLength = await this.whenLoad(this.myOffset, this.outOfFetch);
-                    this.outOfFetch = fetchLength;
+                    await this.whenLoad(this.myOffset);
                     this.loading = false;
                 }
             }catch(e){
-                this.outOfFetch=1
                 this.loading=false
             }
         },

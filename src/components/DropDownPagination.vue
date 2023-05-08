@@ -46,7 +46,7 @@
   export default {
     mixins:[mixin.myTimeCountDown],
     created(){
-      this.myOffset = this.maxLength ?? 0
+      this.myOffset = this.dataList?.length ?? 0
       this.activateApi = this.searchName;
     },
     emits:["update:modelValue", "change"],
@@ -65,11 +65,12 @@
       limit: Number,
       whenLoad: Function,
       whenSearch: Function,
-      maxLength: Number,
       showOption: Function,
       showValue: Function,
       showClear: Boolean,
-      selectOnFocus: Boolean
+      selectOnFocus: Boolean,
+
+      user: null
     },
     data() {
       return {
@@ -102,17 +103,18 @@
 
       async onload(event) {
         try {
-          if (event.last == this.maxLength && this.outOfFetch > 0) {
+          if (event.last == this.dataList.length && this.outOfFetch > 0) {
             this.loading = true;
             setTimeout(async ()=>{
-              const fetchLength = await this.whenLoad(this.myOffset, this.outOfFetch, this.filterValue);
+              const fetchLength = await this.whenLoad(this.myOffset, this.filterValue);
               this.myOffset = this.myOffset + this.limit;
               this.outOfFetch = fetchLength;
               this.loading = false;
             }, 10)
           }
         } catch (e) {
-          this.outOfFetch = 1
+          console.log(e);
+          this.outOfFetch=1;
           this.loading = false
         }
       },
@@ -137,7 +139,6 @@
           this.loading = false
         }
       },
-
     },
     watch: {
       options: {
@@ -152,6 +153,10 @@
         if (!newValue) {
           clearTimeout(this.countdownTracker);
         }
+      },
+
+      user(){
+        this.outOfFetch=1;
       }
     }
   }

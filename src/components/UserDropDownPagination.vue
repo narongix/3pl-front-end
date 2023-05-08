@@ -2,7 +2,7 @@
     <DropDownPagination v-model="myValue" :options="getUsers" :optionLabel="optionLabel" :optionValue="optionValue"
     :disabled="disabled" id="id" inputId="id" placeholder="Please select a user" 
     :whenLoad="onLoadUser" :limit="getUserLimit" :whenSearch="findUser"
-    :maxLength="getUserLength" :showClear="true"  :class="myClass"
+    :showClear="true"  :class="myClass"
     :errorToastLoading="errorToastLoadingUsers" :messageLoad="messageLoadUser"
     :showOption="option => option.full_name" :validation="validation" @change="onChange"
     >
@@ -81,7 +81,7 @@
                 });
             },
 
-            async onLoadUser(offset, outOfFetch, filterValue){
+            async onLoadUser(offset, filterValue){
                 const users = await this.$store.dispatch("user/fetchUser", {
                     offset: offset,
                     limit: this.rows,
