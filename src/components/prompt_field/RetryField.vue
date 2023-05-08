@@ -1,6 +1,6 @@
 <template>
     <Dialog :visible="loading" :modal="true" :closable='false' @update:visibile="hideHandler">
-        <ProgressSpinner v-if="!textLoading"/>
+        <font-awesome-icon v-if="!textLoading" icon="fa-solid fa-spinner" spin-pulse size="2xl" class="mySpinner"/>
         <p v-else>{{ textLoading }}</p>
         <template #footer>
             <div v-if="textLoading">
@@ -12,13 +12,10 @@
     </Dialog>
 </template>
 
-<script>
-    import ProgressSpinner from 'primevue/progressspinner';
+<style lang="scss" src="../../assets/styles/sass/_mySpinner.scss" />
 
+<script>
     export default{
-        components:{
-            ProgressSpinner
-        },
         props:{
             toLoad: Function,
             message: {
