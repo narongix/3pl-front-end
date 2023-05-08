@@ -1,7 +1,7 @@
 <template>
     <div>
         <slot name="myTop"></slot>
-        <div class="card">
+            <div class="card">
             <form @submit="validateAndSubmit">
                 <div class="grid">
                     <div class="col-12">
@@ -162,9 +162,8 @@
                     :disabled="FieldNotActive" id="product_id" placeholder="Please select a product" 
                     :validation="validationField2.product_id.value"
                     :whenLoad="onLoadProductV2" :limit="getProductLimit" :whenSearch="findProduct"
-                    :maxLength="getProductLength"
                     :errorToastLoading="errorToastLoadingProducts" :messageLoad="messageLoadProducts"
-                    :showOption="option => option.search_key"
+                    :showOption="option => option.search_key" :user="userSelector"
                     >
 
                     </DropDownPagination>
@@ -246,7 +245,7 @@
             myExtraCharge:{
                 type: Array,
                 default: ()=>[]
-            }
+            },
             // validatedBeforeCreatingRecipient: {
             //     type: Function,
             //     default: ()=>{
@@ -492,10 +491,6 @@
             getProductByUser(){
                 const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? this.myUserId));
                 return newProduct;
-            },
-
-            getProductLength(){
-                return this.getProductByUser?.length ?? 0
             },
 
             getDisplayTranser(){

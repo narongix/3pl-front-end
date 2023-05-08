@@ -47,7 +47,7 @@
                     <label class="mr-2">Extra Charge</label>
                     <DropDownPagination v-model="selectedExtraCharge" :options="getExtraCharge"
                     :whenLoad="onLoadExtraCharge" :limit="getExtraChargeLimit" :whenSearch="findExtraCharge"
-                    :maxLength="getExtraChargeLength" :messageLoad="messageLoadExtraCharge"
+                    :messageLoad="messageLoadExtraCharge"
                     :errorToastLoading="errorToastLoadingExtraCharge" 
                     placeholder="Select Extra Charge" :filterFields="['item_code', 'description','long_description']"
                     >
@@ -211,10 +211,6 @@
                     operations: false,
                     extraCharge:false
                 }
-            },
-
-            getExtraChargeLength(){
-                return this.getExtraCharge.length;
             }
         },
         methods:{
