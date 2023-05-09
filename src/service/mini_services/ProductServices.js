@@ -94,9 +94,9 @@ export default {
         return res.data
     },
 
-    async updateOnProductCategory(id, category) {
+    async updateOnProductCategory(category) {
         const res = await ApiConfig.patchMethods({
-            api: `/category/${id}`,
+            api: `/category/${category.id}`,
             data: category,
             contentType: "application/json"
         })
@@ -109,13 +109,5 @@ export default {
             data: category
         })
         return res.data
-    },
-
-    async getTotalSku(params){
-        const res = await ApiConfig.getMethods({
-            api: "/product/sku",
-            params: params
-        });
-        return res.data;
     }
 }

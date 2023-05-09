@@ -56,7 +56,7 @@ const adminRoutes = [
     },
     {
         path: "/products/admin_import",
-        name: RouteName.adminMassCreatePage,
+        name: RouteName.adminMassCreateProductPage,
         component: ()=> import("./pages/products/admin/AdminProductMassCreate.vue"),
         meta: {role: roleGroupId.Admin},
         beforeEnter: ()=>{
@@ -65,6 +65,22 @@ const adminRoutes = [
             }
             return {name: RouteName.massCreatePage};
         }
+    },
+    {
+        path: '/product-categories-Admin',
+        name: RouteName.adminProductCategoryListPage,
+        component: ()=>import('./pages/products/admin/AdminProductCategoryList.vue'),
+    },
+    {
+        path: '/product-categories-Admin/new/',
+        name: RouteName.adminCreateProductCategoryPage,
+        component: ()=>import('./pages/products/admin/AdminCreateProductCategoryPage.vue'),
+
+    },
+    {
+        path: '/product-categories-Admin/:id',
+        name: RouteName.adminDetailProductCategoryPage,
+        component: ()=>import('./pages/products/admin/AdminDetailProductCategoryPage.vue')
     },
     {
         path: "/stockDetailreport_admin",

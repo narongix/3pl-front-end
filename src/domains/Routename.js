@@ -1,6 +1,9 @@
 
 class RouteName{
     static adminProductListPage = "productListAdmin";
+    static adminProductCategoryListPage = "productCategoryListAdmin";
+    static adminCreateProductCategoryPage = "productCreateCategoryAdmin";
+    static adminDetailProductCategoryPage = "productDetailCategoryAdmin";
     static adminDashBoardPage = "admin";
     static adminBillingPage = "adminBilling";
     static adminCreateProductPage = "createProductAdmin";
@@ -9,7 +12,7 @@ class RouteName{
     static adminExtraChargeDetailPage = "extraChargeDetail";
     static adminExtraChargeCreatePage = "extraChargeCreate"
     static adminTransferDetailPage = "AdminTransferDetail";
-    static adminMassCreatePage = "adminMassCreate";
+    static adminMassCreateProductPage = "adminMassCreate";
 
     static authPage = "auth";
     static loginPage = "login";

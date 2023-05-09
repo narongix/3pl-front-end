@@ -327,7 +327,6 @@
         computed: { 
             ...mapGetters({
                 getProductLength: "products/getProductLength",
-                getAllSkus: "products/getAllSkus"
             }),
 
             getErrorProducts(){

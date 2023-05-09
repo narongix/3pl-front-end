@@ -9,14 +9,14 @@
                     <p></p>
                     <div class="p-fluid formgrid grid">
                         <div class="field col-12 md:col-12">
-                            <label for="productname">Product Name</label>
+                            <label :class="{ 'p-error': submitted && !productName.val }" for="productname">Product Name</label>
                             <InputText id="productname" type="text" v-model.trim="productName.val"
                                 :class="{ 'p-invalid': submitted && !productName.val }" />
                             <small class="p-error" v-if="submitted && !productName.val">Product is required.</small>
                         </div>
                         
                         <div class="field col-12 md:col-12">
-                            <label for="sku" :class="{'p-error': validationField.sku.val}">Internal Reference</label>
+                            <label for="sku" :class="{'p-error': validationField.sku.value}">Internal Reference</label>
                             <InputText id="sku" type="text" v-model.trim="sku.val" :class="{'p-invalid': validationField.sku.value}" />
                             <small id="sku-help" class="p-error" v-if="validationField.sku.value">{{ validationField.sku.value }}</small>
                         </div>
@@ -63,16 +63,18 @@ export default {
         }
     },
     props:{
+        onSubmit: Function,
         additionalValidation: Function,
         onInit: Function,
         productCategoryOption: Array,
-        myUserId: String
+        myUserId: String,
+        onCreateProductCategoryRequireUserId: Function
     },
     components: {
         RetryField,
         PromptField,
     },
-    emits:["onSubmit"],
+    emits:["onResetValidation"],
     data() {
         return {
             validationField:{
@@ -82,11 +84,6 @@ export default {
                         const haveData = this.sku.val
                         if(!haveData){
                             return this.validationField.sku.value="Reference is required"
-                        }
-                        for(let i in this.mySku){
-                            if(this.sku.val.toLowerCase()==this.mySku[i]){
-                                return this.validationField.sku.value = "Sku must be unique";
-                            }
                         }
                         this.validationField.sku.value=null
                     }
@@ -136,8 +133,15 @@ export default {
         //yes create new data
         async onComfirmCreated() {
             this.promptCreated = false
+            this.resetValidation();
+            const userId = this.onCreateProductCategoryRequireUserId();
+            if(!userId){
+                return ;
+            }
+
             const data = {
-                category_name: this.selectedCreated
+                category_name: this.selectedCreated,
+                user_id: userId
             }
             const newData = await this.$store.dispatch("products/addProductCategory", data);
             this.prodCategory = newData
@@ -151,22 +155,27 @@ export default {
             this.submitted = true;
             
             this.toLoad = async () =>{
-                const allSku = await this.$store.dispatch('products/getTotalSku');
-                this.mySku = allSku.map((e)=>e.toLowerCase());
+                try{
+                    this.validateForm();
+                    if (!this.formIsValid) {
+                    return;
+                    }
 
-                this.validateForm();
+                    const actionPayload = {
+                        name: this.productName.val,
+                        sku: this.sku.val,
+                        categoryId: this.prodCategory?.id ?? null
+                    };
+                    const newProduct = await this.$store.dispatch('products/addProduct', {newlyCreatedProduct: actionPayload, userId: this.myUserId});
 
-                if (!this.formIsValid) {
-                return;
+                    this.onSubmit?.(newProduct);
+                }catch(e){
+                    const error = await e;
+                    if(error.sku){
+                        this.validationField.sku.value = error.sku;
+                    }
+                    throw error;
                 }
-
-                const actionPayload = {
-                    name: this.productName.val,
-                    sku: this.sku.val,
-                    categoryId: this.prodCategory?.id ?? null
-                };
-
-                this.$emit("onSubmit", actionPayload);
             };
             
         },
@@ -190,6 +199,13 @@ export default {
             if(index>=0 || index2>=0){
                 this.formIsValid=false
             }
+        },
+        resetValidation(){
+            this.submitted=false;
+            for(let i in this.validationField){
+                this.validationField[i].value=null;
+            }
+            this.$emit("onResetValidation");
         },
         async loadProdCategories() {
             try {
