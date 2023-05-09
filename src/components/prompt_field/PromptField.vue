@@ -19,8 +19,14 @@
         props:{
             loading: Boolean,
             message: {
-              decline: String,
-              accept: String,
+              decline: {
+                type: String,
+                default: ()=>("No")
+              },
+              accept: {
+                type: String,
+                default: ()=>("Yes")
+              },
               prompt: null
             }
         },

@@ -191,22 +191,17 @@ export default {
         },
 
         async addProduct(context, {newlyCreatedProduct, userId}) {
-            try {
-                const data = {
-                    'product_name': newlyCreatedProduct.name,
-                    'sku': newlyCreatedProduct.sku,
-                    product_category_id: newlyCreatedProduct.categoryId,
-                    user_id: userId
-                }
-                const newProduct = await ApiService.addOnProduct(data)
-                
-                context.commit('onAddProduct', [newProduct]);
-                context.commit("addSku", [newlyCreatedProduct.sku]);
-                return newProduct
-            } catch (e) {
-                const error = await e;
-                throw error;
+            const data = {
+                'product_name': newlyCreatedProduct.name,
+                'sku': newlyCreatedProduct.sku,
+                product_category_id: newlyCreatedProduct.categoryId,
+                user_id: userId
             }
+            const newProduct = await ApiService.addOnProduct(data)
+            
+            context.commit('onAddProduct', [newProduct]);
+            context.commit("addSku", [newlyCreatedProduct.sku]);
+            return newProduct
         },
         
         async addMassProduct({ commit }, {products, userId}){
@@ -231,7 +226,7 @@ export default {
                 return newProduct
             }
             catch (e) {
-                const error = new Error(e || 'Cannot update product!');
+                const error = await e;
                 throw error;
             }
         },
@@ -245,7 +240,7 @@ export default {
                 context.commit('deleteProductState', payload)
             }
             catch (e) {
-                const error = new Error(e || 'Cannot delete product!');
+                const error = await e;
                 throw error;
             }
         },
@@ -281,10 +276,11 @@ export default {
                 }
 
                 const categories = await ApiService.getProdCategories(params);
-                commit('updateProductCategoryState', categories);
+                commit('updateProductCategoryState', categories.rows);
+                return categories;
             }
             catch (e) {
-                const error = new Error(e || 'Cannot retrieve categories!');
+                const error = await e;
                 throw error;
             }
         },
@@ -303,41 +299,36 @@ export default {
                 context.commit('onAddProductCategory', [newProdCat]);
                 return newProdCat
             } catch (e) {
-                const error = new Error(e || 'Cannot add product category!');
+                const error = await e;
                 throw error;
             }
         },
-        async updateProductCategory({ commit }, { payload }) {
+        async updateProductCategory({ commit }, { categoryName, id, userId }) {
             const data = {
-                "category_name": payload.category_name
+                "category_name": categoryName,
+                id: id,
+                user_id: userId
             }
             try {
-                const categories = await ApiService.updateOnProductCategory(payload.id, data)
+                const categories = await ApiService.updateOnProductCategory(data)
                 commit('updateProductCategoryState', [categories]);
                 return categories;
             } catch (e) {
-                const error = new Error(e || 'Cannot update product category!');
+                const error = await e;
                 throw error;
             }
         },
-        async deleteProductCategory(context, { payload }) {
+        async deleteProductCategory(context, { id }) {
             try {
                 const data = {
-                    productCategoryIds: []
+                    productCategoryIds: [id]
                 }
-                data.productCategoryIds.push(payload.id)
                 await ApiService.deleteOnProductCategory(data)
-                context.commit('deleteProductCategoryState', payload)
+                context.commit('deleteProductCategoryState', {'id': id})
             } catch (e) {
-                const error = new Error(e || 'Cannot delete product category!');
+                const error = await e;
                 throw error;
             }
-        },
-
-        async getTotalSku({ commit }){
-            const data = await ApiService.getTotalSku();
-            commit("addSku", data);
-            return data;
         }
     },
 }

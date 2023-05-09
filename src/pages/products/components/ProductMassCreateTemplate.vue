@@ -124,8 +124,12 @@
     
     export default{
         props: {
-            getUserId: String || null,
+            getUserId: {
+                type: String,
+                required: false
+            }
         },
+        components: { RetryField },
         emits: ["onPressImport", "onFinishImport"],
         data() {
             return {
@@ -361,6 +365,5 @@
                 return this.getProductCategories[haveCategory].id;
             },
         },
-        components: { RetryField }
     }
 </script>
