@@ -224,9 +224,10 @@
                     // Start from 2 because the header is in column 1;
                     let oldIndicator = sheetData[0]?.substring(1, sheetData[0].length);
                     
-                    const header = {};
+                    const representationHeader = {};
+                    const originalHeader = {};
                     const result = [];
-
+                    
                     // let header = true;
                     for(let columnCharacter in sheetData){
                         let indicator = columnCharacter?.substring(1, columnCharacter.length);
@@ -242,7 +243,8 @@
                         }
 
                         if(isHeader){
-                            header[characterColumn] = sheetData[columnCharacter]?.h ?? sheetData[columnCharacter]?.v;
+                            representationHeader[characterColumn] = sheetData[columnCharacter]?.h ?? sheetData[columnCharacter]?.v;
+                            originalHeader[sheetData[columnCharacter]?.h ?? sheetData[columnCharacter]?.v] = null;
                             oldIndicator = indicator;
                             continue;
                         }
@@ -254,10 +256,10 @@
                         if(newLine){
                             const rowNumber = columnCharacter.match(rowNumberIdentifier);
                             oldIndicator=indicator;
-                            result.push({row: rowNumber[0]});
+                            result.push({row: rowNumber[0], ...originalHeader});
                         }
                         const indexProduct = result.length-1;
-                        const columnHeader = header[characterColumn];
+                        const columnHeader = representationHeader[characterColumn];
                         result[indexProduct][columnHeader] = sheetData?.[columnCharacter]?.h?.trim?.() ?? sheetData?.[columnCharacter]?.v?.trim?.();
                     }
                     this.dataList.push(...result)
