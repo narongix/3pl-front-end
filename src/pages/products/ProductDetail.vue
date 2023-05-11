@@ -112,7 +112,7 @@
                         </Dropdown>
                     </div>
                 </div>
-                <DataTable :value="dataList" :paginator="true" class="p-datatable-gridlines" :rows="10"
+                <DataTable :value="dataList" :paginator="true" class="p-datatable-gridlines" v-model:rows="rows" :rowsPerPageOptions="[10,20,30]"
                     dataKey="id" :rowHover="true" filterDisplay="menu" responsiveLayout="scroll" @page="onPage($event)">
                     <template #empty>
                         No product history found.
@@ -377,7 +377,9 @@
                         productId: this.$route.params.id,
                         fromDate: this.fromDate,
                         toDate: this.toDate,
-                        userId: this.myUserId
+                        userId: this.myUserId,
+                        limit: event.rows,
+                        offset: event.first
                     });
                  
                     const offset= event.first
@@ -464,7 +466,9 @@
                         productId: this.$route.params.id,
                         fromDate: this.fromDate,
                         toDate: this.toDate,
-                        userId: this.myUserId
+                        userId: this.myUserId,
+                        limit: query?.limit ?? this.rows,
+                        offset: (this.myPageNumber || 0) * this.rows
                     });
                     this.productMovesLenght = data?.rows_total ?? 0;
                     this.initingOrigList();
@@ -522,7 +526,9 @@
                         productId: this.$route.params.id,
                         fromDate: this.fromDate,
                         toDate: this.toDate,
-                        userId: this.myUserId
+                        userId: this.myUserId,
+                        limit: this.rows,
+                        offset: 0
                     });
 
                     this.productMovesLenght = productMoves?.rows_total ?? 0;

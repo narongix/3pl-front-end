@@ -76,7 +76,6 @@ export default {
 
         async login({ commit }, {payload, storeData}) {
             const loginData = await ApiService.login(payload)
-
             commit('setUser', {
                 user: loginData.user,
                 isLoggedIn: true,

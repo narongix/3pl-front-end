@@ -64,12 +64,12 @@
                     severity: "error",
                     summary: "Error!",
                     detail: "Failed Creating Products!"
-                }       
+                }   
             }
         },
         methods:{
             async goToAdminImportTemplate(){
-                this.$router.push({name: RouteName.adminMassCreatePage});
+                this.$router.push({name: RouteName.adminMassCreateProductPage});
             },
             async onConfirmCreateProduct(onMassCreateProducts){
                 if(this.validate()){

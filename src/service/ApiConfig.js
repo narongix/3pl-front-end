@@ -38,8 +38,8 @@ export default {
             myHeaders: {
                 "Content-Type": contentType
             }
-        })).catch(e=>{
-            const error = Exception.authException(e)
+        })).catch(async (e) => {
+            const error = await Exception.authException(e)
             throw error
         })
         return res
