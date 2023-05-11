@@ -174,7 +174,7 @@ export default {
             return response;
         },
 
-        async getProductMoves({ commit }, {fromDate, toDate, productId, userId}){
+        async getProductMoves({ commit }, {fromDate, toDate, productId, userId, offset, limit}){
             const newFromDate = TimeConvert.formatDateToStockFormat(fromDate);
             const newToDate = TimeConvert.formatDateToStockFormat(toDate);
             
@@ -182,7 +182,9 @@ export default {
                 product_id: productId,
                 from_date: newFromDate,
                 to_date: newToDate,
-                user_id: userId
+                user_id: userId,
+                offset: offset,
+                limit: limit
             }
             const response = await ApiService.getProductMoves(params);
             
