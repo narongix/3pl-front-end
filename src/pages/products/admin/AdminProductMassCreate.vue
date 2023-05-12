@@ -1,8 +1,9 @@
 <template>
-    <ProductMassCreateTemplate 
-    :getUserId="userFieldForCreate" 
+    <MassCreateTemplate 
     @onPressImport="switchUserState" 
-    @onFinishImport="onFinishImport" 
+    :onValidate="onValidate"
+    :getAllFields="getAllFields"
+    :templateLink="templateLink"
     v-slot="mySlot">
         <Dialog v-model:visible="userSelectorDialog" header="Mass Create Products" modal :closable="true" @update:visible="clearValueImport()">
             <div class="formgrid grid">
@@ -14,21 +15,26 @@
             </div>
             <template #footer>
                 <Button severity="danger" label="Cancel" @click="onCancelCreateProduct"></Button>
-                <Button severity="success" label="Confirm" @click="onProceedToImport(mySlot.proceedWithImportOperation)"></Button>
+                <Button severity="success" label="Confirm" @click="onProceedToImport(mySlot.getPrepData)"></Button>
             </template>
         </Dialog>
-    </ProductMassCreateTemplate>
+    </MassCreateTemplate>
+    <RetryField :toLoad="toLoad" ></RetryField>
 </template>
 
 <script>
     import UserDropDownPagination from '../../../components/UserDropDownPagination.vue';
-    import ProductMassCreateTemplate from '../components/ProductMassCreateTemplate.vue';
+    import MassCreateTemplate from '../../../components/MassCreateTemplate.vue';
     import RouteName from "../../../domains/Routename";
+    import RetryField from '../../../components/prompt_field/RetryField.vue';
+    import mixin from '../../../domains/mixin';
 
     export default{
-        components: { 
-            ProductMassCreateTemplate, 
-            UserDropDownPagination 
+        mixins:[mixin.checkProductMassCreate],
+        components: {
+            MassCreateTemplate,
+            UserDropDownPagination,
+            RetryField
         },
         props:{
             myDataList: {
@@ -49,6 +55,8 @@
         },
         data() {
             return{
+                toLoad: null,
+
                 userFieldForCreate: null,
                 userSelectorDialog: false,
 
@@ -65,17 +73,9 @@
                 }
             };
         },
-        computed: {},
         methods: {
             onCancelCreateProduct(){                
                 this.switchUserState();
-            },
-
-            onProceedToImport(proceedWithImportOperation){
-                if(this.validate()){
-                    this.switchUserState();
-                    proceedWithImportOperation();
-                }
             },
 
             switchUserState(){
@@ -90,6 +90,21 @@
                 }
                 const index = list.findIndex((e)=>e);
                 return index<0
+            },
+
+            async onProceedToImport(getPrepData){
+                if(this.validate()){
+                    this.toLoad = async ()=>{
+                        this.switchUserState();
+                        const prepData = getPrepData();
+                        const newProuctListToCreate = prepData.filter((e)=>e.reason.length==0);
+                        const data = await this.$store.dispatch("products/addMassProduct",{
+                            userId: this.userFieldForCreate,
+                            products: newProuctListToCreate
+                        });
+                        this.onFinishImport(data.products, prepData.length)
+                    }
+                }
             },
 
             onFinishImport(errorList, total){

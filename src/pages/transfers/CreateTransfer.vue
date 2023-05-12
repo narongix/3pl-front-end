@@ -22,7 +22,8 @@
 		</template>
 
         <template #myButton="mySlot">
-            <Button label="Create" class="p-button-success mr-2" @keyup.enter="mySlot.onClick" @click="mySlot.onClick"/>    
+            <Button label="Create" class="p-button-success mr-2" @keyup.enter="mySlot.onClick" @click="mySlot.onClick"/>
+            <Button label="Import Products" @click="goTOImport" class="p-button-secondary mr-2"></Button>
         </template>
     </BaseFieldForm>
 </template>

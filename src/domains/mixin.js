@@ -90,4 +90,53 @@ const myTimeCountDown = {
     }
 }
 
-export default { myDataTable, myTimeCountDown };
+const checkProductMassCreate={
+    computed:{
+        templateLink(){
+            return "/files/product_template.xlsx";
+        },
+        getAllFields() {
+            return [
+                {
+                    label: "Product Name",
+                    field: "product_name"
+                },
+                {
+                    label: "Internal Reference",
+                    field: "sku"
+                },
+                {
+                    label: "Category",
+                    field: "category_name"
+                },
+                {
+                    label: "Unknown",
+                    field: "unknown"
+                }
+            ];
+        },
+    },
+    methods:{
+        onValidate(product){
+            this.validateProduct(product);
+            this.skuNotExist(product);
+        },
+
+        validateProduct(data) {
+            const productNameValid = data.product_name && data.name?.trim?.() != "";
+            if (!productNameValid) {
+                data.reason?.push("Product Name Cannot Be Empty");
+            }
+            return productNameValid;
+        },
+
+        skuNotExist(product) {
+            const haveSku = !product.sku && product.sku != "";
+            if (haveSku) {
+                return product.reason?.push("SKU Cannot Be empty");
+            }
+        },
+    }
+}
+
+export default { myDataTable, myTimeCountDown, checkProductMassCreate };
