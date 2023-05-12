@@ -10,7 +10,7 @@
                                 <span>Import File</span>
                             </label>
                             <input ref="myImport" id="myImport" type="File" accept=".xlsl, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" title=" " @change="onPickFile">
-                            <a href="/files/product_template.xlsx" download="product_template.xlsx">
+                            <a :href="templateLink" download="product_template.xlsx">
                                 <Button class="mr-2" label="Download Template" severity="help">Download Template</Button>
                             </a> 
                         </div>
@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <slot :proceedWithImportOperation="onImport"></slot>
+        <slot :getPrepData="getPrepData"></slot>
 
 
         <Dialog v-model:visible="dataDialog" header="Products To Create" modal :closable="true" style="width: 75vh;">
@@ -79,11 +79,10 @@
                 </Column>
             </DataTable>
         </Dialog>
-        <RetryField :toLoad="toLoad" errorToast="errorToast"></RetryField>
     </div>
 </template>
 
-<style src="../../../../src/assets/styles/style.css"></style>
+<style src="../assets/styles/style.css"></style>
 <style scoped>
     .p-datatable-header{
         background-color: transparent;
@@ -118,19 +117,21 @@
 </style>
 
 <script>
-    import { mapGetters } from 'vuex';
-    import RetryField from '../../../components/prompt_field/RetryField.vue';
     import { read } from 'xlsx';
     
     export default{
         props: {
-            getUserId: {
+            getAllFields: Object,
+            onValidate: {
+                type: Function,
+                required: true
+            },
+            templateLink: {
                 type: String,
-                required: false
+                required: true
             }
         },
-        components: { RetryField },
-        emits: ["onPressImport", "onFinishImport"],
+        emits: ["onPressImport"],
         data() {
             return {
                 prepData: [],
@@ -140,52 +141,16 @@
                 dataList: [],
 
                 fileNotSelected: true,
-
-                toLoad: null
             };
-        },
-        computed: {
-            ...mapGetters({
-                getProductCategories: "products/prodCategories"
-            }),
-            
-            getProductCategories(){
-                const prodCategories = this.$store.getters["products/prodCategories"].filter((e)=>e.user_id == (this.getUserId ?? e.user_id));
-                return prodCategories;
-            },
-
-            getAllFields() {
-                return [
-                    {
-                        label: "Product Name",
-                        field: "product_name"
-                    },
-                    {
-                        label: "Internal Reference",
-                        field: "sku"
-                    },
-                    {
-                        label: "Category",
-                        field: "category_name"
-                    },
-                    {
-                        label: "Unknown",
-                        field: "unknown"
-                    }
-                ];
-            },
-            errorToast() {
-                return {
-                    severity: "error",
-                    summary: "Error!",
-                    detail: "Failed Creating Products!"
-                };
-            }
         },
         methods: {
             onPressImportPhaseOne(){
-                this.$emit('onPressImport', this.onImport);
+                this.$emit('onPressImport', this.prepData);
                 this.changeStateDialog();
+            },
+
+            getPrepData(){
+                return this.prepData;
             },
 
             onDiscard(){
@@ -280,24 +245,6 @@
                 }
             },
 
-            async onImport() {
-                this.toLoad= async () => {
-                    const newProuctListToCreate = this.prepData.filter((e)=>e.reason.length==0);
-                    const data = await this.$store.dispatch("products/addMassProduct",{
-                        userId: this.getUserId,
-                        products: newProuctListToCreate
-                    });
-                    this.$emit("onFinishImport", data.products, this.prepData.length);
-                };
-            },
-
-            skuNotExist(product) {
-                const haveSku = !product.sku && product.sku != "";
-                if (haveSku) {
-                    return product.reason?.push("SKU Cannot Be empty");
-                }
-            },
-
             onProceed() {
                 const copyHardData = this.validate();
                 const convertedListTosystem = {};
@@ -324,14 +271,13 @@
                     this.prepData[i]['row'] = this.dataList[i]['row'];
                     this.prepData[i]["tmpId"] = i;
                     this.prepData[i].reason = [];
-                    this.validateProduct(this.prepData[i]);
-                    this.skuNotExist(this.prepData[i]);
+                    this.onValidate(this.prepData[i]);
                 }
             },
             validate() {
                 const copyHardData = [...this.stageData];
                 for (let i in copyHardData) {
-                    if (!copyHardData[i].wms || copyHardData[i].wns == "unknown") {
+                    if (!copyHardData[i].wms || copyHardData[i].wms == "unknown") {
                         delete copyHardData[i];
                     }
                 }
@@ -339,32 +285,6 @@
             },
             changeStateDialog() {
                 this.dataDialog = !this.dataDialog;
-            },
-            validateProduct(data) {
-                const productNameValid = data.product_name && data.name?.trim?.() != "";
-                if (!productNameValid) {
-                    data.reason?.push("Product Name Cannot Be Empty");
-                }
-                return productNameValid;
-            },
-            async categoryExist(categoryName) {
-                if(!categoryName){
-                    return null;
-                }
-
-                const haveCategory = this.getProductCategories.findIndex((e) => {
-                    return (e?.category_name ?? "").toLowerCase().trim() == (categoryName ?? "").toLowerCase().trim();
-                });
-
-                if (haveCategory < 0) {
-                    const addProdCat = {
-                        category_name: categoryName,
-                        user_id: this.createMassProductUserId
-                    };
-                    const newCat = await this.$store.dispatch("products/addProductCategory", addProdCat);
-                    return newCat.id;
-                }
-                return this.getProductCategories[haveCategory].id;
             },
         },
     }
