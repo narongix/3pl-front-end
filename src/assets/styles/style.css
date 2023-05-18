@@ -4,6 +4,13 @@
     transform: translate3d(0, 0, 0);
 }
 
+.fixedWidthButton{
+    width: 11.5rem !important;
+}
+.myFixedWidthUserButton{
+    width: 11.5rem !important;
+}
+
 .title{
     line-height: 1;
 }

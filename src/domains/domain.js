@@ -58,6 +58,62 @@ const connectionStatus = {
     success: "success",
     failed: "failed"
 }
+const otherErrorCode = {
+    100: "unknown",
+}
+const productnameErrorCode={
+    1: "Product Name Cannot Be Empty",
+    7: "Product Not yet created",
+    8: "Can't Create Product"
+};
 
-export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType, sheetId, movementType, connectionStatus };
+const demandErrorCode = {
+    2: "Demand Cannot be empty",
+    3: "Demand Must Contain Number only",
+    4: "Demand Cannot be 0",
+};
+
+const skuErrorCode = {
+    5: "SKU/Internal Reference Cannot Be empty",
+    9: "SKU/Internal Reference Already Exists"
+}
+
+
+const errorCode = {
+    ...productnameErrorCode,
+    ...demandErrorCode,
+    ...skuErrorCode,
+    ...otherErrorCode
+};
+
+
+const otherErrorCodeName = {
+    unknown: 100,
+}
+
+const productNameErrorName={
+    ProductNameCannotBeEmpty: 1,
+    ProductNotYetCreated: 7,
+    CantCreateProduct: 8
+};
+
+const demandErrorCodeName = {
+    DemandCannotBeEmpty: 2,
+    DemandMustContainNumberOnly: 3,
+    DemandCannotBeZero: 4
+};
+
+const skuErrorname = {
+    SkuCannotBeEmpty: 5,
+    SKUReferenceAlreadyExists: 9
+}
+
+const errorName = {
+    ...productNameErrorName,
+    ...demandErrorCodeName,
+    ...skuErrorname,
+    ...otherErrorCodeName
+};
+
+export { transferStatus, transferType, transferTypeId, transferId, billStatus, roleGroupId, sortType, sheetId, movementType, connectionStatus, errorCode, errorName };
 

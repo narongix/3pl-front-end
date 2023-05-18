@@ -212,7 +212,7 @@ export default {
                 user_id: userId
             };
             const newlyCreatedProduct = await ApiService.addMassProducts(data);
-            commit("updateProductState", newlyCreatedProduct.data.products);
+            commit("updateProductState", newlyCreatedProduct.data.successList);
             return newlyCreatedProduct.data;
         },
 
@@ -331,6 +331,16 @@ export default {
                 const error = await e;
                 throw error;
             }
+        },
+
+        async findProducts({ commit }, {products, userId}){
+            const body = {
+                products: products,
+                user_id: userId
+            };
+            const res = await ApiService.findProducts(body);
+            commit("updateProductState", res.data.successList);
+            return res.data;
         }
     },
 }

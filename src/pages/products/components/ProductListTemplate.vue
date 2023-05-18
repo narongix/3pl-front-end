@@ -174,56 +174,22 @@
             </div>
         </div>
     </div>
-
-    <Dialog v-model:visible="errorDialog" header="Unsuccessful Products" modal :closable="true" style="min-width: 75vh;">
-        <MySpecialImportDialog v-if="getErrorProducts.length>0" myClass="fail" :header="successAmount.length==0? 'All Records Failed To Import' : 'Some Records Failed to Import'">
-            <template #icon>
-                <font-awesome-icon class="myIcon" icon="fa-regular fa-circle-xmark" size="lg"/>
-            </template>
-
-            <template #bottom>
-                <p><b>{{ getErrorProducts?.length ?? 0 }} out of {{ this.$route.query.total ?? 0 }} failed</b> to import to the system, please check them to re-import them later.</p>
-            </template>
-        </MySpecialImportDialog>
-
-        <MySpecialImportDialog v-if="getErrorProducts.length==0" myClass="success"
-        header='All Records Have Imported Successully'
-        >
-        <template #icon>
-            <font-awesome-icon icon="fa-regular fa-circle-check" size="lg"/>
-        </template>
-
-        <template #bottom>
-            <p><b>{{ successAmount.length }} out of {{ this.$route.query.total ?? 0 }}</b> have been successully imported.</p>
-        </template>
-        </MySpecialImportDialog>
-        
-        <h5>Failed Records({{ getErrorProducts?.length ?? 0 }})</h5>
-        <DataTable :value="getErrorProducts" class="p-datatable-sm mb-5" dataKey="id"
-        responsiveLayout="scroll" 
-        >
-            <template #empty>
-                <p>No Error Products!!</p>
-            </template>
-            <Column field="row" header="No."></Column>
+    <ImportResultDialog v-model="errorDialog" header="Unsuccessful Products" :successList="successAmount" :errorList="getErrorProducts">
+        <template #columns="mySlot">
             <Column field="product_name" header="Product Name" style="min-width: 12rem;"></Column>
             <Column field="category_name" header="Category" style="min-width:5rem"></Column>
             <Column field="sku" header="Product Reference" style="min-width:12rem"></Column>
             <Column field="status" header="Status">
                 <template #body>
                     <div class="flex align-items-center justify-content-center">
-                        <font-awesome-icon v-if="errorProductList.length==0" :icon="['fas', 'check']" />
+                        <font-awesome-icon v-if="mySlot.errorList.length==0" :icon="['fas', 'check']" />
                         <font-awesome-icon v-else :icon="['fas', 'xmark']" />
                     </div>
                 </template>
             </Column>
-            <Column field="reason" header="Reason" style="min-width:12rem">
-                <template #body="{ data }">
-                    {{ data?.reason?.join(", ") }}
-                </template>
-            </Column>
-        </DataTable>
-    </Dialog>
+            
+        </template>
+    </ImportResultDialog>
     <RetryField :toLoad="toLoadRetry" :message="message" :errorToast="errorToastDeletingProduct"></RetryField>
 </template>
 <style scoped>
@@ -245,9 +211,9 @@
     import LinkParagraph from '../../../components/LinkParagraph.vue';
     import { roleGroupId } from '../../../domains/domain';
     import SortButton from '../../../components/sortButton.vue';
-    import MySpecialImportDialog from './MySpecialImportDialog.vue';
     import MyHeader from '../../../components/MyHeader.vue';
     import MyNumber from '../../../components/utils/MyNumber';
+    import ImportResultDialog from '../../../components/ImportResultDialog.vue';
 
     export default {
         async created() {
@@ -256,13 +222,14 @@
             if(this.errorProductList?.length){
                 this.onSwitchErrorDialog();
             }
+            this.successList = JSON.parse(this.$route.query.successList ?? null);
         },
         components: {
             RetryField,
             LinkParagraph,
             SortButton,
-            MySpecialImportDialog,
-            MyHeader
+            MyHeader,
+            ImportResultDialog
         },
         props:{
             onInit: Function,
@@ -318,6 +285,7 @@
                 productId: [],
                 productReference: [],
                 errorProductList: [],
+                successList: [],
 
                 archivedProduct: 0,
 
@@ -330,15 +298,11 @@
             }),
 
             getErrorProducts(){
-                return this.errorProductList?.filter((e)=>{
-                    return (e.reason?.length ?? [])>0;
-                }) ?? [];
+                return this.errorProductList ?? [];
             },
 
             successAmount(){
-                return this.errorProductList?.filter((e)=>{
-                    return (e?.reason?.length ?? []) == 0;
-                }) ?? [];
+                return this.successList ?? [];
             },
 
             getProductCategories(){

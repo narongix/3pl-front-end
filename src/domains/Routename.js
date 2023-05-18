@@ -29,6 +29,7 @@ class RouteName{
     static productDetailPage = 'productDetail';
     static createProductPage = "createProduct";
     static massCreatePage = 'massCreatePage'; 
+    static massImportTransferProductpage = 'massSelectPage';
     static productCategoriesListPage = "productCategoriesList";
     static productCategoriesCreatePage = "productCategoriesCreate";
     static productCategoriesDetailPage = "productCategoriesDetail"

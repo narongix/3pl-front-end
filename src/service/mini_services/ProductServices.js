@@ -109,5 +109,13 @@ export default {
             data: category
         })
         return res.data
+    },
+
+    async findProducts(data){
+        const res = await ApiConfig.postMethods({
+            api: "/product/find",
+            data: data
+        });
+        return res.data;
     }
 }
