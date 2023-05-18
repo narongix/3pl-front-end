@@ -155,7 +155,7 @@
   import TransferStatusField from "./components/TransferStatusField.vue"
 
   import {transferStatus} from "../../domains/domain"
-  import CalendarTime from "@/pages/transfers/components/CalendarTime.vue";
+  // import CalendarTime from "@/pages/transfers/components/CalendarTime.vue";
   import CountDown from "../../components/CountDown.vue"
   import TransferTypeField from "./components/TransferTypeField.vue"
   import UserDropDownPagination from "../../components/UserDropDownPagination.vue"
@@ -167,7 +167,7 @@ import RouteName from "../../domains/Routename"
       this.toLoadRetry = this.initData
     },
     components: {
-      CalendarTime,
+      // CalendarTime,
       TransferItem,
       RetryField,
       PromptField,
