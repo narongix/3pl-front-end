@@ -9,6 +9,7 @@ import billing_store from './modules/billing/billing_store.js';
 import user_store from './modules/user/user_store.js';
 import dashboard_store from './modules/dashboard/dashboard_store.js';
 import extra_charge from './modules/extra_charge/extra_charge_store.js';
+import transfer_mass_create_store from './modules/transfers/transfer_mass_create_store.js';
 
 const store = createStore({
     modules:{
@@ -21,7 +22,8 @@ const store = createStore({
         billing: billing_store,
         user: user_store,
         dashboard: dashboard_store,
-        extraCharge: extra_charge
+        extraCharge: extra_charge,
+        transferCreateState: transfer_mass_create_store
     },
     actions:{
         clearAllStates({ commit }){
@@ -30,6 +32,7 @@ const store = createStore({
             commit("recipient/onClearState");
             commit("stockedDetailReport/onClearState");
             commit("billing/onClearState");
+            commit("transferCreateState/onClearAll")
         }
     }
 });

@@ -156,6 +156,11 @@ const routes = [
                 component: ()=>import("./pages/transfers/CreateTransfer.vue"),
             },
             {
+                path: "/transfers/create/select",
+                name: RouteName.massImportTransferProductpage,
+                component: ()=>import("./pages/transfers/TransferMassSelectProduct.vue")
+            },
+            {
                 path: "/transfers/:id",
                 name: RouteName.transferDetailPage,
                 component: ()=>import("./pages/transfers/MyTransferDetail.vue"),
@@ -290,6 +295,10 @@ router.beforeEach((to,from)=>{
     // Or if the page is refresh and get unauthenticated
     if(from == START_LOCATION && !isLoggedIn && to.name!='login'){
         return {name: "login"}
+    }
+
+    if(from.name == RouteName.massImportTransferProductpage && to.name != RouteName.transferCreatePage){
+        store.dispatch("transferCreateState/onClearAll");
     }
 
 

@@ -15,11 +15,12 @@ export default {
         }
     },
 
-    getMethods({api, params, contentType}){
+    getMethods({api, data, params, contentType}){
         const res = axios.get(api, this.header({
             fields:{
-                params:params
-            },
+                params:params,
+                data:data
+            },  
             myHeaders:{
                 "Content-type": contentType
             }

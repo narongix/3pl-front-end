@@ -1,3 +1,5 @@
+import { errorCode, errorName } from "./domain";
+
 const myDataTable = {
     data(){
         return {
@@ -93,7 +95,7 @@ const myTimeCountDown = {
 const checkProductMassCreate={
     computed:{
         templateLink(){
-            return "/files/product_template.xlsx";
+            return "files/product_template.xlsx";
         },
         getAllFields() {
             return [
@@ -125,7 +127,7 @@ const checkProductMassCreate={
         validateProduct(data) {
             const productNameValid = data.product_name && data.name?.trim?.() != "";
             if (!productNameValid) {
-                data.reason?.push("Product Name Cannot Be Empty");
+                data.reason?.push(errorName.ProductNameCannotBeEmpty);
             }
             return productNameValid;
         },
@@ -133,10 +135,81 @@ const checkProductMassCreate={
         skuNotExist(product) {
             const haveSku = !product.sku && product.sku != "";
             if (haveSku) {
-                return product.reason?.push("SKU Cannot Be empty");
+                return product.reason?.push(errorName.SkuCannotBeEmpty);
             }
         },
     }
 }
 
-export default { myDataTable, myTimeCountDown, checkProductMassCreate };
+const checkTransferProductMassSelect = {
+    computed:{
+        templateLink(){
+            return "/files/transfer_product_template.xlsx";
+        },
+        getAllFields() {
+            return [
+                {
+                    label: "Product Name",
+                    field: "product_name"
+                },
+                {
+                    label: "Internal Reference",
+                    field: "sku"
+                },
+                {
+                    label: "Category",
+                    field: "category_name"
+                },
+                {
+                    label: "Demand",
+                    field: "demand"
+                },
+                {
+                    label: "Unknown",
+                    field: "unknown"
+                }
+            ];
+        },
+    },
+    methods:{
+        onValidate(product){
+            this.validateProduct(product);
+            this.skuNotExist(product);
+            this.QTYExist(product);
+        },
+
+        QTYExist(data){
+            const numData = parseInt(data.demand);
+            if(isNaN(numData)){
+                data.reason.push(errorName.DemandMustContainNumberOnly);
+                return;
+            }
+            if(!numData){
+                data.reason.push(errorName.DemandCannotBeEmpty);
+                return;
+            }
+            if(numData==0){
+                data.reason.push(errorName.DemandCannotBeZero);
+                return;
+            }
+            data.demand=numData;
+        },
+
+        validateProduct(data) {
+            const productNameValid = data.product_name && data.name?.trim?.() != "";
+            if (!productNameValid) {
+                data.reason?.push(errorCode[1]);
+            }
+            return productNameValid;
+        },
+
+        skuNotExist(product) {
+            const haveSku = !product.sku && product.sku != "";
+            if (haveSku) {
+                return product.reason?.push(errorName.SkuCannotBeEmpty);
+            }
+        }
+    }
+}
+
+export default { myDataTable, myTimeCountDown, checkProductMassCreate, checkTransferProductMassSelect };

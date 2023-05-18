@@ -1,14 +1,23 @@
 <template>
-    <MassCreateTemplate
+    <MassCreateTemplate 
     @onPressImport="onPressImport" 
-    @onFinishImport="onFinishImport" 
     :onValidate="onValidate"
     :getAllFields="getAllFields"
     :templateLink="templateLink"
     >
-
+    <template #importButton>
+        <a href="/files/product_template.xlsx" download="product_template.xlsx">
+            <Button class="mr-2" label="Download Template" severity="help">Download Template</Button>
+        </a> 
+    </template>
+    <template #dialogColumn>
+        <Column field="row" header="Index"></Column>
+        <Column field="product_name" header="Product Name"></Column>
+        <Column field="category_name" header="Category"></Column>
+        <Column field="sku" header="Product Reference"></Column>
+    </template>
     </MassCreateTemplate>
-    <RetryField :toLoad="toLoad" :errorToast="errorToast"></RetryField>
+    <RetryField :toLoad="toLoad" errorToast="errorToast"></RetryField>
 </template>
 
 <script>
@@ -46,13 +55,15 @@
                     userId: this.getUserId,
                     products: newProuctListToCreate
                 });
-                this.onFinishImport(data.products, prepData.length);
+                this.onFinishImport(data.errorList, data.successList, prepData.length);
             },
 
-            onFinishImport(failedProducts, totalProducts){
-                const myParam = JSON.stringify(failedProducts);
+            onFinishImport(failedProducts, successProducts, totalProducts){
+                const myFailedProduct = JSON.stringify(failedProducts);
+                const mySuccessProduct = JSON.stringify(successProducts);
                 this.$router.replace({name: RouteName.productListPage, query:{
-                    errorList: myParam,
+                    errorList: myFailedProduct,
+                    successList: mySuccessProduct,
                     total: totalProducts
                 }});
             }

@@ -10,10 +10,11 @@
                                 <span>Import File</span>
                             </label>
                             <input ref="myImport" id="myImport" type="File" accept=".xlsl, .xls, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" title=" " @change="onPickFile">
-                            <a :href="templateLink" download="product_template.xlsx">
-                                <Button class="mr-2" label="Download Template" severity="help">Download Template</Button>
-                            </a> 
+                            <slot name="importButton">
+
+                            </slot>
                         </div>
+
                         <div v-show="!fileNotSelected">
                             <Button class="mr-2" label="Proceed" severity="success" @click="onProceed"></Button>
                             <Button label="Discard" severity="secondary" @click="onDiscard"></Button>
@@ -51,19 +52,21 @@
             </div>
         </div>
 
-        <slot :getPrepData="getPrepData"></slot>
+        <slot :getPrepData="getPrepData" :onDiscard="onDiscard" name="additionalFunction"></slot>
 
-
-        <Dialog v-model:visible="dataDialog" header="Products To Create" modal :closable="true" style="width: 75vh;">
+        <Dialog v-model:visible="dataDialog" header="Products To Create" modal maximizable :closable="true" style="width: 75vh;">
             <Button label="Import" @click="onPressImportPhaseOne"></Button>
             <DataTable :value="prepData" class="p-datatable-sm" dataKey="id"
             responsiveLayout="scroll"
             >
                 <template #empty>Empty...</template>
-                <Column field="row" header="Index"></Column>
-                <Column field="product_name" header="Product Name"></Column>
-                <Column field="category_name" header="Category"></Column>
-                <Column field="sku" header="Product Reference"></Column>
+                <slot name="dialogColumn">
+                    <Column field="row" header="Index"></Column>
+                    <Column field="product_name" header="Product Name"></Column>
+                    <Column field="category_name" header="Category"></Column>
+                    <Column field="sku" header="Product Reference"></Column>
+                </slot>
+
                 
                 <Column field="status" header="Status">
                     <template #body="slot">
@@ -72,9 +75,9 @@
                     </template>
                 </Column>
 
-                <Column field="reason" header="Reasons">
+                <Column field="reason" header="Reasons" style="min-width: 15rem;">
                     <template #body="slot">
-                        {{ slot.data.reason?.join(", ") }}
+                        {{ slot.data.reason?.map((e)=>convertErrorCodeToName(e)).join(", ") }}
                     </template>
                 </Column>
             </DataTable>
@@ -94,7 +97,7 @@
     .myFileImport{
         display: inline-block;
         cursor: pointer;
-        width: 8rem;
+        width: 11.5rem;
         border: 1px solid grey;
         text-align: center;
         align-items: center;
@@ -118,16 +121,13 @@
 
 <script>
     import { read } from 'xlsx';
+    import { errorCode } from '../domains/domain';
     
     export default{
         props: {
             getAllFields: Object,
             onValidate: {
                 type: Function,
-                required: true
-            },
-            templateLink: {
-                type: String,
                 required: true
             }
         },
@@ -144,6 +144,10 @@
             };
         },
         methods: {
+            convertErrorCodeToName(code){
+                return errorCode[code];
+            },
+
             onPressImportPhaseOne(){
                 this.$emit('onPressImport', this.prepData);
                 this.changeStateDialog();
@@ -178,7 +182,6 @@
                     const sheetData = rows?.Sheets[rows.SheetNames?.[0] ?? 0];
                     delete sheetData["!margins"];
                     delete sheetData["!ref"];
-
                     const rowNumberIdentifier = new RegExp(/\d{1,}/);
 
                     let startingColumn = null;
@@ -206,13 +209,13 @@
                             startingColumn = characterColumn;
                             startLoop=false;
                         }
-
                         if(isHeader){
                             representationHeader[characterColumn] = sheetData[columnCharacter]?.h ?? sheetData[columnCharacter]?.v;
                             originalHeader[sheetData[columnCharacter]?.h ?? sheetData[columnCharacter]?.v] = null;
                             oldIndicator = indicator;
                             continue;
                         }
+                        
 
                         // If the old indicator isn't equal to the new one
                         // It means that we're moving into a new row
@@ -225,7 +228,8 @@
                         }
                         const indexProduct = result.length-1;
                         const columnHeader = representationHeader[characterColumn];
-                        result[indexProduct][columnHeader] = sheetData?.[columnCharacter]?.h?.trim?.() ?? sheetData?.[columnCharacter]?.v?.trim?.();
+                        const value = String(sheetData?.[columnCharacter]?.h ?? sheetData?.[columnCharacter]?.v ?? "").trim();
+                        result[indexProduct][columnHeader] = value;
                     }
                     this.dataList.push(...result)
                     this.onGetColumnHeader(result[0]);  
@@ -286,6 +290,6 @@
             changeStateDialog() {
                 this.dataDialog = !this.dataDialog;
             },
-        },
+        }
     }
 </script>

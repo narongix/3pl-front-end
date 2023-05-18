@@ -81,13 +81,13 @@
 					reference: false,
 					userSelector: true,
 				},
-                baseData:{
-                    titleForm: "Transfer Detail",
-                    titleField1: "Transfer Name",
-                    titleField2: "Operation Type",
+				baseData:{
+					titleForm: "Transfer Detail",
+					titleField1: "Transfer Name",
+					titleField2: "Operation Type",
 					// I don't know how many times I have changed this, god.
 					buttonSubmit:"Add Product"
-                },
+				},
 				fieldNotActive: true,
 				oldData: null,
 				transferDetail: null,
@@ -110,14 +110,14 @@
 			}),
 
 			getExtraChargeTransfer(){
-                return this.$store.getters["transfers/getTransferDetail"](this.$route.params.id)?.extra_charges ?? [];
-            },
+					return this.$store.getters["transfers/getTransferDetail"](this.$route.params.id)?.extra_charges ?? [];
+			},
 			myPopUp(){
-                return {
-                    header: "Product Quantity",
-                    productDemandDisplay: "Quantity"
-                }
-            },
+				return {
+					header: "Product Quantity",
+					productDemandDisplay: "Quantity"
+				}
+			},
 			message(){
 				return {
 					failed: "Error Loading Data. Try again?",

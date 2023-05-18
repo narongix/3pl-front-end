@@ -91,12 +91,12 @@
                 <div class="col-12 md:col-12 sm:col-12">
                     <TabView>
                         <TabPanel header="Ordered" :disabled="tabViewDisabled?.ordered">
-                            <slot name="orderedButton" :popUpProductDialog="changeStateDiaglog">
+                            <slot name="orderedButton" :popUpProductDialog="changeStateDiaglog" :data="transferData" :validation="validationField1">
                             </slot>
                             <small class="p-error" v-if="validationField1.transferProducts.value">{{ validationField1.transferProducts.value }}</small>
                             <DataTable :value="transferData.transferProducts" selectionMode="single" @rowSelect="allowActivateRow"
                             :paginator="true" class="p-datatable-sm" :rows="10" datakey="productId" :rowHover="true" responsiveLayout="scroll"
-                            v-model:filters="filters"  filterDisplay="menu"
+                            v-model:filters="filters" filterDisplay="menu"
                             >
                                 <template #empty>
                                     <p :class="{'p-error': validationField1.transferProducts.value}">Please create transfer detail</p>
@@ -188,6 +188,10 @@
         :disabled="FieldNotActive || disabledField['recipient']" :offset="offset"
         ></PromptFindRecipient>
 
+        <slot name="dialog" :data="transferData">
+
+        </slot>
+
         <PromptField :loading="promptDeleted" @onAccept="onConfirmDeletedPrompt" @onDecline="changeDeletedStateDialog" :message="messageDeletePrompt"/>
         <RecipientField v-model="transferData.recipient" v-model:state="state" :userId="userSelector ?? myUserId"></RecipientField>
         <RetryField :toLoad="toLoad" :message="message" :errorToast="errorToast"></RetryField>
@@ -219,6 +223,11 @@
     import PromptFindRecipient from './dialogs/PromptFindRecipient.vue';
 
     export default{
+        created(){
+            this.transferData = {...this.myTransferCreateState.data};
+            this.transferData.scheduledDate = this.myTransferCreateState.data.scheduledDate? new Date(this.myTransferCreateState.data.scheduledDate) : null;
+            this.userSelector = this.myTransferCreateState.userId;
+        },
         props:{
             baseData: Object,
             FieldNotActive: Boolean,
@@ -246,16 +255,13 @@
                 type: Array,
                 default: ()=>[]
             },
-            // validatedBeforeCreatingRecipient: {
-            //     type: Function,
-            //     default: ()=>{
-            //         console.log("userselctor: "+this.userSelector)
-            //         return this.userSelector!=null
-            //     },
-            // }
+            myCustomUserId:{
+                type: String,
+                required: false
+            }
         },
         
-        emits:["onClickSubmit"],
+        emits:["onClickSubmit", "update:myCustomUserId"],
         components:{
             DropDownPagination,
             PromptField,
@@ -435,7 +441,6 @@
                 },
 
                 tempProductList:[],
-                userSelector: null,
                 tempReceipientList:[],
 
                 productLoading: false,
@@ -480,7 +485,19 @@
                 getUserRole: "auth/getUserRole",
                 // Limit offset
                 getProductLimit: "products/limit",
+                successList: "transferCreateState/getSuccessList",
+                myTransferCreateState: "transferCreateState/getTransferCreateState"
             }),
+
+            userSelector:{
+                get(){
+                    return this.myCustomUserId;
+                },
+
+                set(newValue){
+                    this.$emit("update:myCustomUserId", newValue);
+                }
+            },
 
             myHighLight(){
                 return {
@@ -491,10 +508,6 @@
             getProductByUser(){
                 const newProduct = this.getProducts.filter((e)=>e.user_id == (this.userSelector ?? this.myUserId));
                 return newProduct;
-            },
-
-            getDisplayTranser(){
-                return this.transferData.transferProducts.map()
             },
             
             findIndexUpdatedPositionLocalProduct(){
@@ -510,7 +523,6 @@
                     return null;    
                 }
                 return this.promptEditField;
-                
             }
         },
 
@@ -578,7 +590,7 @@
                     transferProducts: this.data?.transfer_products? [...this.data.transfer_products] : [],
                     reference: this.data?.reference ?? null
                 }
-                this.originalLength = this.data.transfer_products?.length ?? 0
+                this.originalLength = this.data?.transfer_products?.length ?? 0
                 this.myTransferStatus = transferStatus?.[this.data?.transfer_status_id] ?? transferStatus[1]
             },
 
@@ -695,12 +707,12 @@
                 e.preventDefault();
             },
 
-            promptEditField(data){  
+            promptEditField(data){
                if(!this.FieldNotActive) {
                     this.editedIndex = data.index
-                    this.product_id = this.data.product_id
+                    this.product_id = data.product_id
 
-                    this.demand = this.data.demand
+                    this.demand = data.demand
                     this.changeStateDiaglog()
                 }
             },
@@ -752,11 +764,11 @@
                     userId: this.userSelector ?? this.myUserId ?? this.userId,
                 })
 
-                return products.length
+                return products.length;
             },
 
             stopLoadingProduct(){
-                this.productLoading=false
+                this.productLoading=false;
             },
 
             async findProduct(filterValue){ 
@@ -830,6 +842,11 @@
                 }else{
                     this.showRecipientField = true
                 }
+            },
+            userSelector(){
+                this.transferData.transferProducts = this.myTransferCreateState.transferProducts;
+                this.$store.dispatch("transferCreateState/onClearTransferCreateState");
+
             }
         }
     }

@@ -160,6 +160,7 @@
   import TransferTypeField from "./components/TransferTypeField.vue"
   import UserDropDownPagination from "../../components/UserDropDownPagination.vue"
   import { roleGroupId } from "../../domains/domain"
+import RouteName from "../../domains/Routename"
 
   export default {
     created() {
@@ -304,7 +305,7 @@
       },
 
       goToCreateTransfer() {
-        this.$router.push({name: "TransferCreate"})
+        this.$router.push({name: RouteName.transferCreatePage});
       },
 
       onPressDeletedProduct(data) {
