@@ -74,9 +74,9 @@
                   <p>{{ formatDate(data?.scheduled_time) }}</p>
                 </template>
 
-                <template #filter>
+                <!-- <template #filter>
                   <CalendarTime @getValueMode="storeScheduleTimeMode" @getValue="storeScheduleTimeValue"></CalendarTime>
-                </template>
+                </template> -->
               </Column>
 
               <Column field="transfer_status_id" :sortable="false" style="min-width:8rem" :showFilterMatchModes="false"
@@ -104,11 +104,11 @@
                   {{ formatDate(data?.completed_time) }}
                 </template>
 
-                <template #filter>
+                <!-- <template #filter>
                     <CalendarTime @getValueMode="storeCompleteTimeMode"
                                 @getValue="storeCompleteTimeValue">
                     </CalendarTime>
-                </template>
+                </template> -->
               </Column>
 
               <Column field="created_at" header="Created Time" :showFilterMatchModes="false" style="min-width:14rem" :sortable="false">
@@ -116,9 +116,9 @@
                   {{ formatDate(data?.created_at) }}
                 </template>
 
-                <template #filter>
+                <!-- <template #filter>
                   <CalendarTime @getValueMode="storeCreatedAtMode" @getValue="storeCreatedAtValue" @onLoad="loadCalendarParam"></CalendarTime>
-                </template>
+                </template> -->
               </Column>
             </DataTable>
           
