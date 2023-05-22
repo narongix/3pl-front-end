@@ -15,7 +15,7 @@
       <i class="pi pi-ellipsis-v"></i>
     </button>
     <ul class="layout-topbar-menu hidden lg:flex origin-top">
-      <li>
+      <!-- <li>
         <button class="p-link layout-topbar-button">
           <i class="pi pi-calendar"></i>
           <span>Events</span>
@@ -26,7 +26,7 @@
           <i class="pi pi-cog"></i>
           <span>Settings</span>
         </button>
-      </li>
+      </li> -->
       <li>
         <button @click="toggleoProfilepanel" class="p-link layout-topbar-button">
           <i class="pi pi-user"></i>
