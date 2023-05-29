@@ -101,8 +101,8 @@ export default {
                 }
             });
         },
-        updateProductCategoryState(state, productState) {
-            productState.forEach((element) => {
+        updateProductCategoryState(state, productCategoryState) {
+            productCategoryState.forEach((element) => {
                 const index = state.prodCategories.findIndex(category => category.id == element.id);
                 if (index < 0) {
                     state.prodCategories.push(element)
@@ -248,8 +248,9 @@ export default {
         },
         async onFetchProducts({ commit }, { offset, productName, limit, searchKey, userId, productId, productReference, sortName, mySortType}) {
             const mySort = mySortType!=null ? sortType[mySortType] : null;
-            const myProductReference = productReference?.map((e)=>e?.trim());
-            const myProductId = productId?.map((e)=>e?.trim());
+
+            const myProductReference = productReference?.map((e)=>String(e ?? "").trim());
+            const myProductId = productId?.map((e)=>String(e ?? "").trim());
 
             const params = {
                 offset: offset,
@@ -278,7 +279,7 @@ export default {
                 }
 
                 const categories = await ApiService.getProdCategories(params);
-                commit('updateProductCategoryState', categories.rows);
+                commit('updateProductCategoryState', categories.rows ?? []);
                 return categories;
             }
             catch (e) {

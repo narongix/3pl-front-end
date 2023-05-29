@@ -39,7 +39,7 @@
                             </tr>
                             <tr>
                                 <th>Payment Date</th>
-                                <td>{{ getPaymentDate(data?.billsummary?.created_at) }}</td>
+                                <td>{{ formatDateTime(data?.billsummary?.payment_date) }}</td>
                             </tr>
                             <tr>
                                 <th>Status</th>

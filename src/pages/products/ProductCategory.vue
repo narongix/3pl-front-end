@@ -18,7 +18,7 @@
         },
         methods:{
             gotoCreateProduct(){
-                this.$router.push({name: RouteName.productCategoriesListPage});
+                this.$router.push({name: RouteName.productCategoriesCreatePage});
             },
 
             async navigateToCategoryDetail(id){
