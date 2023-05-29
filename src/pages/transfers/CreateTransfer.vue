@@ -25,12 +25,12 @@
 
         <template #myButton="mySlot">
             <Button label="Create" class="p-button-success mr-2" @keyup.enter="mySlot.onClick" @click="mySlot.onClick"/>
-            <Button v-show="errorList.length>0" label="Show Not Found" class="p-button-secondary mr-2" @click="changeNotFoundDialogState"></Button>
+            <Button v-show="myErrorList.length>0" label="Show Not Found" class="p-button-secondary mr-2" @click="changeNotFoundDialogState"></Button>
             <Button v-show="errorList2.length>0" label="Error Products" severity="danger" class="mr-2" @click="changeCantCreateProductState"></Button>
         </template>
 
         <template #dialog="mySlot">
-            <ImportResultDialog v-model="myNotFoundDialog" :successList="successList" :errorList="errorList" header="Products Result">
+            <ImportResultDialog v-model="myNotFoundDialog" :successList="mySuccessList" :errorList="myErrorList" header="Products Result">
                 <template #dialogButton>
                     <slot name="dialogButton">
                         <Button @click="onClickMassCreate(mySlot.data)" label="Create Product" severity="success" class="mb-4"></Button>
@@ -93,8 +93,8 @@
             return{
                 errorList2: [],
                 successList2: [],
-                errorList: [],
-                successList: [],
+                // errorList: [],
+                // successList: [],
 
                 myCustomUserId: null,
                 myNotFoundDialog: false,
@@ -153,6 +153,8 @@
                 products: "products/getProductState",
                 myUserId: "auth/getUserId",
                 userRole: "auth/getUserRole",
+                myErrorList: "transferCreateState/getErrorList",
+                mySuccessList: "transferCreateState/getSuccessList"
             }),
 
             myPopUp(){
@@ -176,7 +178,7 @@
                 this.toLoad = async()=>{
                     this.changeNotFoundDialogState();
                     const res = await this.$store.dispatch("products/addMassProduct", {
-                        products: this.errorList,
+                        products: this.myErrorList,
                         userId: this.myCustomUserId
                     });
                     this.$store.dispatch('transferCreateState/onClearAll');
@@ -226,7 +228,7 @@
                     userId: this.myuserId
                 })
                 await this.$store.dispatch("products/onFetchProducts", {offset:0, limit:20})
-                if(this.errorList.length>0){
+                if(this.myErrorList.length>0){
                     this.changeNotFoundDialogState();
                 }
             },
@@ -252,22 +254,24 @@
             }
         },
         watch:{
-            '$store.state.transferCreateState.successList':{
-                deep:true,
-                handler(newValue){
-                    if(newValue.length>0){
-                        this.successList = [...newValue];
-                    }
-                }
-            },
-            '$store.state.transferCreateState.errorList':{
-                deep: true,
-                handler(newValue){
-                    if(newValue.length>0){
-                        this.errorList = [...newValue];
-                    }
-                }
-            }
+            // '$store.state.transferCreateState.successList':{
+            //     deep:true,
+            //     handler(newValue){
+            //         if(newValue.length>0){
+            //             this.successList = [...newValue];
+            //         }
+            //     }
+            // },
+            // '$store.state.transferCreateState.errorList':{
+            //     deep: true,
+            //     handler(newValue){
+            //         console.log("newvalue: ");
+            //         console.log(newValue);
+            //         if(newValue.length>0){
+            //             this.errorList = [...newValue];
+            //         }
+            //     }
+            // }
         }
     }
 </script>

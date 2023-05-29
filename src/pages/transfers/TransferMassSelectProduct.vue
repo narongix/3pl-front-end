@@ -76,7 +76,7 @@
       onFinishImport(successProduct, failedProducts){
         this.$store.dispatch("transferCreateState/onUpdateSuccessList", successProduct);
         this.$store.dispatch("transferCreateState/onUpdateErrorList", failedProducts);
-        this.$router.replace({name: RouteName.transferCreatePage, query:{total: successProduct.length + failedProducts.length}});
+        this.$router.replace({name: RouteName.transferCreatePage, query:{total: successProduct.length + failedProducts.length, }});
       }
     }
   }

@@ -1,7 +1,7 @@
 <template>
     <form @submit.prevent="submitForm">
         <div class="grid">
-            <div class="col-9">
+            <div class="col-12">
                 <div class="card">
                     <h5>Add New Product</h5>
                     <Button label="SAVE" type="submit" class="p-button-success mr-2" />
