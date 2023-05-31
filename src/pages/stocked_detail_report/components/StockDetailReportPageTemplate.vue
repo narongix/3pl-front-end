@@ -193,7 +193,6 @@
 
                 productFilter: 0,
                 productMaxLength: 0,
-                myPageTracker: 0,
                 onExportProductMovement: false,
 
                 myRealOffset: 0,
@@ -425,8 +424,8 @@
                 this.onSelectDate({limit: this.rows});
             },
 
-            async searchStockReport(pageNumber){
-                await this.onSelectDate({pageNumber: pageNumber, limit: this.rows});
+            async searchStockReport(){
+                await this.onSelectDate({limit: this.rows});
             }
         },
         watch:{
@@ -445,7 +444,7 @@
                 handler(){
                     this.myFilterOffset = 0;
                     this.toLoadRetry = async () => {
-                        await this.searchStockReport(this.myPageTracker);
+                        await this.searchStockReport();
                     }
                 }
             },
