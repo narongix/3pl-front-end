@@ -195,6 +195,8 @@
                 productMaxLength: 0,
                 myPageTracker: 0,
                 onExportProductMovement: false,
+
+                myRealOffset: 0,
             }
         },
         computed:{
@@ -253,11 +255,12 @@
 
             async onPage(event){
                 this.toLoadRetry = async()=>{
+                    this.myRealOffset = parseInt(event.first || 0);
                     const stockReport = await this.$store.dispatch("stockedDetailReport/onfetchAndUpdateStockedList", {
                         from_date: this.fromDate,
                         to_date: this.toDate,
                         limit: this.rows,
-                        offset: event.first,
+                        offset: this.myRealOffset,
                         sku: this.myFilters.myProductSku,
                         activeProduct: this.productFilter,
                         userId: this.userId
@@ -271,7 +274,6 @@
             
             async onSelectDate(query){
                 if(this.validate()){
-                    const pageNumber = query?.pageNumber ?? 0; 
                     this.toLoadRetry = async()=>{
                         this.productMaxLength = await this.$store.dispatch("stockedDetailReport/onFetchStockReportTotal", {
                             activeProduct: this.productFilter,
@@ -285,21 +287,20 @@
                             from_date: this.fromDate,
                             to_date: this.toDate,
                             limit: query?.limit ?? this.rows,
-                            offset: (pageNumber || 0) * this.rows,
+                            offset: this.myRealOffset,
                             sku: this.myFilters.myProductSku,
                             activeProduct: this.productFilter,
                             userId: this.userId
                         })
 
                         this.updateList({
-                            start: (pageNumber || 0) * this.rows,
+                            start: this.myRealOffset,
                             end: query?.limit ?? this.rows,
                             tempList: stockList
                         });
 
                         await query.addtionalCommand?.();
                     }
-                    this.offset = this.rows*2;
                 }
             },
 
