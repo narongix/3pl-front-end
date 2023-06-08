@@ -398,7 +398,7 @@
                     const sortType = this.mySort[sortName];
                     const products = await this.$store.dispatch("products/onFetchProducts", {
                         offset: event.first,
-                        limit: this.rows,
+                        limit: event.rows,
                         userId: this.userId,
                         productReference: this.productReference,
                         productName: this.myFilter.product_name,

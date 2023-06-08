@@ -50,12 +50,14 @@
         },
         methods:{
             async onPressImport(prepData){
-                const newProuctListToCreate = prepData.filter((e)=>e.reason.length==0);
-                const data = await this.$store.dispatch("products/addMassProduct",{
-                    userId: this.getUserId,
-                    products: newProuctListToCreate
-                });
-                this.onFinishImport(data.errorList, data.successList, prepData.length);
+                this.toLoad = async ()=>{
+                    const newProuctListToCreate = prepData.filter((e)=>e.reason.length==0);
+                    const data = await this.$store.dispatch("products/addMassProduct",{
+                        userId: this.getUserId,
+                        products: newProuctListToCreate
+                    });
+                    this.onFinishImport(data.errorList, data.successList, prepData.length);
+                }
             },
 
             onFinishImport(failedProducts, successProducts, totalProducts){
