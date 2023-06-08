@@ -25,7 +25,6 @@
             }),
             getProductCategories(){
                 const productCategories = this.$store.getters["products/prodCategories"].filter((e)=>e.user_id == this.userId);
-                console.log(productCategories);
                 return productCategories;
             }
         },
