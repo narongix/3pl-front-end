@@ -4,7 +4,7 @@
             <div class="col-12 md:col-12 sm:col-12">
                 <DropDownPagination v-model="myContact" :options="getRecipientByUser"
                 :disabled="disabled" id="recipient" placeholder="Please select a recipient"
-                :validation="validation"
+                :validation="validation" optionLabel="full_name"
                 :whenLoad="onloadRecipientV2" :limit="getRecipientLimit" :whenSearch="findRecipient"
                 :showOption="option=>option.full_name"
                 :showValue="showValueRecipient" :offset="offset ?? 0" :user="userSelector"
