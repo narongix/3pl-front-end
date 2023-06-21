@@ -9,7 +9,7 @@
 	"scripts": {
 		"serve": "vue-cli-service serve --mode dev",
 		"local": "vue-cli-service serve --mode offline",
-		"build": "vue-cli-service build --mode prod",
+		"build": "vue-cli-service build --mode prod --openssl-legacy-provider",
 		"lint": "vue-cli-service lint",
 		"test:unit": "vue-cli-service test:unit"
 	},
