@@ -836,7 +836,7 @@
             },
 
             "transferData.transfer_type_id"(newVal){
-                if(newVal!=2 || newVal!=4){
+                if(newVal!=2 && newVal!=4){
                     this.showRecipientField = false
                     this.transferData.recipient = null
                 }else{
